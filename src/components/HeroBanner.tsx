@@ -229,10 +229,10 @@ export default function HeroBanner() {
         </div>
 
         {/* ═══════ CONTENT (centered) ═══════ */}
-        <div className="relative z-10 flex min-h-[380px] flex-col items-center justify-center px-4 py-6 text-center sm:min-h-[520px] sm:px-6 sm:py-10 lg:min-h-[560px] lg:py-12 lg:px-10">
+        <div className="relative z-10 flex min-h-[550px] flex-col items-center justify-center px-4 py-6 text-center sm:min-h-[520px] sm:px-6 sm:py-10 lg:min-h-[560px] lg:py-12 lg:px-10">
           {/* Logo + Title */}
           <div
-            className={`hero-slide-up hero-delay-1 ${mounted ? '' : 'opacity-0'}`}
+            className={`hero-slide-up hero-delay-1 max-w-[280px] sm:max-w-none ${mounted ? '' : 'opacity-0'}`}
           >
             <Image
               src="/babylon-lockup-darkblue.svg"
@@ -248,14 +248,14 @@ export default function HeroBanner() {
 
           {/* Subtitle */}
           <p
-            className={`hero-slide-up hero-delay-2 mx-auto mt-2 max-w-md text-xs leading-relaxed text-[#1a1a2e]/60 sm:mt-3 sm:text-base ${mounted ? '' : 'opacity-0'}`}
+            className={`hero-slide-up hero-delay-2 mx-auto mt-2 max-w-[280px] text-xs leading-relaxed text-[#1a1a2e]/60 sm:mt-3 sm:max-w-md sm:text-base ${mounted ? '' : 'opacity-0'}`}
           >
             A Bitcoin-Charged Crypto Economy with Trustless Vaults
           </p>
 
           {/* Search */}
           <div
-            className={`hero-slide-up hero-delay-3 mt-4 w-full max-w-lg sm:mt-6 ${mounted ? '' : 'opacity-0'}`}
+            className={`hero-slide-up hero-delay-3 mt-4 w-full max-w-[280px] sm:mt-6 sm:max-w-lg ${mounted ? '' : 'opacity-0'}`}
           >
             <div className="search-glow relative">
               <svg
