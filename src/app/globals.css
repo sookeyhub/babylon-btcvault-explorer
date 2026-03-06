@@ -1,26 +1,791 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --color-background: #ffffff;
+  --color-foreground: #387085;
+  --color-teal: #387085;
+  --color-teal-light: rgba(56, 112, 133, 0.1);
+  --color-teal-muted: rgba(56, 112, 133, 0.4);
+  --color-terracotta: #cd6332;
+  --color-terracotta-light: rgba(205, 99, 50, 0.1);
+  --color-terracotta-dark: #ce6533;
+  --color-warm-white: #faf9f5;
+  --color-dark: #14140f;
+  --color-border: #cd6332;
+  --font-sans: var(--font-space-grotesk), "Space Grotesk", system-ui, -apple-system, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--color-background);
+  color: var(--color-foreground);
+  font-family: var(--font-space-grotesk), "Space Grotesk", system-ui, -apple-system, sans-serif;
 }
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(56, 112, 133, 0.2);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(56, 112, 133, 0.35);
+}
+
+/* Selection */
+::selection {
+  background-color: rgba(205, 99, 50, 0.2);
+  color: #14140f;
+}
+
+/* ===== Hero Banner Animations ===== */
+
+/* Animated gradient background */
+.banner-gradient {
+  background: linear-gradient(
+    135deg,
+    #b84a1c 0%,
+    #cd6332 25%,
+    #d4793f 50%,
+    #cd6332 75%,
+    #a04520 100%
+  );
+  background-size: 400% 400%;
+  animation: gradientShift 12s ease infinite;
+}
+
+@keyframes gradientShift {
+  0%, 100% { background-position: 0% 50%; }
+  25% { background-position: 100% 0%; }
+  50% { background-position: 100% 100%; }
+  75% { background-position: 0% 100%; }
+}
+
+/* Title entrance */
+.banner-title {
+  animation: titleReveal 1s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes titleReveal {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+    filter: blur(8px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
+  }
+}
+
+/* Live dot pulse */
+.live-dot {
+  animation: livePulse 2s ease-in-out infinite;
+  box-shadow: 0 0 6px rgba(90, 255, 90, 0.5);
+}
+
+@keyframes livePulse {
+  0%, 100% { opacity: 1; box-shadow: 0 0 6px rgba(90, 255, 90, 0.5); }
+  50% { opacity: 0.5; box-shadow: 0 0 12px rgba(90, 255, 90, 0.8); }
+}
+
+/* Search bar subtle glow */
+.search-glow::after {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+  background-size: 200% 100%;
+  animation: searchShimmer 4s ease-in-out infinite;
+  pointer-events: none;
+  z-index: -1;
+}
+
+@keyframes searchShimmer {
+  0%, 100% { background-position: -200% 0; }
+  50% { background-position: 200% 0; }
+}
+
+/* Banner hero hover interaction */
+.banner-hero {
+  transition: filter 0.3s ease;
+}
+
+/* Teal boxes — move right, hold 2s, return */
+@keyframes decoRight {
+  0%, 5% { transform: translateX(0); }
+  20%, 70% { transform: translateX(50px); }
+  90%, 100% { transform: translateX(0); }
+}
+
+/* Orange box 1 — move left with hold */
+@keyframes decoLeft {
+  0%, 5% { transform: translateX(0); }
+  20%, 70% { transform: translateX(-50px); }
+  90%, 100% { transform: translateX(0); }
+}
+
+/* Orange box 1 — up 70px hold → down 50px hold (loop) */
+@keyframes decoUpDown {
+  0%, 20% { transform: translateY(-70px); }
+  50%, 70% { transform: translateY(70px); }
+  100% { transform: translateY(-70px); }
+}
+
+/* Orange box 2 — down 70px hold → up 70px hold (loop) */
+@keyframes decoDownUp {
+  0%, 20% { transform: translateY(70px); }
+  50%, 70% { transform: translateY(-70px); }
+  100% { transform: translateY(70px); }
+}
+
+.deco-lr { animation: decoRight 4s cubic-bezier(0.33, 0, 0.67, 1) infinite; }
+.deco-orange-left { animation: decoLeft 4s cubic-bezier(0.33, 0, 0.67, 1) infinite; }
+.deco-orange-up { animation: decoUpDown 8s cubic-bezier(0.33, 0, 0.67, 1) infinite; }
+.deco-orange-down { animation: decoDownUp 8s cubic-bezier(0.33, 0, 0.67, 1) infinite; }
+
+/* Logo float animation */
+.logo-float {
+  animation: logoFloat 4s ease-in-out infinite;
+}
+
+@keyframes logoFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+/* ===== Mascot Animations ===== */
+
+/* Entrance from left - bouncy slide-in */
+.mascot-enter-left {
+  animation: mascotSlideInLeft 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) 0.3s both;
+}
+
+@keyframes mascotSlideInLeft {
+  0% {
+    opacity: 0;
+    transform: translateX(-60px) rotate(-15deg) scale(0.7);
+  }
+  60% {
+    opacity: 1;
+    transform: translateX(8px) rotate(3deg) scale(1.05);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0) rotate(0deg) scale(1);
+  }
+}
+
+/* Entrance from right - bouncy slide-in */
+.mascot-enter-right {
+  animation: mascotSlideInRight 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) 0.6s both;
+}
+
+@keyframes mascotSlideInRight {
+  0% {
+    opacity: 0;
+    transform: translateX(60px) rotate(15deg) scale(0.7);
+  }
+  60% {
+    opacity: 1;
+    transform: translateX(-8px) rotate(-3deg) scale(1.05);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0) rotate(0deg) scale(1);
+  }
+}
+
+/* Gentle bouncing idle for standing mascot */
+.mascot-bounce-gentle {
+  animation: mascotBounceGentle 3s ease-in-out infinite;
+}
+
+@keyframes mascotBounceGentle {
+  0%, 100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  25% {
+    transform: translateY(-4px) rotate(-1deg);
+  }
+  50% {
+    transform: translateY(-8px) rotate(0deg);
+  }
+  75% {
+    transform: translateY(-4px) rotate(1deg);
+  }
+}
+
+/* Excited floating for flying mascot */
+.mascot-float-excited {
+  animation: mascotFloatExcited 2.5s ease-in-out infinite;
+}
+
+@keyframes mascotFloatExcited {
+  0%, 100% {
+    transform: translateY(0) rotate(-2deg) scale(1);
+  }
+  30% {
+    transform: translateY(-14px) rotate(2deg) scale(1.03);
+  }
+  60% {
+    transform: translateY(-6px) rotate(-1deg) scale(0.98);
+  }
+}
+
+/* Speech bubble pop-in */
+.mascot-speech-pop {
+  animation: speechPop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) 1.2s both;
+}
+
+@keyframes speechPop {
+  0% {
+    opacity: 0;
+    transform: scale(0) rotate(-10deg);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+  }
+}
+
+/* Sparkle animations */
+.mascot-sparkle {
+  animation: sparkleFloat 2s ease-in-out infinite;
+}
+
+.mascot-sparkle-delayed {
+  animation: sparkleFloat 2s ease-in-out 0.7s infinite;
+}
+
+@keyframes sparkleFloat {
+  0%, 100% {
+    opacity: 0.4;
+    transform: translateY(0) scale(0.8);
+  }
+  50% {
+    opacity: 1;
+    transform: translateY(-8px) scale(1.2);
+  }
+}
+
+/* ===== Hero Mascot (Main Fire-Breathing Loong) ===== */
+
+/* Grand entrance - rises from bottom with bounce */
+.mascot-hero-entrance {
+  animation: mascotHeroEntrance 1s cubic-bezier(0.34, 1.56, 0.64, 1) 0.4s both;
+}
+
+@keyframes mascotHeroEntrance {
+  0% {
+    opacity: 0;
+    transform: translateY(80px) scale(0.6) rotate(5deg);
+  }
+  50% {
+    opacity: 1;
+    transform: translateY(-15px) scale(1.08) rotate(-2deg);
+  }
+  70% {
+    transform: translateY(5px) scale(0.98) rotate(1deg);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1) rotate(0deg);
+  }
+}
+
+/* Hero idle - subtle breathing with gentle sway */
+.mascot-hero-idle {
+  animation: mascotHeroIdle 4s ease-in-out infinite;
+}
+
+@keyframes mascotHeroIdle {
+  0%, 100% {
+    transform: translateY(0) rotate(0deg) scale(1);
+  }
+  20% {
+    transform: translateY(-3px) rotate(-0.5deg) scale(1.01);
+  }
+  50% {
+    transform: translateY(-8px) rotate(0.5deg) scale(1.02);
+  }
+  80% {
+    transform: translateY(-3px) rotate(-0.3deg) scale(1.01);
+  }
+}
+
+/* Fire glow pulsing under mascot */
+.mascot-fire-glow {
+  animation: fireGlow 2s ease-in-out infinite;
+}
+
+@keyframes fireGlow {
+  0%, 100% {
+    opacity: 0.4;
+    transform: translateX(-50%) scaleX(1);
+  }
+  50% {
+    opacity: 0.8;
+    transform: translateX(-50%) scaleX(1.3);
+  }
+}
+
+/* ===== New Hero Design — Decorations & Animations ===== */
+
+/* Grid dot pattern overlay */
+.hero-grid-dots {
+  background-image: radial-gradient(rgba(255,255,255,0.08) 1px, transparent 1px);
+  background-size: 24px 24px;
+  pointer-events: none;
+}
+
+/* Scan line — horizontal light sweep */
+.hero-scan-line {
+  background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.04) 45%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.04) 55%, transparent 100%);
+  background-size: 200% 100%;
+  animation: heroScanLine 8s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes heroScanLine {
+  0%, 100% { background-position: 200% 0; }
+  50% { background-position: -200% 0; }
+}
+
+/* ── Gradient overlay (breathing teal/orange ambient light) ── */
+.hero-gradient-overlay {
+  background:
+    radial-gradient(ellipse 70% 60% at 18% 35%, rgba(56,112,133,0.2) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 50% at 85% 25%, rgba(205,99,50,0.14) 0%, transparent 50%),
+    radial-gradient(ellipse 40% 40% at 60% 80%, rgba(56,112,133,0.1) 0%, transparent 50%);
+  animation: gradientBreath 10s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes gradientBreath {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 1; }
+}
+
+/* ── Parallax layers (driven by --px, --py custom properties) ── */
+.hero-parallax-deep {
+  transform: translate(calc(var(--px, 0) * -30px), calc(var(--py, 0) * -20px));
+  transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.hero-parallax-mid {
+  transform: translate(calc(var(--px, 0) * -15px), calc(var(--py, 0) * -10px));
+  transition: transform 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+/* ── Loong watermark ── */
+.hero-loong-mask {
+  -webkit-mask-image: radial-gradient(ellipse 80% 90% at center, black 10%, transparent 65%);
+  mask-image: radial-gradient(ellipse 80% 90% at center, black 10%, transparent 65%);
+}
+
+.hero-loong-breathe {
+  opacity: 0.07;
+  filter: brightness(3) saturate(0);
+  animation: loongBreathe 8s ease-in-out infinite;
+  will-change: transform, opacity;
+}
+
+@keyframes loongBreathe {
+  0%, 100% { transform: scale(1); opacity: 0.07; }
+  50% { transform: scale(1.04); opacity: 0.12; }
+}
+
+/* ── Ambient glow orbs ── */
+.hero-orb {
+  border-radius: 50%;
+  filter: blur(60px);
+  pointer-events: none;
+}
+
+.hero-orb-1 {
+  width: 220px;
+  height: 220px;
+  background: rgba(56, 112, 133, 0.22);
+  animation: orbDrift1 14s ease-in-out infinite;
+}
+
+.hero-orb-2 {
+  width: 160px;
+  height: 160px;
+  background: rgba(205, 99, 50, 0.14);
+  animation: orbDrift2 18s ease-in-out infinite;
+}
+
+.hero-orb-3 {
+  width: 130px;
+  height: 130px;
+  background: rgba(56, 112, 133, 0.12);
+  animation: orbDrift3 11s ease-in-out infinite;
+}
+
+@keyframes orbDrift1 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(35px, -30px) scale(1.12); }
+  66% { transform: translate(-20px, 18px) scale(0.92); }
+}
+
+@keyframes orbDrift2 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(-30px, -40px) scale(1.18); }
+}
+
+@keyframes orbDrift3 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(28px, 22px) scale(1.1); }
+}
+
+/* ── Click ripple ── */
+.hero-ripple {
+  position: absolute;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.5);
+  transform: translate(-50%, -50%);
+  animation: rippleExpand 1.2s cubic-bezier(0, 0.55, 0.45, 1) forwards;
+  pointer-events: none;
+  z-index: 25;
+}
+
+@keyframes rippleExpand {
+  0% {
+    width: 0;
+    height: 0;
+    opacity: 0.7;
+    border-width: 3px;
+  }
+  100% {
+    width: 500px;
+    height: 500px;
+    opacity: 0;
+    border-width: 0.5px;
+  }
+}
+
+/* ── Geometric hexagon rotation ── */
+.hero-hex-1 {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: hexSlow 30s linear infinite;
+}
+
+.hero-hex-2 {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: hexSlow 25s linear infinite reverse;
+}
+
+.hero-hex-3 {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: hexSlow 35s linear infinite;
+}
+
+@keyframes hexSlow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* ── Circuit trace drawing ── */
+.hero-circuit-1 {
+  stroke-dasharray: 250;
+  stroke-dashoffset: 250;
+  animation: circuitTrace 5s ease-in-out infinite alternate;
+}
+
+.hero-circuit-2 {
+  stroke-dasharray: 250;
+  stroke-dashoffset: 250;
+  animation: circuitTrace 6s ease-in-out 1.5s infinite alternate;
+}
+
+.hero-circuit-3 {
+  stroke-dasharray: 250;
+  stroke-dashoffset: 250;
+  animation: circuitTrace 7s ease-in-out 3s infinite alternate;
+}
+
+@keyframes circuitTrace {
+  0% { stroke-dashoffset: 250; opacity: 0.3; }
+  100% { stroke-dashoffset: 0; opacity: 1; }
+}
+
+/* ── Node dot pulse ── */
+.hero-node-pulse-1 { animation: nodePulse 3s ease-in-out infinite; }
+.hero-node-pulse-2 { animation: nodePulse 3s ease-in-out 1s infinite; }
+.hero-node-pulse-3 { animation: nodePulse 3s ease-in-out 2s infinite; }
+
+@keyframes nodePulse {
+  0%, 100% { opacity: 0.3; r: 2; }
+  50% { opacity: 1; r: 3.5; }
+}
+
+/* ── Horizontal line sweep ── */
+.hero-line-sweep-1 {
+  stroke-dasharray: 400;
+  stroke-dashoffset: 400;
+  animation: lineSweep 8s ease-in-out infinite;
+}
+
+.hero-line-sweep-2 {
+  stroke-dasharray: 400;
+  stroke-dashoffset: -400;
+  animation: lineSweep 10s ease-in-out 2s infinite;
+}
+
+@keyframes lineSweep {
+  0%, 100% { stroke-dashoffset: 400; }
+  50% { stroke-dashoffset: -400; }
+}
+
+/* Slide-up entrance animation — staggered */
+.hero-slide-up {
+  animation: heroSlideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes heroSlideUp {
+  0% { opacity: 0; transform: translateY(24px); filter: blur(4px); }
+  100% { opacity: 1; transform: translateY(0); filter: blur(0); }
+}
+
+.hero-delay-1 { animation-delay: 0.15s; }
+.hero-delay-2 { animation-delay: 0.3s; }
+.hero-delay-3 { animation-delay: 0.45s; }
+.hero-delay-4 { animation-delay: 0.6s; }
+.hero-delay-5 { animation-delay: 0.75s; }
+
+/* Network strip */
+.network-strip {
+  border-left: 3px solid #cd6332;
+}
+
+@media (max-width: 640px) {
+  .network-strip-scroll {
+    animation: marqueeScroll 20s linear infinite;
+  }
+  @keyframes marqueeScroll {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+}
+
+/* ===== Lending Page Styles ===== */
+.lending-tx-item { border: 1px solid rgba(205,99,50,0.12); background: white; margin-bottom: 6px; transition: all 0.2s; }
+.lending-tx-item:hover { border-color: rgba(205,99,50,0.25); }
+.lending-tx-row { display: flex; align-items: center; gap: 12px; padding: 12px 16px; cursor: pointer; user-select: none; }
+.lending-row-status { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.lending-row-status.ok { background: #5a8a3c; box-shadow: 0 0 6px rgba(90,138,60,0.4); }
+.lending-row-status.fail { background: #c83232; box-shadow: 0 0 6px rgba(200,50,50,0.4); }
+.lending-row-icon { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; color: #fff; flex-shrink: 0; }
+.lending-row-icon.icon-eth { background: #627eea; }
+.lending-row-icon.icon-usdc { background: #2775ca; }
+.lending-row-icon.icon-dai { background: #f5ac37; }
+.lending-row-icon.icon-wbtc { background: #f09242; }
+.lending-row-icon.icon-aave { background: #b6509e; }
+.lending-row-pair { display: flex; align-items: center; gap: 10px; min-width: 0; flex: 1; }
+.lending-row-pair-label { font-size: 13px; font-weight: 600; color: #14140f; display: block; }
+.lending-row-dex { font-size: 11px; color: rgba(56,112,133,0.5); display: block; }
+.lending-row-amount { font-size: 13px; font-weight: 600; color: #14140f; display: flex; align-items: center; gap: 8px; white-space: nowrap; }
+.lending-row-apy { font-size: 10px; font-weight: 600; padding: 2px 6px; background: rgba(90,138,60,0.1); color: #5a8a3c; }
+.lending-row-apy.borrow { background: rgba(205,99,50,0.1); color: #cd6332; }
+.lending-row-value { text-align: right; min-width: 80px; }
+.lending-row-usd { font-size: 13px; font-weight: 600; color: #14140f; }
+.lending-row-time { font-size: 11px; color: rgba(56,112,133,0.45); }
+.lending-row-chevron { color: rgba(56,112,133,0.3); transition: transform 0.2s; flex-shrink: 0; }
+.lending-tx-item.open .lending-row-chevron { transform: rotate(180deg); }
+.lending-tx-detail { display: none; border-top: 1px solid rgba(205,99,50,0.08); padding: 16px; background: rgba(250,249,245,0.5); }
+.lending-tx-item.open .lending-tx-detail { display: block; }
+.lending-top-horizontal { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; align-items: stretch; }
+.lending-top-horizontal > * { display: flex; flex-direction: column; }
+.lending-hero { padding: 20px; border: 1px solid rgba(205,99,50,0.15); background: white; display: flex; flex-direction: column; }
+.lending-hero.success { border-left: 3px solid #5a8a3c; }
+.lending-hero.failed { border-left: 3px solid #c83232; background: linear-gradient(135deg, rgba(200,50,50,0.02), white); }
+.lending-hero-top { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 16px; }
+.lending-hero-top-left { display: flex; align-items: center; gap: 12px; }
+.lending-hero-type-icon { width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; background: rgba(205,99,50,0.08); color: #cd6332; }
+.lending-hero.failed .lending-hero-type-icon { background: rgba(200,50,50,0.08); color: #c83232; }
+.lending-hero-title { font-size: 16px; font-weight: 700; color: #14140f; }
+.lending-hero-subtitle { display: flex; align-items: center; gap: 4px; font-size: 12px; color: #5a8a3c; margin-top: 2px; }
+.lending-hero.failed .lending-hero-subtitle { color: #c83232; }
+.lending-hero-timestamp { font-size: 11px; color: rgba(56,112,133,0.45); white-space: nowrap; }
+.lending-hero-amount-section { flex: 1; }
+.lending-hero-amount-label { font-size: 11px; color: rgba(56,112,133,0.45); text-transform: uppercase; letter-spacing: 0.05em; font-weight: 500; margin-bottom: 4px; }
+.lending-hero-usd { font-size: 32px; font-weight: 800; color: #14140f; letter-spacing: -0.02em; }
+.lending-hero.failed .lending-hero-usd { color: #c83232; }
+.lending-hero-native { font-size: 12px; color: rgba(56,112,133,0.55); }
+.lending-hero-identity { display: flex; flex-direction: column; gap: 6px; font-size: 12px; color: rgba(56,112,133,0.45); margin-top: 16px; }
+.lending-hero-row { display: flex; align-items: center; gap: 8px; }
+.lending-hero-hash { font-family: var(--font-mono); font-size: 11px; color: #cd6332; cursor: pointer; display: flex; align-items: center; gap: 4px; }
+.lending-hero-hash:hover { color: #b8562b; }
+.lending-hero-block { font-family: var(--font-mono); font-size: 11px; color: #14140f; }
+.lending-detail-card { border: 1px solid rgba(205,99,50,0.15); background: white; display: flex; flex-direction: column; }
+.lending-detail-card.detail-failed { border-color: rgba(200,50,50,0.2); }
+.lending-card-header { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; border-bottom: 1px solid rgba(205,99,50,0.08); }
+.lending-card-title { display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 600; color: #14140f; }
+.lending-card-title svg { width: 15px; height: 15px; opacity: 0.6; }
+.lending-card-badge { font-size: 10px; font-weight: 600; padding: 2px 8px; background: rgba(205,99,50,0.08); color: #cd6332; }
+.lending-flow-visual { margin: 0 16px 4px; padding: 12px 16px; background: rgba(250,249,245,0.8); border: 1px solid rgba(56,112,133,0.08); display: flex; flex-direction: row; align-items: center; justify-content: center; gap: 10px; flex-wrap: nowrap; }
+.lending-flow-token { display: flex; align-items: center; gap: 10px; padding: 10px 14px; background: white; border: 1px solid rgba(56,112,133,0.1); min-width: 0; flex-shrink: 1; }
+.lending-flow-icon { width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 800; color: #fff; flex-shrink: 0; }
+.lending-flow-icon.icon-eth { background: #627eea; }
+.lending-flow-icon.icon-usdc { background: #2775ca; }
+.lending-flow-icon.icon-dai { background: #f5ac37; }
+.lending-flow-icon.icon-wbtc { background: #f09242; }
+.lending-flow-icon.icon-aave { background: #b6509e; }
+.lending-flow-amount { font-size: 15px; font-weight: 800; color: #14140f; letter-spacing: -0.3px; white-space: nowrap; }
+.lending-flow-sub { font-size: 11px; color: rgba(56,112,133,0.45); white-space: nowrap; }
+.lending-flow-arrow { width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; background: rgba(90,138,60,0.08); border: 1px solid rgba(90,138,60,0.12); color: #5a8a3c; flex-shrink: 0; }
+.lending-flow-dest { display: flex; align-items: center; gap: 6px; padding: 8px 12px; background: rgba(90,138,60,0.06); border: 1px solid rgba(90,138,60,0.1); color: #5a8a3c; font-size: 11px; font-weight: 600; white-space: nowrap; flex-shrink: 0; }
+.lending-flow-dest svg { width: 12px; height: 12px; }
+.lending-card-rows { padding: 8px 16px 12px; flex: 1; }
+.lending-c-row { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; border-bottom: 1px solid rgba(56,112,133,0.05); }
+.lending-c-row:last-child { border-bottom: none; }
+.lending-c-row-key { font-size: 12px; color: rgba(56,112,133,0.55); }
+.lending-c-row-val { font-size: 12px; font-weight: 600; color: #14140f; display: flex; align-items: center; gap: 6px; }
+.lending-detail-tabs { display: flex; gap: 0; margin-bottom: 12px; border: 1px solid rgba(205,99,50,0.12); background: white; }
+.lending-detail-tabs button { flex: 1; padding: 10px 16px; background: none; border: none; border-bottom: 2px solid transparent; font-size: 12px; font-weight: 500; color: rgba(56,112,133,0.5); cursor: pointer; transition: all 0.2s; font-family: var(--font-sans); display: flex; align-items: center; justify-content: center; gap: 6px; }
+.lending-detail-tabs button:hover { color: #cd6332; background: rgba(205,99,50,0.04); }
+.lending-detail-tabs button.active { color: #cd6332; font-weight: 600; background: rgba(205,99,50,0.06); border-bottom: 2px solid #cd6332; }
+.lending-tab-count { font-size: 10px; background: rgba(205,99,50,0.1); color: #cd6332; padding: 1px 6px; font-weight: 600; }
+.lending-bento-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.lending-bento-card { border: 1px solid rgba(56,112,133,0.1); background: white; display: flex; flex-direction: column; }
+.lending-detail-list { padding: 0 16px; }
+.lending-detail-separator { display: flex; align-items: center; gap: 12px; padding: 8px 16px; }
+.lending-detail-separator-line { flex: 1; height: 1px; background: rgba(56,112,133,0.08); }
+.lending-detail-separator-label { font-size: 10px; color: rgba(56,112,133,0.35); text-transform: uppercase; letter-spacing: 0.05em; font-weight: 500; }
+.lending-position-impact { padding: 8px 16px 12px; }
+.lending-pi-row { display: flex; justify-content: space-between; align-items: center; padding: 5px 0; }
+.lending-pi-key { font-size: 12px; color: rgba(56,112,133,0.55); }
+.lending-pi-val { font-size: 12px; font-weight: 600; color: #14140f; display: flex; align-items: center; gap: 4px; }
+.lending-pi-arrow { color: rgba(56,112,133,0.3); font-size: 11px; }
+.lending-pi-up { color: #5a8a3c; }
+.lending-pi-down { color: #c83232; }
+.lending-hf-bar { width: 100%; height: 4px; background: rgba(56,112,133,0.08); overflow: hidden; }
+.lending-hf-bar-fill { height: 100%; transition: width 0.5s; }
+.lending-hf-bar-fill.good { background: linear-gradient(90deg, #5a8a3c, #7cb854); }
+.lending-hf-bar-fill.warning { background: linear-gradient(90deg, #d4793f, #f5ac37); }
+.lending-hf-bar-fill.danger { background: linear-gradient(90deg, #c83232, #ef4444); }
+.lending-easy-bubble { margin: 8px 16px 12px; padding: 12px 16px; background: linear-gradient(135deg, rgba(205,99,50,0.04), rgba(56,112,133,0.04)); border: 1px solid rgba(205,99,50,0.08); }
+.lending-easy-label { display: flex; align-items: center; gap: 6px; font-size: 10px; font-weight: 600; color: rgba(56,112,133,0.45); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px; }
+.lending-easy-bubble p { font-size: 12px; color: rgba(56,112,133,0.7); line-height: 1.6; }
+.lending-hl { font-weight: 700; color: #14140f; }
+.lending-hl-warn { color: #c83232; font-weight: 700; }
+.lending-pill { font-size: 10px; font-weight: 600; padding: 2px 8px; display: inline-flex; align-items: center; }
+.lending-pill.success { background: rgba(90,138,60,0.1); color: #5a8a3c; }
+.lending-pill.error { background: rgba(200,50,50,0.1); color: #c83232; }
+.lending-pill.warning { background: rgba(212,121,63,0.1); color: #d4793f; }
+.lending-pill.info { background: rgba(56,112,133,0.08); color: #387085; }
+.lending-pill.brand { background: rgba(205,99,50,0.08); color: #cd6332; }
+.lending-data-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+.lending-data-table th { text-align: left; padding: 8px 12px; font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: rgba(56,112,133,0.45); background: rgba(250,249,245,0.5); border-bottom: 1px solid rgba(56,112,133,0.08); }
+.lending-data-table td { padding: 8px 12px; border-bottom: 1px solid rgba(56,112,133,0.05); color: #14140f; }
+.lending-addr { font-family: var(--font-mono); font-size: 11px; color: #cd6332; }
+.lending-type-badge { font-size: 9px; font-weight: 700; padding: 1px 6px; letter-spacing: 0.05em; }
+.lending-type-badge.type-in { background: rgba(90,138,60,0.1); color: #5a8a3c; }
+.lending-type-badge.type-out { background: rgba(200,50,50,0.08); color: #c83232; }
+.lending-log { border: 1px solid rgba(56,112,133,0.08); background: white; margin-bottom: 4px; }
+.lending-log-header { display: flex; align-items: center; justify-content: space-between; padding: 8px 12px; cursor: pointer; transition: background 0.2s; }
+.lending-log-header:hover { background: rgba(250,249,245,0.8); }
+.lending-log-idx { width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; color: rgba(56,112,133,0.5); background: rgba(56,112,133,0.06); margin-right: 10px; }
+.lending-log-event { font-size: 12px; font-weight: 600; color: #14140f; }
+.lending-log-contract { font-size: 11px; color: rgba(56,112,133,0.45); margin-left: 8px; }
+.lending-log-body { display: none; padding: 12px; background: rgba(250,249,245,0.3); border-top: 1px solid rgba(56,112,133,0.06); }
+.lending-log.open .lending-log-body { display: block; }
+.lending-log.open .lending-log-toggle { transform: rotate(180deg); }
+.lending-log-section-label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: rgba(56,112,133,0.4); margin-bottom: 4px; margin-top: 8px; }
+.lending-log-section-label:first-child { margin-top: 0; }
+.lending-log-hex { font-family: var(--font-mono); font-size: 10px; color: rgba(56,112,133,0.6); word-break: break-all; line-height: 1.5; padding: 4px 0; }
+.lending-log-topic { display: flex; gap: 8px; align-items: flex-start; padding: 2px 0; }
+.lending-log-topic-idx { font-size: 9px; font-weight: 700; color: rgba(56,112,133,0.35); background: rgba(56,112,133,0.06); padding: 1px 4px; flex-shrink: 0; }
+.lending-log-topic-val { font-family: var(--font-mono); font-size: 10px; color: rgba(56,112,133,0.5); word-break: break-all; }
+.lending-empty-state { text-align: center; padding: 40px 20px; color: rgba(56,112,133,0.35); }
+.lending-empty-state svg { width: 36px; height: 36px; margin-bottom: 12px; opacity: 0.5; }
+.lending-empty-state-text { font-size: 13px; font-weight: 600; color: rgba(56,112,133,0.5); }
+.lending-empty-state-sub { font-size: 12px; color: rgba(56,112,133,0.35); margin-top: 4px; }
+.lending-widget { position: sticky; top: 72px; border: 1px solid rgba(205,99,50,0.2); background: white; }
+.lending-widget-header { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; border-bottom: 1px solid rgba(205,99,50,0.1); }
+.lending-widget-title { display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 700; color: #14140f; }
+.lending-widget-title svg { width: 16px; height: 16px; color: #cd6332; }
+.lending-widget-settings { width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(56,112,133,0.1); background: none; color: rgba(56,112,133,0.4); cursor: pointer; transition: all 0.2s; }
+.lending-widget-settings:hover { border-color: rgba(205,99,50,0.3); color: #cd6332; }
+.lending-widget-settings svg { width: 14px; height: 14px; }
+.lending-widget-tabs { display: flex; border-bottom: 1px solid rgba(205,99,50,0.1); }
+.lending-widget-tab { flex: 1; padding: 10px; font-size: 13px; font-weight: 600; text-align: center; background: none; border: none; border-bottom: 2px solid transparent; color: rgba(56,112,133,0.4); cursor: pointer; transition: all 0.2s; font-family: var(--font-sans); }
+.lending-widget-tab:hover { color: #cd6332; }
+.lending-widget-tab.active { color: #cd6332; background: rgba(205,99,50,0.04); border-bottom: 2px solid #cd6332; }
+.lending-widget-body { padding: 16px; }
+.lending-widget-input-box { border: 1px solid rgba(56,112,133,0.12); padding: 12px; margin-bottom: 12px; }
+.lending-widget-input-label { font-size: 11px; color: rgba(56,112,133,0.45); font-weight: 500; margin-bottom: 8px; }
+.lending-widget-input-row { display: flex; align-items: center; gap: 8px; }
+.lending-widget-input { flex: 1; border: none; outline: none; font-size: 24px; font-weight: 700; color: #14140f; background: none; font-family: var(--font-sans); min-width: 0; }
+.lending-widget-input::placeholder { color: rgba(56,112,133,0.2); }
+.lending-widget-token-btn { display: flex; align-items: center; gap: 6px; padding: 6px 10px; border: 1px solid rgba(56,112,133,0.12); background: rgba(250,249,245,0.8); cursor: pointer; font-family: var(--font-sans); font-size: 13px; font-weight: 600; color: #14140f; white-space: nowrap; }
+.lending-widget-token-btn svg { width: 12px; height: 12px; color: rgba(56,112,133,0.3); }
+.lending-widget-token-icon { width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 800; color: #fff; }
+.lending-widget-balance { display: flex; justify-content: space-between; align-items: center; margin-top: 8px; font-size: 11px; color: rgba(56,112,133,0.45); }
+.lending-widget-balance-usd { color: #14140f; font-weight: 500; }
+.lending-widget-max-btn { font-size: 10px; font-weight: 700; color: #cd6332; background: rgba(205,99,50,0.08); border: none; padding: 1px 6px; cursor: pointer; font-family: var(--font-sans); margin-left: 4px; }
+.lending-widget-max-btn:hover { background: rgba(205,99,50,0.15); }
+.lending-widget-info { margin-bottom: 12px; }
+.lending-widget-info-row { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid rgba(56,112,133,0.05); font-size: 12px; }
+.lending-widget-info-key { color: rgba(56,112,133,0.55); }
+.lending-widget-info-val { font-weight: 600; color: #14140f; }
+.lending-widget-submit { width: 100%; padding: 12px; font-size: 14px; font-weight: 700; color: white; background: #cd6332; border: none; cursor: pointer; font-family: var(--font-sans); display: flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.2s; }
+.lending-widget-submit:hover { background: #b8562b; }
+.lending-widget-submit svg { width: 16px; height: 16px; }
+.lending-widget-hf { margin-bottom: 12px; padding: 10px 12px; border: 1px solid rgba(56,112,133,0.08); background: rgba(250,249,245,0.5); }
+.lending-widget-hf-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+.lending-widget-hf-label { font-size: 11px; color: rgba(56,112,133,0.45); font-weight: 500; }
+.lending-widget-hf-value { font-size: 12px; font-weight: 700; }
+.lending-widget-hf-value.good { color: #5a8a3c; }
+.lending-widget-hf-value.warning { color: #d4793f; }
+.lending-widget-hf-value.danger { color: #c83232; }
+.lending-widget-position { border-top: 1px solid rgba(205,99,50,0.1); padding: 14px 16px; }
+.lending-widget-position-title { font-size: 11px; font-weight: 600; color: rgba(56,112,133,0.45); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 10px; }
+.lending-widget-position-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.lending-widget-position-item { text-align: center; }
+.lending-widget-position-val { font-size: 14px; font-weight: 700; color: #14140f; }
+.lending-widget-position-label { font-size: 10px; color: rgba(56,112,133,0.4); margin-top: 2px; }
+.lending-widget-footer { text-align: center; padding: 10px 16px; font-size: 11px; color: rgba(56,112,133,0.35); border-top: 1px solid rgba(205,99,50,0.08); display: flex; align-items: center; justify-content: center; gap: 6px; }
+.lending-widget-footer svg { width: 12px; height: 12px; }
+.lending-gas-usage-header { display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 4px; }
+.lending-gas-usage-label { color: rgba(56,112,133,0.55); }
+.lending-gas-usage-nums { font-family: var(--font-mono); font-size: 11px; color: #14140f; }
+.lending-gas-bar { height: 4px; background: rgba(56,112,133,0.08); margin-bottom: 4px; }
+.lending-gas-bar-fill { height: 100%; background: #5a8a3c; }
+.lending-gas-bar-fill.fail { background: #c83232; }
+.lending-gas-pct { display: flex; justify-content: space-between; align-items: center; font-size: 10px; margin-bottom: 12px; }
+.lending-gas-pct-val { color: rgba(56,112,133,0.45); }
+.lending-gas-eff-bad { font-size: 9px; font-weight: 700; padding: 1px 6px; background: rgba(200,50,50,0.1); color: #c83232; }
+.lending-fee-row { display: flex; justify-content: space-between; padding: 4px 0; font-size: 12px; }
+.lending-fee-key { color: rgba(56,112,133,0.55); }
+.lending-fee-val { color: #14140f; font-weight: 500; }
+.lending-fee-gwei { font-size: 11px; color: rgba(56,112,133,0.4); }
+.lending-fee-total { border-top: 1px solid rgba(56,112,133,0.08); padding-top: 6px; margin-top: 4px; }
+.lending-fee-total-key { font-weight: 600; color: #14140f; }
+.lending-fee-sub { font-size: 11px; color: rgba(56,112,133,0.4); }
+.lending-fee-wasted { margin-top: 8px; padding: 8px 12px; background: rgba(200,50,50,0.04); border: 1px solid rgba(200,50,50,0.1); }
+.lending-fee-wasted .wasted-main { font-size: 12px; font-weight: 600; color: #c83232; display: flex; align-items: center; gap: 6px; }
+.lending-fee-wasted .wasted-main svg { width: 14px; height: 14px; }
+.lending-fee-wasted .wasted-detail { font-size: 11px; color: rgba(56,112,133,0.5); margin-top: 2px; }
+.lending-fail-reason-box { margin: 8px 16px 12px; padding: 12px; background: rgba(200,50,50,0.03); border: 1px solid rgba(200,50,50,0.12); }
+.lending-fail-reason-label { display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 700; color: #c83232; margin-bottom: 6px; }
+.lending-fail-reason-label svg { width: 14px; height: 14px; }
+.lending-fail-reason-box p { font-size: 12px; color: #14140f; line-height: 1.6; }
+.lending-fail-reason-code { margin-top: 8px; padding: 8px; background: rgba(200,50,50,0.04); font-family: var(--font-mono); font-size: 10px; color: #c83232; line-height: 1.5; }
+.lending-ai-dot { width: 6px; height: 6px; border-radius: 50%; background: #cd6332; display: inline-block; animation: lendingAiPulse 2s ease-in-out infinite; }
+@keyframes lendingAiPulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+@media (max-width: 768px) { .lending-top-horizontal { grid-template-columns: 1fr; } .lending-bento-grid { grid-template-columns: 1fr; } .lending-flow-visual { flex-wrap: wrap; justify-content: center; } }
