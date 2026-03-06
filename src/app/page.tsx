@@ -25,28 +25,23 @@ export default async function HomePage() {
 
       {/* Live Network Strip */}
       <div className="mx-auto max-w-[1200px] px-4 pt-4 sm:px-6">
-        <div className="network-strip flex items-center gap-6 overflow-hidden bg-white px-5 py-3">
+        <div className="network-strip flex flex-wrap items-center gap-x-5 gap-y-2 overflow-hidden bg-white px-5 py-3 sm:flex-nowrap sm:gap-6">
           <div className="flex shrink-0 items-center gap-2">
             <span className="live-dot h-2 w-2 rounded-full bg-[#5a8a3c]" />
             <span className="text-xs font-semibold text-[#5a8a3c]">Network Healthy</span>
           </div>
-          <div className="h-4 w-px bg-[#cd6332]/15" />
-          <div className="flex shrink-0 items-center gap-1.5 text-xs">
-            <span className="text-[rgba(56,112,133,0.45)]">Block</span>
-            <span className="font-mono font-semibold text-[#14140f]">#2,856,532</span>
-          </div>
-          <div className="h-4 w-px bg-[#cd6332]/15" />
+          <div className="hidden h-4 w-px bg-[#cd6332]/15 sm:block" />
           <div className="flex shrink-0 items-center gap-1.5 text-xs">
             <span className="text-[rgba(56,112,133,0.45)]">Gas</span>
             <span className="font-mono font-semibold text-[#14140f]">12 Gwei</span>
           </div>
-          <div className="h-4 w-px bg-[#cd6332]/15" />
+          <div className="hidden h-4 w-px bg-[#cd6332]/15 sm:block" />
           <div className="flex shrink-0 items-center gap-1.5 text-xs">
             <span className="text-[rgba(56,112,133,0.45)]">BABY</span>
             <span className="font-mono font-semibold text-[#14140f]">$0.01164</span>
             <span className="font-semibold text-[#5a8a3c]">+1.93%</span>
           </div>
-          <div className="h-4 w-px bg-[#cd6332]/15" />
+          <div className="hidden h-4 w-px bg-[#cd6332]/15 sm:block" />
           <div className="flex shrink-0 items-center gap-1.5 text-xs">
             <span className="text-[rgba(56,112,133,0.45)]">Avg Block Time</span>
             <span className="font-mono font-semibold text-[#14140f]">10.1s</span>
