@@ -2,7 +2,7 @@ import { RawVaultRowSchema } from './schema';
 import { buildHeaderMap, type InternalField } from './column-mapping';
 import type { Vault, VaultStatus } from './types';
 
-const VALID_STATUSES: VaultStatus[] = ['Active', 'Closed', 'Pending', 'Liquidated'];
+const VALID_STATUSES: VaultStatus[] = ['Active', 'Expired', 'Pending', 'Liquidated', 'Redeemed'];
 
 /** Normalize a raw status string to a valid VaultStatus */
 function normalizeStatus(raw: string): VaultStatus {

@@ -1,18 +1,41 @@
 'use client';
 
+import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 
-const EXPLORER_NAV = [
+interface SubMenuItem {
+  href: string;
+  label: string;
+}
+
+interface NavItem {
+  href: string;
+  label: string;
+  submenu?: SubMenuItem[];
+}
+
+const EXPLORER_NAV: NavItem[] = [
   { href: '/', label: 'Home' },
+  { href: '/txs', label: 'Transactions' },
   { href: '/vaults', label: 'Vaults' },
+  {
+    href: '/accounts',
+    label: 'Accounts',
+    submenu: [
+      { href: '/accounts', label: 'All Accounts' },
+      { href: '/depositors', label: 'Depositors' },
+      { href: '/providers', label: 'Providers' },
+    ],
+  },
   { href: '/analytics', label: 'Analytics' },
 ];
 
 export default function Header() {
   const pathname = usePathname();
   const isLending = pathname.startsWith('/lending');
+  const [openMenu, setOpenMenu] = useState<string | null>(null);
 
   return (
     <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-sm">
@@ -69,10 +92,84 @@ export default function Header() {
         <div className="mx-auto flex max-w-[1200px] items-center px-4 sm:px-6">
           <nav className="flex items-center">
             {EXPLORER_NAV.map((item) => {
-              const isActive =
-                item.href === '/'
+              // Determine if this nav item (or any of its submenu) is active
+              const isActive = item.submenu
+                ? item.submenu.some((sub) => pathname === sub.href || pathname.startsWith(sub.href + '/'))
+                : item.href === '/'
                   ? pathname === '/'
                   : pathname.startsWith(item.href);
+
+              // Items with submenu get a wrapper div for hover
+              if (item.submenu) {
+                return (
+                  <div
+                    key={item.href}
+                    className="relative"
+                    onMouseEnter={() => setOpenMenu(item.label)}
+                    onMouseLeave={() => setOpenMenu(null)}
+                  >
+                    <Link
+                      href={item.href}
+                      className={`relative flex items-center gap-1 px-4 py-2.5 text-[13px] font-medium transition-colors ${
+                        isActive
+                          ? 'text-[#cd6332]'
+                          : 'text-[#387085]/70 hover:text-[#cd6332]'
+                      }`}
+                    >
+                      {item.label}
+                      {/* Chevron icon */}
+                      <svg
+                        className={`h-3 w-3 transition-transform duration-200 ${
+                          openMenu === item.label ? 'rotate-180' : ''
+                        }`}
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        strokeWidth="2.5"
+                        stroke="currentColor"
+                      >
+                        <path strokeLinecap="round" strokeLinejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
+                      </svg>
+                      {isActive && (
+                        <span className="absolute bottom-0 left-4 right-4 h-[2px] bg-[#cd6332]" />
+                      )}
+                    </Link>
+
+                    {/* Dropdown */}
+                    {openMenu === item.label && (
+                      <div className="absolute top-full left-0 z-50 w-52 border border-[#387085]/10 bg-white py-1 shadow-sm">
+                        {item.submenu.map((sub) => {
+                          const isSubActive = pathname === sub.href || pathname.startsWith(sub.href + '/');
+                          return (
+                            <Link
+                              key={sub.href}
+                              href={sub.href}
+                              onClick={() => setOpenMenu(null)}
+                            >
+                              <div
+                                className={`px-4 py-2.5 transition-colors ${
+                                  isSubActive
+                                    ? 'border-l-2 border-[#cd6332] bg-[#faf9f5]'
+                                    : 'border-l-2 border-transparent hover:bg-[#faf9f5]'
+                                }`}
+                              >
+                                <p
+                                  className={`text-[13px] font-medium ${
+                                    isSubActive ? 'text-[#cd6332]' : 'text-[#14140f]'
+                                  }`}
+                                >
+                                  {sub.label}
+                                </p>
+                              </div>
+                            </Link>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
+                );
+              }
+
+              // Regular nav items (no submenu)
               return (
                 <Link
                   key={item.href}

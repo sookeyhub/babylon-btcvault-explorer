@@ -1,10 +1,8 @@
 import type { Vault, VaultListParams, PaginatedResult } from './types';
 
-/** Format BTC amount with proper precision */
+/** Format sBTC amount with proper precision */
 export function formatBTC(amount: number): string {
-  if (amount >= 1000) return `${(amount / 1000).toFixed(2)}k BTC`;
-  if (amount >= 1) return `${amount.toFixed(4)} BTC`;
-  return `${amount.toFixed(8)} BTC`;
+  return `${amount.toFixed(8)} sBTC`;
 }
 
 /** Format large numbers with commas */
@@ -13,7 +11,7 @@ export function formatNumber(n: number): string {
 }
 
 /** Truncate hash/address for display */
-export function truncateAddress(addr: string, start = 8, end = 6): string {
+export function truncateAddress(addr: string, start = 6, end = 4): string {
   if (!addr || addr.length <= start + end + 3) return addr;
   return `${addr.slice(0, start)}...${addr.slice(-end)}`;
 }
@@ -38,11 +36,11 @@ export function formatRelativeTime(iso: string): string {
 
   const minutes = Math.floor(diff / 60000);
   if (minutes < 1) return 'just now';
-  if (minutes < 60) return `${minutes}m ago`;
+  if (minutes < 60) return `${minutes} mins ago`;
   const hours = Math.floor(minutes / 60);
-  if (hours < 24) return `${hours}h ago`;
+  if (hours < 24) return `${hours} ${hours === 1 ? 'hour' : 'hours'} ago`;
   const days = Math.floor(hours / 24);
-  if (days < 30) return `${days}d ago`;
+  if (days < 30) return `${days} ${days === 1 ? 'day' : 'days'} ago`;
   return formatDate(iso);
 }
 
@@ -59,9 +57,8 @@ export function queryVaults(
     filtered = filtered.filter(
       (v) =>
         v.id.toLowerCase().includes(q) ||
-        v.name.toLowerCase().includes(q) ||
         v.btcAddress.toLowerCase().includes(q) ||
-        v.ethAddress.toLowerCase().includes(q) ||
+        v.depositorAddress.toLowerCase().includes(q) ||
         v.dappName.toLowerCase().includes(q) ||
         v.providerName.toLowerCase().includes(q),
     );
@@ -107,12 +104,14 @@ export function getStatusColor(status: Vault['status']): {
   switch (status) {
     case 'Active':
       return { bg: 'bg-emerald-500/10', text: 'text-emerald-400', dot: 'bg-emerald-400' };
-    case 'Closed':
+    case 'Expired':
       return { bg: 'bg-zinc-500/10', text: 'text-zinc-400', dot: 'bg-zinc-400' };
     case 'Pending':
       return { bg: 'bg-amber-500/10', text: 'text-amber-400', dot: 'bg-amber-400' };
     case 'Liquidated':
       return { bg: 'bg-red-500/10', text: 'text-red-400', dot: 'bg-red-400' };
+    case 'Redeemed':
+      return { bg: 'bg-blue-500/10', text: 'text-blue-400', dot: 'bg-blue-400' };
     default:
       return { bg: 'bg-zinc-500/10', text: 'text-zinc-400', dot: 'bg-zinc-400' };
   }

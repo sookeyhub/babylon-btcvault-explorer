@@ -21,7 +21,6 @@ export default function VaultTable({ vaults, compact, title, headerLink }: Vault
 
   return (
     <div className="overflow-hidden rounded-none border border-[#cd6332]/20">
-      {/* Orange section header — matches reference */}
       {title && (
         <div className="flex items-center justify-between bg-[#cd6332] px-5 py-3">
           <p className="text-sm font-semibold text-white">{title}</p>
@@ -40,15 +39,22 @@ export default function VaultTable({ vaults, compact, title, headerLink }: Vault
             <tr className="border-b border-[#cd6332]/10 text-[11px] font-medium uppercase tracking-wider text-[rgba(56,112,133,0.45)]">
               <th className="px-5 py-3 font-medium">Vault ID</th>
               <th className="px-5 py-3 font-medium">Status</th>
-              <th className="px-5 py-3 font-medium">Size</th>
-              <th className="px-5 py-3 font-medium">dApp</th>
+              {!compact && (
+                <th className="hidden px-5 py-3 font-medium lg:table-cell">BTC Address</th>
+              )}
+              <th className="px-5 py-3 font-medium">Depositor</th>
+              <th className="px-5 py-3 font-medium">Amount</th>
+              <th className="px-5 py-3 font-medium">DApp</th>
               {!compact && (
                 <>
                   <th className="hidden px-5 py-3 font-medium md:table-cell">Provider</th>
-                  <th className="hidden px-5 py-3 font-medium lg:table-cell">BTC Address</th>
+                  <th className="hidden px-5 py-3 font-medium xl:table-cell">Provider Address</th>
                 </>
               )}
               <th className="px-5 py-3 font-medium">Created</th>
+              {!compact && (
+                <th className="hidden px-5 py-3 font-medium md:table-cell">Closed</th>
+              )}
             </tr>
           </thead>
           <tbody>
@@ -60,31 +66,50 @@ export default function VaultTable({ vaults, compact, title, headerLink }: Vault
                 <td className="px-5 py-3">
                   <Link
                     href={`/vaults/${vault.id}`}
-                    className="font-medium text-[#cd6332] hover:text-[#b8562b]"
+                    className="font-mono text-[11px] font-medium text-[#cd6332] hover:text-[#b8562b]"
                   >
-                    {vault.id}
+                    {truncateAddress(vault.id, 6, 4)}
                   </Link>
                 </td>
                 <td className="px-5 py-3">
                   <StatusBadge status={vault.status} />
                 </td>
+                {!compact && (
+                  <td className="hidden px-5 py-3 lg:table-cell">
+                    <span className="font-mono text-[11px] text-[rgba(56,112,133,0.4)]">
+                      {truncateAddress(vault.btcAddress, 6, 4)}
+                    </span>
+                  </td>
+                )}
+                <td className="px-5 py-3">
+                  <Link href={`/accounts/${vault.depositorAddress}`} className="font-mono text-[11px] text-[rgba(56,112,133,0.5)] transition-colors hover:text-[#cd6332]">
+                    {truncateAddress(vault.depositorAddress, 6, 4)}
+                  </Link>
+                </td>
                 <td className="px-5 py-3 font-medium tabular-nums text-[#14140f]">
-                  {formatBTC(vault.vaultSize)}
+                  {vault.vaultSize.toFixed(8)} sBTC
                 </td>
                 <td className="px-5 py-3 text-[#387085]">{vault.dappName}</td>
                 {!compact && (
                   <>
-                    <td className="hidden px-5 py-3 text-[rgba(56,112,133,0.6)] md:table-cell">
-                      {vault.providerName}
+                    <td className="hidden px-5 py-3 md:table-cell">
+                      <Link href={`/accounts/${vault.providerAddress}`} className="text-[rgba(56,112,133,0.6)] transition-colors hover:text-[#cd6332]">
+                        {vault.providerName}
+                      </Link>
                     </td>
-                    <td className="hidden px-5 py-3 lg:table-cell">
+                    <td className="hidden px-5 py-3 xl:table-cell">
                       <span className="font-mono text-[11px] text-[rgba(56,112,133,0.4)]">
-                        {truncateAddress(vault.btcAddress)}
+                        {truncateAddress(vault.providerAddress, 6, 4)}
                       </span>
                     </td>
                   </>
                 )}
                 <td className="px-5 py-3 text-[rgba(56,112,133,0.5)]">{formatDate(vault.createdAt)}</td>
+                {!compact && (
+                  <td className="hidden px-5 py-3 text-[rgba(56,112,133,0.5)] md:table-cell">
+                    {vault.closedAt ? formatDate(vault.closedAt) : '—'}
+                  </td>
+                )}
               </tr>
             ))}
           </tbody>
