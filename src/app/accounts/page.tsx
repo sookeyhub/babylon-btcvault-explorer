@@ -381,7 +381,8 @@ function AccountDashboard() {
                     const opts: Intl.DateTimeFormatOptions = { month: 'short', day: 'numeric' };
                     return `${p.weekStart.toLocaleDateString('en-US', opts)} – ${p.weekEnd.toLocaleDateString('en-US', opts)}`;
                   }}
-                  formatter={(value: number, name: string) => [
+                  formatter={(value: number | undefined, name: string) => [
+  value ?? 0,
                     value,
                     name === 'count' ? 'New Depositors' : 'Total Depositors',
                   ]}
