@@ -381,11 +381,10 @@ function AccountDashboard() {
                     const opts: Intl.DateTimeFormatOptions = { month: 'short', day: 'numeric' };
                     return `${p.weekStart.toLocaleDateString('en-US', opts)} – ${p.weekEnd.toLocaleDateString('en-US', opts)}`;
                   }}
-                  formatter={(value: number | undefined, name: string) => [
+                  formatter={(value: number | undefined, name: string | undefined) => [
   value ?? 0,
-                    value,
-                    name === 'count' ? 'New Depositors' : 'Total Depositors',
-                  ]}
+  name === 'count' ? 'New Depositors' : 'Total Depositors',
+]}
                   labelStyle={{ color: '#14140f', fontWeight: 500, marginBottom: 4 }}
                   cursor={{ fill: 'rgba(56,112,133,0.04)' }}
                 />
