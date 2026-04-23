@@ -7,6 +7,7 @@ export interface Vault {
   name?: string;
   status: VaultStatus;
   btcAddress: string;
+  ethAddress?: string;
   depositorAddress: string;
   /** Vault size in sBTC */
   vaultSize: number;
@@ -16,6 +17,7 @@ export interface Vault {
   createdAt: string;
   closedAt: string | null;
   btcPegInTxHash: string;
+  ethPegInTxHash?: string;
   /** HTLC hashlock */
   hashlock: string;
   /** Block number of creation tx */

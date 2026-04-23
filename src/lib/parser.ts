@@ -91,6 +91,10 @@ export function parseVaultRows(
         closedAt: normalizeTimestamp(parsed.closed_at),
         btcPegInTxHash: parsed.btc_peg_in_tx_hash,
         ethPegInTxHash: parsed.eth_peg_in_tx_hash,
+        depositorAddress: "",
+        hashlock: "",
+        blockNumber: 0,
+        createdTxHash: "",
       };
 
       vaults.push(vault);

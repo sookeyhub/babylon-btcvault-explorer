@@ -60,7 +60,7 @@ export default function DepositorDetailPage({
 
   // Vaults owned by this depositor
   const vaults = MOCK_VAULTS.filter(
-    (v) => v.depositorAddress.toLowerCase() === lcAddress,
+    (v) => v.depositorAddress?.toLowerCase() === lcAddress,
   );
 
   if (!depositor || vaults.length === 0) {

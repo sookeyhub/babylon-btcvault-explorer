@@ -84,7 +84,7 @@ export async function getAccountTransactions(address: string): Promise<Transacti
 export async function getAccountVaults(address: string): Promise<Vault[]> {
   return MOCK_VAULTS.filter(
     (v) =>
-      v.depositorAddress.toLowerCase() === address.toLowerCase() ||
+      v.depositorAddress?.toLowerCase() === address.toLowerCase() ||
       v.providerAddress.toLowerCase() === address.toLowerCase(),
   );
 }

@@ -75,7 +75,7 @@ interface EnrichedAccount extends Account {
 // Precompute depositor / provider / dapp sets from mock data
 const DEPOSITOR_VAULTS = new Map<string, { total: number; active: number; btc: number; dapps: Map<string, number> }>();
 for (const v of MOCK_VAULTS) {
-  const addr = v.depositorAddress.toLowerCase();
+  const addr = v.depositorAddress?.toLowerCase();
   const entry = DEPOSITOR_VAULTS.get(addr) ?? { total: 0, active: 0, btc: 0, dapps: new Map<string, number>() };
   entry.total++;
   if (v.status === 'Active') entry.active++;
@@ -191,7 +191,7 @@ function AccountDashboard() {
   // ── New Depositors — weekly first-time depositors (last 4 weeks) ─────
   const firstVaultByDepositor = new Map<string, Date>();
   for (const v of vaults) {
-    const addr = v.depositorAddress.toLowerCase();
+    const addr = v.depositorAddress?.toLowerCase();
     const date = new Date(v.createdAt);
     const existing = firstVaultByDepositor.get(addr);
     if (!existing || date < existing) {

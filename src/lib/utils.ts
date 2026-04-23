@@ -58,7 +58,7 @@ export function queryVaults(
       (v) =>
         v.id.toLowerCase().includes(q) ||
         v.btcAddress.toLowerCase().includes(q) ||
-        v.depositorAddress.toLowerCase().includes(q) ||
+        v.depositorAddress?.toLowerCase().includes(q) ||
         v.dappName.toLowerCase().includes(q) ||
         v.providerName.toLowerCase().includes(q),
     );

@@ -51,7 +51,7 @@ export default function AccountDetailTabs({ address, accountType, isProvider }: 
   // Check whether this EOA actually deposited any vaults
   const lcAddr = address.toLowerCase();
   const hasDepositedVaults = MOCK_VAULTS.some(
-    (v) => v.depositorAddress.toLowerCase() === lcAddr,
+    (v) => v.depositorAddress?.toLowerCase() === lcAddr,
   );
 
   // Build available tabs based on role (Provider / Depositor / neither)
@@ -79,7 +79,7 @@ export default function AccountDetailTabs({ address, accountType, isProvider }: 
       ),
     );
     setDepositedVaults(
-      MOCK_VAULTS.filter((v) => v.depositorAddress.toLowerCase() === addr),
+      MOCK_VAULTS.filter((v) => v.depositorAddress?.toLowerCase() === addr),
     );
     setManagedVaults(
       MOCK_VAULTS.filter((v) => v.providerAddress.toLowerCase() === addr),
@@ -259,7 +259,7 @@ function VaultsTable({ vaults, address, roleLabel }: { vaults: Vault[]; address:
           </thead>
           <tbody>
             {vaults.slice(0, 25).map((vault) => {
-              const isDepositor = vault.depositorAddress.toLowerCase() === address.toLowerCase();
+              const isDepositor = vault.depositorAddress?.toLowerCase() === address.toLowerCase();
               return (
                 <tr
                   key={vault.id}
