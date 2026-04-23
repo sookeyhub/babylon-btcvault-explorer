@@ -43,20 +43,8 @@ export default function DepositorsPage() {
 
   return (
     <div className="mx-auto max-w-[1200px] space-y-5 px-4 py-8 sm:px-6">
-      {/* Breadcrumb */}
-      <nav className="flex items-center gap-1.5 text-xs text-[rgba(56,112,133,0.55)]">
-        <Link href="/" className="transition-colors hover:text-[#cd6332]">Home</Link>
-        <span>/</span>
-        <span className="font-medium text-[#14140f]">Depositors</span>
-      </nav>
-
       {/* Title */}
-      <div>
-        <h1 className="text-lg font-semibold text-[#14140f]">Depositors</h1>
-        <p className="mt-1 text-sm text-[rgba(56,112,133,0.55)]">
-          BTC vault depositors indexed from btcv_vaults
-        </p>
-      </div>
+      <h1 className="text-lg font-semibold text-[#14140f]">Depositors</h1>
 
       {/* Results count + Pagination */}
       <div className="flex items-center justify-between">

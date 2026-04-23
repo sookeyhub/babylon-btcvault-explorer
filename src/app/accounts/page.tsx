@@ -582,12 +582,7 @@ export default function AccountsPage() {
         </DevNoteSection>
       </DevNote>
       {/* ── Page title ─────────────────────────────────────────────────── */}
-      <div>
-        <h1 className="text-lg font-semibold text-[#14140f]">Accounts</h1>
-        <p className="mt-1 text-sm text-[#387085]/60">
-          Network participants across depositors, providers, and DeFi applications
-        </p>
-      </div>
+      <h1 className="text-lg font-semibold text-[#14140f]">Accounts</h1>
 
       {/* ── Account dashboard ──────────────────────────────────────────── */}
       <AccountDashboard />
