@@ -64,14 +64,14 @@ export default function ProviderDashboard({ provider }: { provider: ProviderInfo
         ))}
       </div>
 
-      <div className="grid grid-cols-1 gap-5 lg:grid-cols-3">
+      <div className="grid grid-cols-1 items-stretch gap-5 lg:grid-cols-3">
         {/* LEFT col — Identity */}
-        <section className="border border-[#387085]/10 bg-white lg:col-span-2">
+        <section className="flex flex-col border border-[#387085]/10 bg-white lg:col-span-2">
           <div className="border-b border-[#387085]/10 px-5 py-3">
             <h2 className="text-sm font-semibold text-[#14140f]">Overview</h2>
           </div>
-          <table className="w-full">
-            <tbody>
+          <table className="w-full flex-1">
+            <tbody className="h-full">
               {[
                 { label: 'Operator Address', val: provider.address, mono: true, copy: true },
                 { label: 'Connected DApp',   val: provider.appName, mono: false, copy: false },
@@ -79,10 +79,10 @@ export default function ProviderDashboard({ provider }: { provider: ProviderInfo
                 { label: 'Commission',       val: `${commissionPct}%`, mono: false, copy: false },
               ].map((row, i, arr) => (
                 <tr key={row.label} className={i < arr.length - 1 ? 'border-b border-[#387085]/8' : ''}>
-                  <td className="w-40 py-2.5 pl-5 pr-4 text-[11px] font-medium uppercase tracking-wide text-[#387085]/50">
+                  <td className="w-40 py-3 pl-5 pr-4 align-middle text-[11px] font-medium uppercase tracking-wide text-[#387085]/50">
                     {row.label}
                   </td>
-                  <td className="py-2.5 pr-5">
+                  <td className="py-3 pr-5 align-middle">
                     <div className="flex items-center gap-1.5">
                       <span className={`text-sm text-[#14140f] ${row.mono ? 'break-all font-mono text-[#387085]' : ''}`}>
                         {row.val}

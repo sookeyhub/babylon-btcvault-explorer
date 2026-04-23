@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { getAccountByAddress, getProviderByAddress } from '@/lib/data';
+import { MOCK_VAULTS } from '@/lib/mock-data';
 import { truncateAddress } from '@/lib/utils';
 import CopyButton from '@/components/CopyButton';
 import AccountDetailTabs from './AccountDetailTabs';
@@ -24,6 +25,15 @@ export default async function AccountDetailPage({ params }: Props) {
   // Determine provider role
   const provider = await getProviderByAddress(account.address);
 
+  // Depositor stats (used when non-Provider account renders basic Summary)
+  const lcAddress = account.address.toLowerCase();
+  const depositorVaults = MOCK_VAULTS.filter(
+    (v) => v.depositorAddress?.toLowerCase() === lcAddress,
+  );
+  const depositorTotalVaults = depositorVaults.length;
+  const depositorActiveVaults = depositorVaults.filter((v) => v.status === 'Active').length;
+  const depositorTotalBtc = depositorVaults.reduce((s, v) => s + v.vaultSize, 0);
+
   const typeBadge: Record<string, string> = {
     EOA:      'bg-[#387085]/10 text-[#387085]',
     Contract: 'bg-[#cd6332]/10 text-[#cd6332]',
@@ -42,33 +52,37 @@ export default async function AccountDetailPage({ params }: Props) {
       <DevNote title="Account Detail 기획 의도">
         <DevNoteSection heading="페이지 목적">
           <p>모든 주소를 하나의 통합 라우트로 접근.</p>
-          <p>역할에 따라 뷰를 자동 분기해 사용자가 주소 종류를 구분할 필요 없도록 함.</p>
+          <p>역할에 따라 뷰가 자동 분기되어 사용자가 주소 종류를 구분할 필요 없음.</p>
         </DevNoteSection>
 
         <DevNoteSection heading="역할별 뷰 분기">
-          <p>Provider 역할이면 Provider 전용 대시보드 노출. 탭은 Transactions와 Vaults.</p>
-          <p>Depositor 역할이면 기본 요약 카드와 Deposited Vaults 탭 제공.</p>
-          <p>역할 없는 일반 계정은 Transactions 탭만 표시.</p>
+          <p>Provider는 전용 대시보드, Depositor는 Vault 중심 요약 카드, 역할이 없는 계정은 Transactions 탭만 표시.</p>
         </DevNoteSection>
 
         <DevNoteSection heading="Provider Dashboard">
-          <p>관리 중인 Total BTC를 헤더 우측에 최우선 지표로 강조.</p>
-          <p>Active Vaults, Total Vaults, Commission, Connected DApp 네 가지 핵심 운영 지표 노출.</p>
-          <p>Overview에 식별 정보, Vault Status에 상태별 분포를 나란히 배치.</p>
-          <p>외부에 민감한 엔드포인트 정보(RPC·gRPC 등)는 표시하지 않음.</p>
+          <p>헤더 우측에 Total BTC를 최우선 지표로 강조.</p>
+          <p>Active Vaults, Total Vaults, Commission, Connected DApp의 운영 지표 노출.</p>
+          <p>Overview에 식별 정보, Vault Status에 상태별 분포를 2열로 배치.</p>
+          <p>탭은 Transactions와 Vaults로 구성.</p>
         </DevNoteSection>
 
-        <DevNoteSection heading="탭 구조">
-          <p>Transactions는 해당 주소가 관여한 모든 온체인 활동을 시간 역순으로 제공.</p>
-          <p>Deposited Vaults는 해당 주소가 직접 만든 vault 목록.</p>
-          <p>Vaults는 Provider가 관리하는 vault 목록으로 페이지네이션 제공.</p>
+        <DevNoteSection heading="Depositor 요약">
+          <p>Summary 카드는 Vault 활동을 중심으로 4개 지표 제공.</p>
+          <p>Total BTC, Total Vaults, Active Vaults(녹색 강조), Txn Count.</p>
+          <p>예치 규모와 현재 활성 상태를 한눈에 파악하도록 구성.</p>
+          <p>탭은 Transactions와 Deposited Vaults로 구성.</p>
+        </DevNoteSection>
+
+        <DevNoteSection heading="역할 없는 계정">
+          <p>Summary 카드는 동일하게 노출하되 Total BTC와 Vault 값은 0으로 표시.</p>
+          <p>탭은 Transactions만 제공.</p>
         </DevNoteSection>
 
         <DevNoteSection heading="정책 / 예외">
-          <p>DApp 전용 상세 페이지는 제공하지 않음. 역할은 Provider 또는 Depositor만 유의미하게 다룸.</p>
-          <p>이름이 있는 계정은 이름만 표시하고 주소는 hover 시 툴팁으로 확인.</p>
+          <p>DApp 전용 상세 페이지는 없음. 역할은 Provider 또는 Depositor만 유의미.</p>
+          <p>이름이 있는 계정은 이름만 노출, 주소는 hover 시 툴팁.</p>
           <p>Contract 계정은 주소 앞 아이콘으로 구분.</p>
-          <p>모든 주소 링크는 이 통합 페이지로 라우팅 일원화.</p>
+          <p>모든 주소 링크는 이 통합 페이지로 일원화.</p>
         </DevNoteSection>
       </DevNote>
 
@@ -129,25 +143,23 @@ export default async function AccountDetailPage({ params }: Props) {
       {!provider && (
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
           <div className="border border-[#387085]/10 bg-[#faf9f5] p-3">
-            <p className="text-[11px] font-medium uppercase tracking-wide text-[#387085]/50">Balance</p>
+            <p className="text-[11px] font-medium uppercase tracking-wide text-[#387085]/50">Total BTC</p>
             <p className="mt-0.5 text-lg font-semibold text-[#14140f]">
-              {account.balance.toLocaleString(undefined, { minimumFractionDigits: 4, maximumFractionDigits: 8 })} sBTC
+              {depositorTotalBtc.toFixed(4)} sBTC
             </p>
           </div>
           <div className="border border-[#387085]/10 bg-[#faf9f5] p-3">
-            <p className="text-[11px] font-medium uppercase tracking-wide text-[#387085]/50">Percentage</p>
-            <p className="mt-0.5 text-lg font-semibold text-[#14140f]">{account.percentage}%</p>
+            <p className="text-[11px] font-medium uppercase tracking-wide text-[#387085]/50">Total Vaults</p>
+            <p className="mt-0.5 text-lg font-semibold text-[#14140f]">{depositorTotalVaults.toLocaleString()}</p>
           </div>
           <div className="border border-[#387085]/10 bg-[#faf9f5] p-3">
-            <p className="text-[11px] font-medium uppercase tracking-wide text-[#387085]/50">Transactions</p>
+            <p className="text-[11px] font-medium uppercase tracking-wide text-[#387085]/50">Active Vaults</p>
+            <p className="mt-0.5 text-lg font-semibold text-green-600">{depositorActiveVaults.toLocaleString()}</p>
+          </div>
+          <div className="border border-[#387085]/10 bg-[#faf9f5] p-3">
+            <p className="text-[11px] font-medium uppercase tracking-wide text-[#387085]/50">Txn Count</p>
             <p className="mt-0.5 text-lg font-semibold text-[#14140f]">{account.txnCount.toLocaleString()}</p>
           </div>
-          {account.vaultCount > 0 && (
-            <div className="border border-[#387085]/10 bg-[#faf9f5] p-3">
-              <p className="text-[11px] font-medium uppercase tracking-wide text-[#387085]/50">Vaults</p>
-              <p className="mt-0.5 text-lg font-semibold text-[#14140f]">{account.vaultCount.toLocaleString()}</p>
-            </div>
-          )}
         </div>
       )}
 
