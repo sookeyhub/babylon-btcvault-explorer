@@ -4,7 +4,7 @@ export type VaultStatus = 'Active' | 'Expired' | 'Pending' | 'Liquidated' | 'Red
 /** Core vault entity — maps to the live BTCVault explorer schema */
 export interface Vault {
   id: string;
-  name: string;
+  name?: string;
   status: VaultStatus;
   btcAddress: string;
   depositorAddress: string;
