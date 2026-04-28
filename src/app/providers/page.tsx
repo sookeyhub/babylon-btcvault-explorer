@@ -247,9 +247,9 @@ export default function ProvidersPage() {
                   padding: '6px 10px',
                 }}
                 labelStyle={{ color: '#14140f', fontWeight: 500, marginBottom: 4 }}
-                formatter={(value: number | undefined, name: string) => [
+                formatter={(value: number | undefined, name: string | undefined) => [
                   value != null ? `${value.toFixed(2)} BTC` : '—',
-                  name,
+                  name ?? '',
                 ]}
                 cursor={{ stroke: '#387085', strokeOpacity: 0.2, strokeWidth: 1 }}
               />
