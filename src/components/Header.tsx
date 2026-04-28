@@ -21,12 +21,11 @@ const EXPLORER_NAV: NavItem[] = [
   { href: '/txs', label: 'Transactions' },
   { href: '/vaults', label: 'Vaults' },
   {
-    href: '/accounts',
+    href: '/providers',
     label: 'Accounts',
     submenu: [
-      { href: '/accounts', label: 'All Accounts' },
-      { href: '/depositors', label: 'Depositors' },
       { href: '/providers', label: 'Providers' },
+      { href: '/depositors', label: 'Depositors' },
     ],
   },
   { href: '/analytics', label: 'Analytics' },
