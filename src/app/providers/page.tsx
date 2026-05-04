@@ -136,7 +136,36 @@ export default function ProvidersPage() {
   const totalDeltaPct = totalThen > 0 ? (totalDelta / totalThen) * 100 : 0;
 
   return (
-    <div className="mx-auto max-w-[1200px] space-y-5 px-4 py-8 sm:px-6">
+    <div className="relative mx-auto max-w-[1200px] space-y-5 px-4 py-8 sm:px-6">
+      <DevNote title="Providers 기획 의도">
+        <DevNoteSection heading="페이지 목적">
+          <p>Vault를 운영하며 BTC 커스터디와 ZKP 서명을 담당하는 운영자 목록을 조회.</p>
+          <p>누가 얼마의 자산을 관리하고 어떤 DApp과 연결되어 있는지 파악.</p>
+        </DevNoteSection>
+
+        <DevNoteSection heading="표시 대상">
+          <p>프로토콜에 등록된 Provider만 포함.</p>
+          <p>아직 vault를 배정받지 않은 신규 Provider도 포함.</p>
+        </DevNoteSection>
+
+        <DevNoteSection heading="컬럼 구성">
+          <p>순위, 이름, 주소, 연결 DApp, 수수료율, 관리 Vault 수, Total BTC.</p>
+          <p>수수료율은 사용자가 바로 이해할 수 있도록 % 단위로 변환해 표시.</p>
+        </DevNoteSection>
+
+        <DevNoteSection heading="정렬 / 이동">
+          <p>Total BTC 내림차순으로 관리 규모가 큰 Provider를 상단 배치.</p>
+          <p>이름 또는 주소 클릭 시 통합 Account 상세로 이동.</p>
+        </DevNoteSection>
+
+        <DevNoteSection heading="Provider TVL Trend 차트">
+          <p>최근 30일간 Provider별 일간 관리 BTC(TVL)를 누적 영역으로 시각화.</p>
+          <p>created ≤ day &amp; closed &gt; day 인 vault의 vaultSize 합으로 산출.</p>
+          <p>Total BTC 기준 상위 10개를 개별 영역, 나머지는 Others 회색으로 통합.</p>
+          <p>우측 상단에 현재 총 TVL과 30일 변화량(±BTC, ±%)을 함께 표시.</p>
+        </DevNoteSection>
+      </DevNote>
+
       {/* Title */}
       <h1 className="text-lg font-semibold text-[#14140f]">Providers</h1>
 
@@ -165,24 +194,7 @@ export default function ProvidersPage() {
       </div>
 
       {/* Provider TVL Trend */}
-      <div className="relative">
-        <DevNote title="Provider TVL Trend 차트">
-          <DevNoteSection heading="차트 목적">
-            <p>최근 30일간 Provider별 일간 관리 BTC(TVL) 추이를 누적 영역으로 시각화.</p>
-            <p>전체 시장 성장세와 Provider별 점유 변화를 한눈에 파악.</p>
-          </DevNoteSection>
-
-          <DevNoteSection heading="산출 방식">
-            <p>일자별로 created ≤ day &amp; closed &gt; day 인 vault의 vaultSize 합산.</p>
-            <p>현재 시점 Total BTC 기준 상위 10개를 개별 Provider로, 나머지는 Others 회색 영역으로 통합.</p>
-          </DevNoteSection>
-
-          <DevNoteSection heading="헤더 보조 지표">
-            <p>우측 상단에 현재 총 TVL과 30일 변화량(±BTC, ±%)을 함께 표시.</p>
-            <p>증감 부호에 따라 그린/레드로 색상 분기.</p>
-          </DevNoteSection>
-        </DevNote>
-        <section className="flex h-[380px] flex-col border border-[#387085]/10 bg-white">
+      <section className="flex h-[380px] flex-col border border-[#387085]/10 bg-white">
         <div className="flex items-center justify-between border-b border-[#387085]/10 px-5 py-3">
           <div>
             <h2 className="text-sm font-semibold text-[#14140f]">Provider TVL Trend</h2>
@@ -280,7 +292,6 @@ export default function ProvidersPage() {
           </ResponsiveContainer>
         </div>
       </section>
-      </div>
 
       {/* Results count + Pagination */}
       <div className="flex items-center justify-between">
@@ -297,29 +308,7 @@ export default function ProvidersPage() {
       </div>
 
       {/* Table */}
-      <div className="relative">
-        <DevNote title="Providers 기획 의도">
-          <DevNoteSection heading="페이지 목적">
-            <p>Vault를 운영하며 BTC 커스터디와 ZKP 서명을 담당하는 운영자 목록을 조회.</p>
-            <p>누가 얼마의 자산을 관리하고 어떤 DApp과 연결되어 있는지 파악.</p>
-          </DevNoteSection>
-
-          <DevNoteSection heading="표시 대상">
-            <p>프로토콜에 등록된 Provider만 포함.</p>
-            <p>아직 vault를 배정받지 않은 신규 Provider도 포함.</p>
-          </DevNoteSection>
-
-          <DevNoteSection heading="컬럼 구성">
-            <p>순위, 이름, 주소, 연결 DApp, 수수료율, 관리 Vault 수, Total BTC.</p>
-            <p>수수료율은 사용자가 바로 이해할 수 있도록 % 단위로 변환해 표시.</p>
-          </DevNoteSection>
-
-          <DevNoteSection heading="정렬 / 이동">
-            <p>Total BTC 내림차순으로 관리 규모가 큰 Provider를 상단 배치.</p>
-            <p>이름 또는 주소 클릭 시 통합 Account 상세로 이동.</p>
-          </DevNoteSection>
-        </DevNote>
-        <div className="overflow-x-auto rounded-none border border-[#cd6332]/20 bg-white">
+      <div className="overflow-x-auto rounded-none border border-[#cd6332]/20 bg-white">
           <table className="w-full text-left text-xs">
           <thead>
             <tr className="bg-[#cd6332] text-[11px] font-medium uppercase tracking-wider text-white">
@@ -366,7 +355,6 @@ export default function ProvidersPage() {
             })}
             </tbody>
           </table>
-        </div>
       </div>
     </div>
   );

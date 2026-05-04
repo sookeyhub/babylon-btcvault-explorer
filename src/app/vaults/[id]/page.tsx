@@ -210,26 +210,53 @@ export default async function VaultDetailPage({ params }: Props) {
 
   return (
     <div className="relative mx-auto max-w-[900px] space-y-5 px-4 py-8 sm:px-6">
-      {/* ── Header + Status + Summary (overview region) ────────────────── */}
-      <div className="relative space-y-5">
-        <DevNote title="Vault Overview 기획 의도">
-          <DevNoteSection heading="식별 정보">
-            <p>Vault ID와 현재 status 아이콘을 함께 노출해 즉시 식별 가능.</p>
-            <p>ID는 truncate 표기, 복사 버튼으로 전체 ID 확보.</p>
-          </DevNoteSection>
+      <DevNote title="Vault Detail 기획 의도">
+        <DevNoteSection heading="식별 정보">
+          <p>Vault ID와 현재 status 아이콘을 함께 노출해 즉시 식별 가능.</p>
+          <p>ID는 truncate 표기, 복사 버튼으로 전체 ID 확보.</p>
+        </DevNoteSection>
 
-          <DevNoteSection heading="상태 배너">
-            <p>현재 status와 created / closed 시점 등 핵심 라이프사이클 일자를 강조.</p>
-            <p>사용자가 Vault의 현재 위치를 즉시 인지하도록 구성.</p>
-          </DevNoteSection>
+        <DevNoteSection heading="상태 배너">
+          <p>현재 status와 created / closed 시점 등 핵심 라이프사이클 일자를 강조.</p>
+          <p>사용자가 Vault의 현재 위치를 즉시 인지하도록 구성.</p>
+        </DevNoteSection>
 
-          <DevNoteSection heading="Summary 카드">
-            <p>Amount / DApp / Provider 3개 핵심 메타데이터를 카드 형태로 노출.</p>
-            <p>Vault 자체의 자산 규모와 연결 컨텍스트를 한눈에 파악.</p>
-          </DevNoteSection>
-        </DevNote>
+        <DevNoteSection heading="Summary 카드">
+          <p>Amount / DApp / Provider 3개 핵심 메타데이터를 카드 형태로 노출.</p>
+          <p>Vault 자체의 자산 규모와 연결 컨텍스트를 한눈에 파악.</p>
+        </DevNoteSection>
 
-        <div className="space-y-1.5">
+        <DevNoteSection heading="Vault History 목적">
+          <p>개별 Vault가 어떤 단계를 거쳐 현재 상태에 도달했는지 한눈에 추적.</p>
+          <p>Bitcoin 레이어에서 Ethereum 레이어로 넘어가는 2단계 프로토콜 흐름을 하나의 타임라인으로 통합.</p>
+        </DevNoteSection>
+
+        <DevNoteSection heading="이벤트 흐름">
+          <p>BTC 전송 → BTC 컨펌 → Submitted → 서명 → Ack → 검증 → Activated 순으로 표시.</p>
+          <p>종료 시 Redeemed / Expired / Liquidated 중 하나가 마지막 이벤트로 추가됨.</p>
+        </DevNoteSection>
+
+        <DevNoteSection heading="표시 정책">
+          <p>실제로 발생한 이벤트만 노출, 미래 이벤트는 숨김.</p>
+          <p>최신순 정렬, Current 이벤트는 시각적으로 강조.</p>
+        </DevNoteSection>
+
+        <DevNoteSection heading="상태 전환 강조">
+          <p>Vault status가 바뀌는 이벤트는 이전 → 이후 상태를 인라인으로 표시.</p>
+        </DevNoteSection>
+
+        <DevNoteSection heading="민감 정보 보호">
+          <p>Activated 시 공개되는 Secret은 기본 숨김, reveal 버튼으로 명시적 열람.</p>
+        </DevNoteSection>
+
+        <DevNoteSection heading="TX 이동">
+          <p>Ethereum TX는 내부 트랜잭션 상세로 이동.</p>
+          <p>BTC TX는 외부 익스플로러 전용이라 해시 표기만 제공.</p>
+        </DevNoteSection>
+      </DevNote>
+
+      {/* ── Header area ───────────────────────────────────────────────────── */}
+      <div className="space-y-1.5">
           {/* "Vault" label row */}
           <div className="flex items-center gap-1.5 text-xs text-[rgba(56,112,133,0.55)]">
             <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" strokeWidth="1.8" stroke="currentColor">
@@ -239,74 +266,43 @@ export default async function VaultDetailPage({ params }: Props) {
             <span>Vault</span>
           </div>
 
-          {/* ID row */}
-          <div className="flex items-center gap-2">
-            <StatusIcon status={vault.status} />
-            <span className="font-mono text-base font-semibold text-[#14140f]">
-              {truncateAddress(vault.id, 6, 4)}
-            </span>
-            <CopyButton text={vault.id} />
+        {/* ID row */}
+        <div className="flex items-center gap-2">
+          <StatusIcon status={vault.status} />
+          <span className="font-mono text-base font-semibold text-[#14140f]">
+            {truncateAddress(vault.id, 6, 4)}
+          </span>
+          <CopyButton text={vault.id} />
+        </div>
+      </div>
+
+      {/* ── Status banner ─────────────────────────────────────────────────── */}
+      <StatusBanner
+        status={vault.status}
+        createdAt={vault.createdAt}
+        closedAt={vault.closedAt}
+        lifecycle={lifecycle}
+      />
+
+      {/* ── 3 summary cards ───────────────────────────────────────────────── */}
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+        {[
+          { label: 'Amount',   value: `${vault.vaultSize.toFixed(2)} sBTC` },
+          { label: 'DApp',     value: vault.dappName },
+          { label: 'Provider', value: vault.providerName },
+        ].map(({ label, value }) => (
+          <div
+            key={label}
+            className="border border-[#387085]/10 bg-[#faf9f5] p-3"
+          >
+            <p className="text-[11px] font-medium uppercase tracking-wide text-[#387085]/50">{label}</p>
+            <p className="mt-0.5 text-lg font-semibold text-[#14140f]">{value}</p>
           </div>
-        </div>
-
-        <StatusBanner
-          status={vault.status}
-          createdAt={vault.createdAt}
-          closedAt={vault.closedAt}
-          lifecycle={lifecycle}
-        />
-
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-          {[
-            { label: 'Amount',   value: `${vault.vaultSize.toFixed(2)} sBTC` },
-            { label: 'DApp',     value: vault.dappName },
-            { label: 'Provider', value: vault.providerName },
-          ].map(({ label, value }) => (
-            <div
-              key={label}
-              className="border border-[#387085]/10 bg-[#faf9f5] p-3"
-            >
-              <p className="text-[11px] font-medium uppercase tracking-wide text-[#387085]/50">{label}</p>
-              <p className="mt-0.5 text-lg font-semibold text-[#14140f]">{value}</p>
-            </div>
-          ))}
-        </div>
+        ))}
       </div>
 
       {/* ── Vault details + Transaction Flow + Raw Txs ────────────────────── */}
-      <div className="relative">
-        <DevNote title="Vault History 기획 의도">
-          <DevNoteSection heading="목적">
-            <p>개별 Vault가 어떤 단계를 거쳐 현재 상태에 도달했는지 한눈에 추적.</p>
-            <p>Bitcoin 레이어에서 Ethereum 레이어로 넘어가는 2단계 프로토콜 흐름을 하나의 타임라인으로 통합.</p>
-          </DevNoteSection>
-
-          <DevNoteSection heading="이벤트 흐름">
-            <p>BTC 전송 → BTC 컨펌 → Submitted → 서명 → Ack → 검증 → Activated 순으로 표시.</p>
-            <p>종료 시 Redeemed / Expired / Liquidated 중 하나가 마지막 이벤트로 추가됨.</p>
-          </DevNoteSection>
-
-          <DevNoteSection heading="표시 정책">
-            <p>실제로 발생한 이벤트만 노출, 미래 이벤트는 숨김.</p>
-            <p>최신순 정렬, Current 이벤트는 시각적으로 강조.</p>
-          </DevNoteSection>
-
-          <DevNoteSection heading="상태 전환 강조">
-            <p>Vault status가 바뀌는 이벤트는 이전 → 이후 상태를 인라인으로 표시.</p>
-          </DevNoteSection>
-
-          <DevNoteSection heading="민감 정보 보호">
-            <p>Activated 시 공개되는 Secret은 기본 숨김, reveal 버튼으로 명시적 열람.</p>
-          </DevNoteSection>
-
-          <DevNoteSection heading="TX 이동">
-            <p>Ethereum TX는 내부 트랜잭션 상세로 이동.</p>
-            <p>BTC TX는 외부 익스플로러 전용이라 해시 표기만 제공.</p>
-          </DevNoteSection>
-        </DevNote>
-        <VaultDetailTabs vault={vault} lifecycle={lifecycle} />
-      </div>
-
+      <VaultDetailTabs vault={vault} lifecycle={lifecycle} />
     </div>
   );
 }

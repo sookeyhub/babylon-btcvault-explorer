@@ -36,7 +36,7 @@ export function DevNoteSection({
   children: React.ReactNode;
 }) {
   return (
-    <div className="mt-4 first:mt-0">
+    <div className="mt-5 border-t border-dashed border-[#cd6332]/20 pt-3 first:mt-0 first:border-t-0 first:pt-0">
       <p className="mb-1.5 text-[11px] font-semibold text-[#cd6332]">
         {heading}
       </p>

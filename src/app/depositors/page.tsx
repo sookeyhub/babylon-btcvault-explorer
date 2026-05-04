@@ -119,7 +119,37 @@ export default function DepositorsPage() {
   const totalNewDepositors = weeks.reduce((s, w) => s + w.count, 0);
 
   return (
-    <div className="mx-auto max-w-[1200px] space-y-5 px-4 py-8 sm:px-6">
+    <div className="relative mx-auto max-w-[1200px] space-y-5 px-4 py-8 sm:px-6">
+      <DevNote title="Depositors 기획 의도">
+        <DevNoteSection heading="페이지 목적">
+          <p>BTCVault에 BTC를 예치한 개별 사용자 전체를 조회.</p>
+          <p>어떤 주소가 얼마나 예치했고, 현재 얼마가 활성 상태인지 파악.</p>
+        </DevNoteSection>
+
+        <DevNoteSection heading="표시 대상">
+          <p>실제로 Vault를 만든 주소만 포함.</p>
+          <p>활동 이력이 없는 일반 지갑 주소는 제외.</p>
+        </DevNoteSection>
+
+        <DevNoteSection heading="컬럼 구성">
+          <p>순위, 주소, 총 Vault 수, 활성 Vault 수, Total BTC, 첫 예치일.</p>
+          <p>활성 수는 현재 사용 중인 예치 규모를 시각적으로 구분하기 위해 녹색으로 표시.</p>
+          <p>첫 예치일은 온보딩 시점을 추적하는 용도.</p>
+        </DevNoteSection>
+
+        <DevNoteSection heading="정렬 / 이동">
+          <p>Total BTC 내림차순으로 규모가 큰 예치자를 상단 배치.</p>
+          <p>주소 클릭 시 통합 Account 상세로 이동.</p>
+        </DevNoteSection>
+
+        <DevNoteSection heading="New Depositors 차트">
+          <p>최근 13주(약 3개월)간 신규 Depositor 유입 추이를 주 단위로 풀 너비 노출.</p>
+          <p>해당 주에 처음으로 vault를 생성한 주소만 신규 Depositor로 카운트.</p>
+          <p>막대는 주별 신규 수, 라인은 누적 총 Depositor 수.</p>
+          <p>우측 상단 +N 값은 표시 구간 동안 새로 유입된 총 Depositor 수.</p>
+        </DevNoteSection>
+      </DevNote>
+
       {/* Title */}
       <h1 className="text-lg font-semibold text-[#14140f]">Depositors</h1>
 
@@ -148,23 +178,7 @@ export default function DepositorsPage() {
       </div>
 
       {/* New Depositors chart */}
-      <div className="relative">
-        <DevNote title="New Depositors 차트">
-          <DevNoteSection heading="차트 목적">
-            <p>최근 13주(약 3개월)간 신규 Depositor 유입 추이를 주 단위로 풀 너비 노출.</p>
-            <p>온보딩 흐름과 누적 사용자 성장세를 한눈에 파악.</p>
-          </DevNoteSection>
-
-          <DevNoteSection heading="산출 방식">
-            <p>해당 주에 처음으로 vault를 생성한 주소만 신규 Depositor로 카운트.</p>
-            <p>막대는 주별 신규 수, 라인은 누적 총 Depositor 수.</p>
-          </DevNoteSection>
-
-          <DevNoteSection heading="헤더 보조 지표">
-            <p>우측 상단 +N 값은 표시 구간 동안 새로 유입된 총 Depositor 수.</p>
-          </DevNoteSection>
-        </DevNote>
-        <section className="flex h-[360px] flex-col border border-[#387085]/10 bg-white">
+      <section className="flex h-[360px] flex-col border border-[#387085]/10 bg-white">
         <div className="flex items-center justify-between border-b border-[#387085]/10 px-5 py-3">
           <div>
             <h2 className="text-sm font-semibold text-[#14140f]">New Depositors</h2>
@@ -217,7 +231,6 @@ export default function DepositorsPage() {
           </div>
         </div>
       </section>
-      </div>
 
       {/* Results count + Pagination */}
       <div className="flex items-center justify-between">
@@ -234,30 +247,7 @@ export default function DepositorsPage() {
       </div>
 
       {/* Table */}
-      <div className="relative">
-        <DevNote title="Depositors 기획 의도">
-          <DevNoteSection heading="페이지 목적">
-            <p>BTCVault에 BTC를 예치한 개별 사용자 전체를 조회.</p>
-            <p>어떤 주소가 얼마나 예치했고, 현재 얼마가 활성 상태인지 파악.</p>
-          </DevNoteSection>
-
-          <DevNoteSection heading="표시 대상">
-            <p>실제로 Vault를 만든 주소만 포함.</p>
-            <p>활동 이력이 없는 일반 지갑 주소는 제외.</p>
-          </DevNoteSection>
-
-          <DevNoteSection heading="컬럼 구성">
-            <p>순위, 주소, 총 Vault 수, 활성 Vault 수, Total BTC, 첫 예치일.</p>
-            <p>활성 수는 현재 사용 중인 예치 규모를 시각적으로 구분하기 위해 녹색으로 표시.</p>
-            <p>첫 예치일은 온보딩 시점을 추적하는 용도.</p>
-          </DevNoteSection>
-
-          <DevNoteSection heading="정렬 / 이동">
-            <p>Total BTC 내림차순으로 규모가 큰 예치자를 상단 배치.</p>
-            <p>주소 클릭 시 통합 Account 상세로 이동.</p>
-          </DevNoteSection>
-        </DevNote>
-        <div className="overflow-x-auto rounded-none border border-[#cd6332]/20 bg-white">
+      <div className="overflow-x-auto rounded-none border border-[#cd6332]/20 bg-white">
           <table className="w-full text-left text-xs">
           <thead>
             <tr className="bg-[#cd6332] text-[11px] font-medium uppercase tracking-wider text-white">
@@ -296,7 +286,6 @@ export default function DepositorsPage() {
             })}
             </tbody>
           </table>
-        </div>
       </div>
     </div>
   );
