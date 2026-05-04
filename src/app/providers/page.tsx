@@ -174,22 +174,18 @@ export default function ProvidersPage() {
         <div className="border border-[#387085]/10 bg-[#faf9f5] p-3">
           <p className="text-[11px] font-medium uppercase tracking-wide text-[#387085]/50">Total Providers</p>
           <p className="mt-0.5 text-2xl font-semibold text-[#14140f]">{totalProviders.toLocaleString()}</p>
-          <p className="mt-0.5 text-[11px] text-[#387085]/40">registered vault providers</p>
         </div>
         <div className="border border-[#cd6332]/20 bg-[#cd6332]/5 p-3">
           <p className="text-[11px] font-medium uppercase tracking-wide text-[#387085]/50">Total BTC Managed</p>
           <p className="mt-0.5 text-2xl font-semibold text-[#cd6332]">{totalBtc.toFixed(2)} BTC</p>
-          <p className="mt-0.5 text-[11px] text-[#387085]/40">across all providers</p>
         </div>
         <div className="border border-[#387085]/10 bg-[#faf9f5] p-3">
           <p className="text-[11px] font-medium uppercase tracking-wide text-[#387085]/50">Avg Commission</p>
           <p className="mt-0.5 text-2xl font-semibold text-[#14140f]">{(avgCommission / 100).toFixed(2)}%</p>
-          <p className="mt-0.5 text-[11px] text-[#387085]/40">average fee rate</p>
         </div>
         <div className="border border-[#387085]/10 bg-[#faf9f5] p-3">
           <p className="text-[11px] font-medium uppercase tracking-wide text-[#387085]/50">Active Vaults</p>
           <p className="mt-0.5 text-2xl font-semibold text-green-600">{activeVaultCount.toLocaleString()}</p>
-          <p className="mt-0.5 text-[11px] text-[#387085]/40">vaults currently active</p>
         </div>
       </div>
 

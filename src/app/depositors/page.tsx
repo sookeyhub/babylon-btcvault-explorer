@@ -158,22 +158,18 @@ export default function DepositorsPage() {
         <div className="border border-[#387085]/10 bg-[#faf9f5] p-3">
           <p className="text-[11px] font-medium uppercase tracking-wide text-[#387085]/50">Total Depositors</p>
           <p className="mt-0.5 text-2xl font-semibold text-[#14140f]">{totalDepositors.toLocaleString()}</p>
-          <p className="mt-0.5 text-[11px] text-[#387085]/40">unique depositor addresses</p>
         </div>
         <div className="border border-[#cd6332]/20 bg-[#cd6332]/5 p-3">
           <p className="text-[11px] font-medium uppercase tracking-wide text-[#387085]/50">Total BTC Deposited</p>
           <p className="mt-0.5 text-2xl font-semibold text-[#cd6332]">{totalBtc.toFixed(2)} BTC</p>
-          <p className="mt-0.5 text-[11px] text-[#387085]/40">sum of all vault amounts</p>
-        </div>
-        <div className="border border-[#387085]/10 bg-[#faf9f5] p-3">
-          <p className="text-[11px] font-medium uppercase tracking-wide text-[#387085]/50">Active Vaults</p>
-          <p className="mt-0.5 text-2xl font-semibold text-green-600">{activeVaultCount.toLocaleString()}</p>
-          <p className="mt-0.5 text-[11px] text-[#387085]/40">vaults currently active</p>
         </div>
         <div className="border border-[#387085]/10 bg-[#faf9f5] p-3">
           <p className="text-[11px] font-medium uppercase tracking-wide text-[#387085]/50">Avg BTC per Depositor</p>
           <p className="mt-0.5 text-2xl font-semibold text-[#14140f]">{avgBtc.toFixed(2)} BTC</p>
-          <p className="mt-0.5 text-[11px] text-[#387085]/40">average deposited amount</p>
+        </div>
+        <div className="border border-[#387085]/10 bg-[#faf9f5] p-3">
+          <p className="text-[11px] font-medium uppercase tracking-wide text-[#387085]/50">Active Vaults</p>
+          <p className="mt-0.5 text-2xl font-semibold text-green-600">{activeVaultCount.toLocaleString()}</p>
         </div>
       </div>
 
