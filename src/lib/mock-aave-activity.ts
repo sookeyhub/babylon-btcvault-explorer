@@ -225,6 +225,150 @@ export interface PortfolioPosition {
   healthFactor: number | null;
 }
 
+/**
+ * btcVaultAaveV4Position stand-in.
+ * Per-depositor Aave position used by the Provider dashboard.
+ */
+export interface AaveV4PositionDebt {
+  reserveId?: string;
+  symbol: string;
+  decimals: number;
+  totalAmount: string;   // principal + accruedInterest (raw base units)
+  principal: string;
+  accruedInterest: string;
+}
+
+export interface AaveV4Position {
+  depositor: string;        // truncated for display
+  depositorFull: string;
+  proxyContract: string;
+  totalCollateral: {
+    symbol: string;
+    decimals: number;
+    amount: string;
+    priceUsd: string | null;
+  };
+  healthFactor: string;
+  currentLtv: string;
+  riskPremium: string;
+  /** Average collateral factor — effectively the liquidation LTV ceiling (e.g. '0.75' = 75%). */
+  avgCollateralFactor?: string;
+  debts: AaveV4PositionDebt[];
+}
+
+/**
+ * Single Aave V4 position aggregate for the active Depositor (mock).
+ * Drives the Positions-tab summary card.
+ */
+export const MOCK_DEPOSITOR_AAVE_POSITION: AaveV4Position = {
+  depositor: '0x5a6b...3a4b',
+  depositorFull: '0x5a6b7c8d9e0f1a2b3c4d5e6f7a8b9c0d1e2f3a4b',
+  proxyContract: '0x45df05cb7128227dabc8ff175219697a08d49233',
+  totalCollateral: {
+    symbol: 'sBTC',
+    decimals: 8,
+    amount: '3001229',
+    priceUsd: '69014.43',
+  },
+  healthFactor: '1.16',
+  currentLtv: '64.34',
+  avgCollateralFactor: '0.75',
+  riskPremium: '10.00',
+  debts: [
+    {
+      reserveId: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',
+      symbol: 'USDC',
+      decimals: 6,
+      totalAmount: '498150000',
+      principal: '498148000',
+      accruedInterest: '2221',
+    },
+    {
+      reserveId: '0xdac17f958d2ee523a2206206994597c13d831ec7',
+      symbol: 'USDT',
+      decimals: 6,
+      totalAmount: '125400000',
+      principal: '125000000',
+      accruedInterest: '400000',
+    },
+  ],
+};
+
+export const MOCK_AAVE_POSITIONS: AaveV4Position[] = [
+  {
+    depositor: '0x5a6b...3a4b',
+    depositorFull: '0x5a6b7c8d9e0f1a2b3c4d5e6f7a8b9c0d1e2f3a4b',
+    proxyContract: '0x31cf0a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6ddf1',
+    totalCollateral: { symbol: 'sBTC', decimals: 8, amount: '3001229', priceUsd: '69014.43' },
+    healthFactor: '9.71',
+    currentLtv: '7.72',
+    riskPremium: '10.00',
+    debts: [
+      {
+        symbol: 'USDC',
+        decimals: 6,
+        totalAmount: '177876805',
+        principal: '177876044',
+        accruedInterest: '761',
+      },
+    ],
+  },
+  {
+    depositor: '0x13eb...a439',
+    depositorFull: '0x13eb4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a439',
+    proxyContract: '0x42ab1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6dcd3',
+    totalCollateral: { symbol: 'sBTC', decimals: 8, amount: '88344622', priceUsd: '69014.43' },
+    healthFactor: '1.38',
+    currentLtv: '52.40',
+    riskPremium: '10.00',
+    debts: [
+      {
+        symbol: 'USDC',
+        decimals: 6,
+        totalAmount: '3184200000',
+        principal: '3180000000',
+        accruedInterest: '4200000',
+      },
+    ],
+  },
+  {
+    depositor: '0x2bbf...4778',
+    depositorFull: '0x2bbf1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d4778',
+    proxyContract: '0x8f121a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6dee9',
+    totalCollateral: { symbol: 'sBTC', decimals: 8, amount: '145000000', priceUsd: '69014.43' },
+    healthFactor: '1.08',
+    currentLtv: '68.90',
+    riskPremium: '10.00',
+    debts: [
+      {
+        symbol: 'USDT',
+        decimals: 6,
+        totalAmount: '6901443000',
+        principal: '6800000000',
+        accruedInterest: '101443000',
+      },
+    ],
+  },
+  {
+    depositor: '0xdba3...055d',
+    depositorFull: '0xdba31a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d055d',
+    proxyContract: '0x9c451a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6dfe2',
+    totalCollateral: { symbol: 'sBTC', decimals: 8, amount: '62000000', priceUsd: '69014.43' },
+    healthFactor: '0.94', // ← liquidation risk
+    currentLtv: '79.10',
+    riskPremium: '10.00',
+    debts: [
+      {
+        symbol: 'USDC',
+        decimals: 6,
+        totalAmount: '3380806000',
+        principal: '3250000000',
+        accruedInterest: '130806000',
+      },
+    ],
+  },
+];
+
 export const MOCK_PORTFOLIO_POSITIONS: PortfolioPosition[] = [
   {
     asset: 'sBTC',

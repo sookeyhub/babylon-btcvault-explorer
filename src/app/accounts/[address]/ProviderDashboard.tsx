@@ -3,6 +3,7 @@
 import { useMemo } from 'react';
 import Link from 'next/link';
 import { MOCK_VAULTS } from '@/lib/mock-data';
+import { MOCK_AAVE_POSITIONS } from '@/lib/mock-aave-activity';
 import { truncateAddress } from '@/lib/utils';
 import CopyButton from '@/components/CopyButton';
 import type { ProviderInfo, VaultStatus } from '@/lib/types';
@@ -18,6 +19,20 @@ const STATUS_COLORS: Record<VaultStatus, string> = {
   Expired:    '#9ca3af',
   Liquidated: '#dc2626',
 };
+
+// ── Aave helpers ─────────────────────────────────────────────────────────────
+
+function parseAmount(amount: string, decimals: number): number {
+  return parseFloat(amount) / Math.pow(10, decimals);
+}
+
+function getHealthStatus(hf: number): { label: string; color: string; bg: string; text: string } {
+  if (hf >= 2.0) return { label: 'Safe', color: '#16a34a', bg: 'bg-green-50', text: 'text-green-700' };
+  if (hf >= 1.5) return { label: 'Healthy', color: '#387085', bg: 'bg-[#387085]/8', text: 'text-[#387085]' };
+  if (hf >= 1.2) return { label: 'Caution', color: '#d97706', bg: 'bg-amber-50', text: 'text-amber-700' };
+  if (hf >= 1.0) return { label: 'At Risk', color: '#f97316', bg: 'bg-orange-50', text: 'text-orange-700' };
+  return { label: 'Liquidation', color: '#dc2626', bg: 'bg-red-50', text: 'text-red-600' };
+}
 
 // ── Component ────────────────────────────────────────────────────────────────
 
@@ -245,6 +260,210 @@ export default function ProviderDashboard({ provider }: { provider: ProviderInfo
           </div>
         </section>
       </div>
+
+      {/* Aave Position Health */}
+      <AavePositionHealth />
     </div>
+  );
+}
+
+// ── Aave Position Health section ─────────────────────────────────────────────
+
+function AavePositionHealth() {
+  const positions = MOCK_AAVE_POSITIONS;
+  const totalCollateral = positions.reduce(
+    (s, p) => s + parseAmount(p.totalCollateral.amount, p.totalCollateral.decimals),
+    0,
+  );
+  const activeBorrowers = positions.filter((p) => p.debts.length > 0).length;
+  const atRiskCount = positions.filter((p) => parseFloat(p.healthFactor) < 1.5).length;
+  const lowestHf =
+    positions.length > 0
+      ? Math.min(...positions.map((p) => parseFloat(p.healthFactor)))
+      : 0;
+  const sortedPositions = [...positions].sort(
+    (a, b) => parseFloat(a.healthFactor) - parseFloat(b.healthFactor),
+  );
+
+  return (
+    <section className="border border-[#387085]/10 bg-white">
+      {/* Header */}
+      <div className="flex items-start justify-between border-b border-[#387085]/10 px-5 py-3">
+        <div>
+          <h2 className="text-sm font-semibold text-[#14140f]">Aave Position Health</h2>
+          <p className="mt-0.5 text-[11px] text-[#387085]/50">
+            Collateral and debt status per depositor
+          </p>
+        </div>
+        <div className="flex flex-wrap items-center gap-2">
+          {atRiskCount > 0 ? (
+            <span className="inline-flex items-center gap-1 border border-red-200/60 bg-red-50 px-2 py-0.5 text-[10px] font-medium text-red-600">
+              ⚠ {atRiskCount} at risk
+            </span>
+          ) : (
+            <span className="inline-flex items-center gap-1 bg-green-50 px-2 py-0.5 text-[10px] font-medium text-green-700">
+              ✓ All healthy
+            </span>
+          )}
+          <span className="text-[11px] text-[#387085]/40">
+            {positions.length} borrowers
+          </span>
+        </div>
+      </div>
+
+      {/* KPI summary 4-col */}
+      <div className="grid grid-cols-2 border-b border-[#387085]/10 sm:grid-cols-4">
+        <div className="border-r border-[#387085]/8 px-5 py-3">
+          <p className="text-[11px] font-medium uppercase tracking-wide text-[#387085]/50">
+            Total Collateral
+          </p>
+          <p className="mt-0.5 text-lg font-semibold text-[#cd6332]">
+            {totalCollateral.toFixed(4)} sBTC
+          </p>
+          <p className="mt-0.5 text-[11px] text-[#387085]/40">across all positions</p>
+        </div>
+        <div className="border-r border-[#387085]/8 px-5 py-3">
+          <p className="text-[11px] font-medium uppercase tracking-wide text-[#387085]/50">
+            Active Borrowers
+          </p>
+          <p className="mt-0.5 text-lg font-semibold text-[#14140f]">{activeBorrowers}</p>
+          <p className="mt-0.5 text-[11px] text-[#387085]/40">with outstanding debt</p>
+        </div>
+        <div className="border-r border-[#387085]/8 px-5 py-3">
+          <p className="text-[11px] font-medium uppercase tracking-wide text-[#387085]/50">
+            At-Risk Positions
+          </p>
+          <p
+            className={`mt-0.5 text-lg font-semibold ${
+              atRiskCount > 0 ? 'text-amber-600' : 'text-[#14140f]'
+            }`}
+          >
+            {atRiskCount}
+          </p>
+          <p className="mt-0.5 text-[11px] text-[#387085]/40">Health Factor &lt; 1.5</p>
+        </div>
+        <div className="px-5 py-3">
+          <p className="text-[11px] font-medium uppercase tracking-wide text-[#387085]/50">
+            Lowest Health Factor
+          </p>
+          <p
+            className={`mt-0.5 text-lg font-semibold ${
+              lowestHf < 1.2 ? 'text-red-500' : 'text-[#14140f]'
+            }`}
+          >
+            {lowestHf.toFixed(2)}
+          </p>
+          <p className="mt-0.5 text-[11px] text-[#387085]/40">across all positions</p>
+        </div>
+      </div>
+
+      {/* Position rows — sorted by HF asc (most risky first) */}
+      <div className="divide-y divide-[#387085]/8">
+        {sortedPositions.map((position) => {
+          const hf = parseFloat(position.healthFactor);
+          const status = getHealthStatus(hf);
+          const coll = parseAmount(
+            position.totalCollateral.amount,
+            position.totalCollateral.decimals,
+          );
+          const isLiquidation = hf < 1.0;
+          const ltv = parseFloat(position.currentLtv);
+          return (
+            <div
+              key={position.depositorFull}
+              className={`px-5 py-3 transition-colors ${
+                isLiquidation ? 'bg-red-50/40 hover:bg-red-50/60' : 'hover:bg-[#faf9f5]'
+              }`}
+            >
+              <div className="flex items-center justify-between gap-4">
+                {/* Left — depositor + status */}
+                <div className="flex min-w-0 items-center gap-3">
+                  <span
+                    className={`flex-shrink-0 rounded-full px-2 py-0.5 text-[10px] font-semibold ${status.bg} ${status.text}`}
+                  >
+                    {isLiquidation && '⚠ '}
+                    {status.label}
+                  </span>
+                  <Link
+                    href={`/accounts/${position.depositorFull}`}
+                    className="truncate font-mono text-xs text-[#cd6332] hover:underline"
+                  >
+                    {position.depositor}
+                  </Link>
+                </div>
+
+                {/* Right — metrics */}
+                <div className="flex flex-shrink-0 items-center gap-6 text-right">
+                  {/* Collateral */}
+                  <div>
+                    <p className="text-[10px] uppercase tracking-wide text-[#387085]/40">
+                      Collateral
+                    </p>
+                    <p className="text-sm font-semibold text-[#14140f]">
+                      {coll.toFixed(4)}
+                      <span className="ml-1 text-[11px] font-normal text-[#387085]/40">
+                        sBTC
+                      </span>
+                    </p>
+                  </div>
+
+                  {/* Debt */}
+                  {position.debts.map((debt, i) => {
+                    const total = parseAmount(debt.totalAmount, debt.decimals);
+                    const interest = parseAmount(debt.accruedInterest, debt.decimals);
+                    return (
+                      <div key={i}>
+                        <p className="text-[10px] uppercase tracking-wide text-[#387085]/40">
+                          Debt
+                        </p>
+                        <p className="text-sm font-semibold text-[#cd6332]">
+                          {total.toLocaleString('en-US', { maximumFractionDigits: 2 })}
+                          <span className="ml-1 text-[11px] font-normal text-[#387085]/40">
+                            {debt.symbol}
+                          </span>
+                        </p>
+                        <p className="text-[10px] text-[#387085]/35">
+                          +{interest.toLocaleString('en-US', { maximumFractionDigits: 4 })}{' '}
+                          interest
+                        </p>
+                      </div>
+                    );
+                  })}
+
+                  {/* LTV */}
+                  <div>
+                    <p className="text-[10px] uppercase tracking-wide text-[#387085]/40">LTV</p>
+                    <p
+                      className={`text-sm font-semibold ${
+                        ltv > 70
+                          ? 'text-red-500'
+                          : ltv > 50
+                            ? 'text-amber-600'
+                            : 'text-[#14140f]'
+                      }`}
+                    >
+                      {position.currentLtv}%
+                    </p>
+                  </div>
+
+                  {/* Health */}
+                  <div>
+                    <p className="text-[10px] uppercase tracking-wide text-[#387085]/40">
+                      Health
+                    </p>
+                    <p
+                      className="text-sm font-semibold"
+                      style={{ color: status.color }}
+                    >
+                      {hf.toFixed(2)}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </section>
   );
 }

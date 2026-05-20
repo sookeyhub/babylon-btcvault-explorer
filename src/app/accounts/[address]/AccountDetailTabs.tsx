@@ -6,6 +6,7 @@ import { MOCK_TRANSACTIONS, MOCK_VAULTS } from '@/lib/mock-data';
 import {
   MOCK_PORTFOLIO_POSITIONS,
   MOCK_AAVE_V4_ACTIVITIES,
+  MOCK_DEPOSITOR_AAVE_POSITION,
   type AaveV4Activity,
   type AaveV4ActivityType,
   type TokenAmount,
@@ -378,14 +379,19 @@ function AaveActivityTable() {
                               {style.label}
                             </span>
                             {activity.vaultId && (
-                              <Link
-                                href={`/vaults/${activity.vaultId}`}
-                                title={`Vault ${activity.vaultId}`}
-                                className="font-mono text-[10px] text-[#cd6332]/70 transition-colors hover:text-[#cd6332] hover:underline"
-                              >
-                                {activity.vaultId.slice(0, 6)}...
-                                {activity.vaultId.slice(-4)}
-                              </Link>
+                              <span className="inline-flex items-center gap-1">
+                                <span className="text-[9px] font-medium uppercase tracking-wide text-[#387085]/40">
+                                  Vault
+                                </span>
+                                <Link
+                                  href={`/vaults/${activity.vaultId}`}
+                                  title={`Vault ${activity.vaultId}`}
+                                  className="font-mono text-[10px] text-[#cd6332]/70 transition-colors hover:text-[#cd6332] hover:underline"
+                                >
+                                  {activity.vaultId.slice(0, 6)}...
+                                  {activity.vaultId.slice(-4)}
+                                </Link>
+                              </span>
                             )}
                           </div>
                           <span
@@ -398,19 +404,29 @@ function AaveActivityTable() {
 
                         {/* Row 2: tx hash + block */}
                         <div className="mt-1.5 flex flex-wrap items-center gap-3">
-                          <Link
-                            href={`/tx/${activity.txHash}`}
-                            title={activity.txHash}
-                            className="font-mono text-[10px] text-[#cd6332]/70 transition-colors hover:text-[#cd6332] hover:underline"
-                          >
-                            {activity.txHash.slice(0, 6)}...{activity.txHash.slice(-4)}
-                          </Link>
+                          <span className="inline-flex items-center gap-1">
+                            <span className="text-[9px] font-medium uppercase tracking-wide text-[#387085]/40">
+                              Tx
+                            </span>
+                            <Link
+                              href={`/tx/${activity.txHash}`}
+                              title={activity.txHash}
+                              className="font-mono text-[10px] text-[#cd6332]/70 transition-colors hover:text-[#cd6332] hover:underline"
+                            >
+                              {activity.txHash.slice(0, 6)}...{activity.txHash.slice(-4)}
+                            </Link>
+                          </span>
                           <span className="text-[10px] text-[#387085]/20">·</span>
-                          <span
-                            title={formatFull(activity.blockTime)}
-                            className="font-mono text-[10px] text-[#387085]/40"
-                          >
-                            #{activity.blockNumber.toLocaleString()}
+                          <span className="inline-flex items-center gap-1">
+                            <span className="text-[9px] font-medium uppercase tracking-wide text-[#387085]/40">
+                              Block
+                            </span>
+                            <span
+                              title={formatFull(activity.blockTime)}
+                              className="font-mono text-[10px] text-[#387085]/40"
+                            >
+                              #{activity.blockNumber.toLocaleString()}
+                            </span>
                           </span>
                         </div>
                       </div>
@@ -429,241 +445,21 @@ function AaveActivityTable() {
 /* ── Portfolio Positions — asset-aggregated card view ─────────────────── */
 
 function CollateralPositionsTable({
-  onSwitchTab,
+  onSwitchTab: _onSwitchTab,
 }: {
   onSwitchTab: (key: TabKey) => void;
 }) {
-  // Default: first asset expanded
-  const [expanded, setExpanded] = useState<Set<string>>(
-    () => new Set(MOCK_PORTFOLIO_POSITIONS[0] ? [MOCK_PORTFOLIO_POSITIONS[0].asset] : []),
-  );
-
-  const toggle = (asset: string) => {
-    setExpanded((prev) => {
-      const next = new Set(prev);
-      if (next.has(asset)) next.delete(asset);
-      else next.add(asset);
-      return next;
-    });
-  };
-
-  if (MOCK_PORTFOLIO_POSITIONS.length === 0) {
-    return (
-      <div className="overflow-x-auto rounded-none border border-[#cd6332]/20 bg-white">
-        <div className="py-12 text-center text-sm text-[#387085]/40">
-          No positions found
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="space-y-4">
-      {MOCK_PORTFOLIO_POSITIONS.map((position) => {
-        const isOpen = expanded.has(position.asset);
+      {/* Aave-style position summary */}
+      <PositionSummaryCard />
 
-        return (
-          <div key={position.asset} className="border border-[#387085]/10 bg-white">
-            {/* Header — toggle button */}
-            <button
-              type="button"
-              onClick={() => toggle(position.asset)}
-              aria-expanded={isOpen}
-              className={`flex w-full items-center justify-between px-5 py-4 text-left transition-colors hover:bg-[#faf9f5] ${
-                isOpen ? 'border-b border-[#387085]/10' : ''
-              }`}
-            >
-              <div className="flex items-center gap-3">
-                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#cd6332]/10 text-sm font-semibold text-[#cd6332]">
-                  {position.assetIcon}
-                </div>
-                <div>
-                  <p className="text-base font-semibold text-[#14140f]">{position.asset}</p>
-                  {position.healthFactor != null &&
-                    (() => {
-                      const hf = position.healthFactor;
-                      const hfMeta =
-                        hf < 1
-                          ? { label: 'Liquidation', color: 'text-red-500', bg: 'bg-red-50' }
-                          : hf < 1.2
-                            ? { label: 'At Risk', color: 'text-red-500', bg: 'bg-red-50' }
-                            : hf < 1.5
-                              ? { label: 'Caution', color: 'text-amber-600', bg: 'bg-amber-50' }
-                              : hf < 2
-                                ? { label: 'Healthy', color: 'text-green-600', bg: 'bg-green-50' }
-                                : { label: 'Safe', color: 'text-green-600', bg: 'bg-green-50' };
-                      return (
-                        <p className="mt-0.5 flex items-center gap-1.5 text-[11px]">
-                          <span className="text-[#387085]/50">Health Factor</span>
-                          <span className={`font-semibold ${hfMeta.color}`}>{hf.toFixed(2)}</span>
-                          <span
-                            className={`rounded-full px-1.5 py-0.5 text-[10px] font-medium ${hfMeta.bg} ${hfMeta.color}`}
-                          >
-                            {hfMeta.label}
-                          </span>
-                        </p>
-                      );
-                    })()}
-                </div>
-              </div>
-              <div className="flex items-center gap-4">
-                <div className="text-right">
-                  <p className="text-xl font-semibold text-[#14140f]">
-                    {position.collateral.toFixed(4)}
-                  </p>
-                  <p className="text-[11px] text-[#387085]/40">total collateral</p>
-                </div>
-                <svg
-                  className={`h-4 w-4 text-[#387085]/60 transition-transform duration-200 ${
-                    isOpen ? 'rotate-180' : ''
-                  }`}
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth="2"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="m19.5 8.25-7.5 7.5-7.5-7.5"
-                  />
-                </svg>
-              </div>
-            </button>
-
-            {/* Body — vertical row list (collapsible) */}
-            {isOpen && (
-              <div>
-                {/* Collateral */}
-                <div className="flex items-center justify-between border-b border-[#387085]/8 px-5 py-3">
-                  <div className="flex items-center gap-3">
-                    <span className="w-24 flex-shrink-0 text-[11px] font-medium uppercase tracking-wide text-[#387085]/50">
-                      Collateral
-                    </span>
-                    <button
-                      type="button"
-                      onClick={() => onSwitchTab('deposited')}
-                      title="View these vaults"
-                      className="text-[11px] text-[#387085]/40 transition-colors hover:text-[#cd6332] hover:underline"
-                    >
-                      {position.activeVaults}/{position.collateralVaults} vaults active
-                    </button>
-                  </div>
-                  <div className="text-right">
-                    <span className="text-sm font-semibold text-[#14140f]">
-                      {position.collateral.toFixed(6)}
-                    </span>
-                    <span className="ml-1 text-[11px] text-[#387085]/40">{position.asset}</span>
-                  </div>
-                </div>
-
-                {/* Borrowed */}
-                <div className="flex items-center justify-between border-b border-[#387085]/8 px-5 py-3">
-                  <div className="flex items-center gap-3">
-                    <span className="w-24 flex-shrink-0 text-[11px] font-medium uppercase tracking-wide text-[#387085]/50">
-                      Borrowed
-                    </span>
-                    {position.borrowed > 0 && (
-                      <span className="text-[11px] text-[#387085]/40">
-                        {position.totalRepaid.toLocaleString()} repaid of{' '}
-                        {position.totalBorrowed.toLocaleString()}
-                      </span>
-                    )}
-                  </div>
-                  <div className="text-right">
-                    {position.borrowed > 0 ? (
-                      <>
-                        <span className="text-sm font-semibold text-[#cd6332]">
-                          {position.borrowed.toLocaleString()}
-                        </span>
-                        <span className="ml-1 text-[11px] text-[#387085]/40">
-                          {position.borrowedAsset}
-                        </span>
-                      </>
-                    ) : (
-                      <span className="text-sm text-[#387085]/30">—</span>
-                    )}
-                  </div>
-                </div>
-
-                {/* LTV */}
-                <div className="flex items-center justify-between border-b border-[#387085]/8 px-5 py-3">
-                  <div className="flex items-center gap-3">
-                    <span className="w-24 flex-shrink-0 text-[11px] font-medium uppercase tracking-wide text-[#387085]/50">
-                      LTV
-                    </span>
-                    {position.ltv != null && position.borrowed > 0 && (
-                      <div className="flex w-40 max-w-[200px] items-center gap-1.5">
-                        <div className="h-1.5 flex-1 overflow-hidden bg-[#387085]/8">
-                          <div
-                            className="h-full"
-                            style={{
-                              width: `${Math.min(position.ltv, 100)}%`,
-                              background:
-                                position.ltv >= 90
-                                  ? '#dc2626'
-                                  : position.ltv >= 75
-                                    ? '#d97706'
-                                    : '#16a34a',
-                              opacity: 0.75,
-                            }}
-                          />
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                  {position.ltv != null && position.borrowed > 0 ? (
-                    <span
-                      className={`text-sm font-semibold ${
-                        position.ltv >= 90
-                          ? 'text-red-500'
-                          : position.ltv >= 75
-                            ? 'text-amber-600'
-                            : 'text-[#14140f]'
-                      }`}
-                    >
-                      {position.ltv.toFixed(1)}%
-                    </span>
-                  ) : (
-                    <span className="text-sm text-[#387085]/30">—</span>
-                  )}
-                </div>
-
-                {/* Interest */}
-                <div className="flex items-center justify-between px-5 py-3">
-                  <div className="flex items-center gap-3">
-                    <span className="w-24 flex-shrink-0 text-[11px] font-medium uppercase tracking-wide text-[#387085]/50">
-                      Interest
-                    </span>
-                    {position.interest != null && position.interest > 0 && (
-                      <span className="text-[11px] text-[#387085]/40">accrued interest</span>
-                    )}
-                  </div>
-                  {position.interest != null && position.interest > 0 ? (
-                    <div className="text-right">
-                      <span className="text-sm font-semibold text-[#cd6332]">
-                        {position.interest.toLocaleString('en-US', {
-                          minimumFractionDigits: 2,
-                          maximumFractionDigits: 2,
-                        })}
-                      </span>
-                      <span className="ml-1 text-[11px] text-[#387085]/40">
-                        {position.borrowedAsset}
-                      </span>
-                    </div>
-                  ) : (
-                    <span className="text-sm text-[#387085]/30">—</span>
-                  )}
-                </div>
-
-              </div>
-            )}
-          </div>
-        );
-      })}
+      {/* Debts table */}
+      <PositionDebtsTable />
     </div>
   );
 }
+
 
 /* ── Transactions Table ───────────────────────────────────────────────── */
 function TransactionsTable({ txs, address }: { txs: Transaction[]; address: string }) {
@@ -978,6 +774,319 @@ function ManagedVaultsPanel({ vaults, address }: { vaults: Vault[]; address: str
           </div>
         )}
       </div>
+    </div>
+  );
+}
+
+/* ── Positions tab — Aave-style summary card ───────────────────────────── */
+
+function parsePositionAmount(amount: string, decimals: number): number {
+  return parseFloat(amount) / Math.pow(10, decimals);
+}
+
+function getPositionHealthStatus(hf: number): {
+  label: string;
+  color: string;
+  bg: string;
+  text: string;
+} {
+  if (hf >= 2.0)
+    return { label: 'Safe', color: '#16a34a', bg: 'bg-green-50', text: 'text-green-700' };
+  if (hf >= 1.5)
+    return { label: 'Healthy', color: '#387085', bg: 'bg-[#387085]/8', text: 'text-[#387085]' };
+  if (hf >= 1.2)
+    return { label: 'Caution', color: '#d97706', bg: 'bg-amber-50', text: 'text-amber-700' };
+  if (hf >= 1.0)
+    return { label: 'At Risk', color: '#f97316', bg: 'bg-orange-50', text: 'text-orange-700' };
+  return { label: 'Liquidation', color: '#dc2626', bg: 'bg-red-50', text: 'text-red-600' };
+}
+
+function PositionSummaryCard() {
+  const p = MOCK_DEPOSITOR_AAVE_POSITION;
+
+  const collateralAmount = parsePositionAmount(
+    p.totalCollateral.amount,
+    p.totalCollateral.decimals,
+  );
+  const collateralUsd = p.totalCollateral.priceUsd
+    ? collateralAmount * parseFloat(p.totalCollateral.priceUsd)
+    : null;
+
+  const currentLtv = parseFloat(p.currentLtv);
+  const maxLtv = p.avgCollateralFactor ? parseFloat(p.avgCollateralFactor) * 100 : 75;
+  const ltvFillPct = Math.min((currentLtv / maxLtv) * 100, 100);
+  const ltvColor =
+    currentLtv >= maxLtv * 0.95
+      ? '#dc2626'
+      : currentLtv >= maxLtv * 0.7
+        ? '#d97706'
+        : '#16a34a';
+
+  const debtTotal = p.debts.reduce(
+    (s, d) => s + parsePositionAmount(d.totalAmount, d.decimals),
+    0,
+  );
+  const interestTotal = p.debts.reduce(
+    (s, d) => s + parsePositionAmount(d.accruedInterest, d.decimals),
+    0,
+  );
+  const debtSymbol = p.debts[0]?.symbol ?? '';
+
+  const hf = parseFloat(p.healthFactor);
+  const status = getPositionHealthStatus(hf);
+  // HF gauge: 0 → 3+ range, map to 0-100%
+  const HF_GAUGE_MAX = 3;
+  const hfPct = Math.min((hf / HF_GAUGE_MAX) * 100, 100);
+  // Markers: 1.0 liquidation, 1.5 caution-safe, 2.0 safe
+  const liquidationMarker = (1.0 / HF_GAUGE_MAX) * 100;
+  const healthyMarker = (1.5 / HF_GAUGE_MAX) * 100;
+  const safeMarker = (2.0 / HF_GAUGE_MAX) * 100;
+
+  return (
+    <div className="space-y-3">
+      {/* Block 1 — Collateral / Current LTV / Debt cards */}
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+        {/* Collateral card */}
+        <div className="border border-[#387085]/10 bg-white px-5 py-4">
+          <p className="mb-1 text-[11px] font-medium uppercase tracking-wide text-[#387085]/50">
+            Collateral
+          </p>
+          <p className="text-lg font-semibold text-[#14140f]">
+            {collateralAmount.toFixed(6)}
+            <span className="ml-1 text-sm font-normal text-[#387085]/50">
+              {p.totalCollateral.symbol}
+            </span>
+          </p>
+          {collateralUsd != null && (
+            <p className="mt-0.5 text-[11px] text-[#387085]/40">
+              ≈ ${collateralUsd.toLocaleString('en-US', { maximumFractionDigits: 2 })}
+            </p>
+          )}
+        </div>
+
+        {/* Current LTV card */}
+        <div className="border border-[#387085]/10 bg-white px-5 py-4">
+          <p className="mb-1 text-[11px] font-medium uppercase tracking-wide text-[#387085]/50">
+            Current LTV
+          </p>
+          <p className="text-lg font-semibold" style={{ color: ltvColor }}>
+            {currentLtv.toFixed(2)}%
+          </p>
+          <p className="mt-0.5 text-[11px] text-[#387085]/40">
+            of {maxLtv.toFixed(0)}% max
+          </p>
+          {/* LTV mini bar */}
+          <div className="mt-2 relative h-1.5 w-full bg-[#387085]/8">
+            <div
+              className="absolute left-0 top-0 h-full transition-all"
+              style={{
+                width: `${ltvFillPct}%`,
+                background: ltvColor,
+                opacity: 0.85,
+              }}
+            />
+          </div>
+        </div>
+
+        {/* Debt card */}
+        <div className="border border-[#387085]/10 bg-white px-5 py-4">
+          <p className="mb-1 text-[11px] font-medium uppercase tracking-wide text-[#387085]/50">
+            Debt
+          </p>
+          <p className="text-lg font-semibold text-[#cd6332]">
+            {debtTotal.toLocaleString('en-US', { maximumFractionDigits: 2 })}
+            <span className="ml-1 text-sm font-normal text-[#387085]/50">
+              {debtSymbol}
+            </span>
+          </p>
+          {interestTotal > 0 && (
+            <p className="mt-0.5 text-[11px] text-[#387085]/40">
+              +{interestTotal.toLocaleString('en-US', { maximumFractionDigits: 4 })}{' '}
+              interest
+            </p>
+          )}
+        </div>
+      </div>
+
+      {/* Block 2 — Health Factor */}
+      <div className="border border-[#387085]/10 bg-white px-5 py-4">
+        <div className="mb-3 flex items-center justify-between">
+          <p className="text-[11px] font-medium uppercase tracking-wide text-[#387085]/50">
+            Health Factor
+          </p>
+          <span
+            className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${status.bg} ${status.text}`}
+          >
+            {hf < 1 && '⚠ '}
+            {status.label}
+          </span>
+        </div>
+
+        <div className="flex items-baseline gap-3">
+          <p className="text-3xl font-bold" style={{ color: status.color }}>
+            {hf.toFixed(2)}
+          </p>
+          <p className="text-[11px] text-[#387085]/40">
+            {hf < 1
+              ? 'subject to liquidation'
+              : `${(hf - 1).toFixed(2)} above liquidation threshold`}
+          </p>
+        </div>
+
+        {/* HF gauge */}
+        <div className="relative mt-4">
+          {/* Track — gradient red → amber → teal → green */}
+          <div
+            className="h-2 w-full"
+            style={{
+              background:
+                'linear-gradient(to right, #dc2626 0%, #dc2626 ' +
+                liquidationMarker +
+                '%, #d97706 ' +
+                liquidationMarker +
+                '%, #d97706 ' +
+                healthyMarker +
+                '%, #387085 ' +
+                healthyMarker +
+                '%, #387085 ' +
+                safeMarker +
+                '%, #16a34a ' +
+                safeMarker +
+                '%, #16a34a 100%)',
+              opacity: 0.5,
+            }}
+          />
+          {/* Current HF pointer */}
+          <div
+            className="absolute top-[-3px] h-[14px] w-[3px] bg-[#14140f]"
+            style={{ left: `calc(${hfPct}% - 1.5px)` }}
+            title={`Health Factor ${hf.toFixed(2)}`}
+          />
+          {/* Threshold markers */}
+          {[
+            { pct: liquidationMarker, label: '1.0' },
+            { pct: healthyMarker, label: '1.5' },
+            { pct: safeMarker, label: '2.0' },
+          ].map((m) => (
+            <div
+              key={m.label}
+              className="absolute top-3 -translate-x-1/2 text-[9px] text-[#387085]/40"
+              style={{ left: `${m.pct}%` }}
+            >
+              {m.label}
+            </div>
+          ))}
+        </div>
+        <div className="mt-6 flex justify-between text-[10px] text-[#387085]/40">
+          <span>Liquidation</span>
+          <span>Caution</span>
+          <span>Healthy</span>
+          <span>Safe</span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ── Position Debts Table ───────────────────────────────────────────────── */
+
+function PositionDebtsTable() {
+  const debts = MOCK_DEPOSITOR_AAVE_POSITION.debts;
+
+  if (debts.length === 0) {
+    return (
+      <div className="overflow-x-auto rounded-none border border-[#cd6332]/20 bg-white">
+        <div className="py-12 text-center text-sm text-[#387085]/40">No debts</div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="overflow-x-auto rounded-none border border-[#cd6332]/20 bg-white">
+      <table className="w-full text-left text-xs">
+        <thead>
+          <tr className="bg-[#cd6332] text-[11px] font-medium uppercase tracking-wider text-white">
+            <th className="whitespace-nowrap px-4 py-2.5 font-medium">Reserve ID</th>
+            <th className="whitespace-nowrap px-4 py-2.5 font-medium">Token</th>
+            <th className="whitespace-nowrap px-4 py-2.5 text-right font-medium">Amount</th>
+            <th className="whitespace-nowrap px-4 py-2.5 text-right font-medium">Principal</th>
+            <th className="whitespace-nowrap px-4 py-2.5 text-right font-medium">
+              Accrued Interest
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          {debts.map((d, i) => {
+            const amount = parsePositionAmount(d.totalAmount, d.decimals);
+            const principal = parsePositionAmount(d.principal, d.decimals);
+            const interest = parsePositionAmount(d.accruedInterest, d.decimals);
+            const reserve = d.reserveId;
+            const reserveLabel = reserve
+              ? `${reserve.slice(0, 6)}...${reserve.slice(-4)}`
+              : '—';
+            return (
+              <tr
+                key={`${d.symbol}-${i}`}
+                className="h-10 border-b border-[#387085]/8 transition-colors last:border-0 hover:bg-[#faf9f5]"
+              >
+                {/* Reserve ID */}
+                <td className="whitespace-nowrap px-4 py-2.5">
+                  {reserve ? (
+                    <div className="flex items-center">
+                      <span
+                        title={reserve}
+                        className="font-mono text-[11px] text-[#387085]"
+                      >
+                        {reserveLabel}
+                      </span>
+                      <CopyIcon text={reserve} />
+                    </div>
+                  ) : (
+                    <span className="text-[#387085]/30">—</span>
+                  )}
+                </td>
+
+                {/* Token */}
+                <td className="whitespace-nowrap px-4 py-2.5 text-sm font-medium text-[#14140f]">
+                  {d.symbol}
+                </td>
+
+                {/* Amount (principal + interest) */}
+                <td className="whitespace-nowrap px-4 py-2.5 text-right tabular-nums">
+                  <span className="text-sm font-semibold text-[#cd6332]">
+                    {amount.toLocaleString('en-US', { maximumFractionDigits: 6 })}
+                  </span>
+                  <span className="ml-1 text-[11px] text-[#387085]/40">{d.symbol}</span>
+                </td>
+
+                {/* Principal */}
+                <td className="whitespace-nowrap px-4 py-2.5 text-right tabular-nums">
+                  <span className="text-sm text-[#14140f]">
+                    {principal.toLocaleString('en-US', { maximumFractionDigits: 6 })}
+                  </span>
+                  <span className="ml-1 text-[11px] text-[#387085]/40">{d.symbol}</span>
+                </td>
+
+                {/* Accrued Interest */}
+                <td className="whitespace-nowrap px-4 py-2.5 text-right tabular-nums">
+                  {interest > 0 ? (
+                    <>
+                      <span className="text-sm text-[#387085]">
+                        +{interest.toLocaleString('en-US', { maximumFractionDigits: 6 })}
+                      </span>
+                      <span className="ml-1 text-[11px] text-[#387085]/40">
+                        {d.symbol}
+                      </span>
+                    </>
+                  ) : (
+                    <span className="text-sm text-[#387085]/30">—</span>
+                  )}
+                </td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
     </div>
   );
 }
