@@ -2,6 +2,10 @@ import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { getAccountByAddress, getProviderByAddress } from '@/lib/data';
 import { MOCK_VAULTS } from '@/lib/mock-data';
+import {
+  MOCK_COLLATERAL_POSITIONS,
+  MOCK_PORTFOLIO_POSITIONS,
+} from '@/lib/mock-aave-activity';
 import { truncateAddress } from '@/lib/utils';
 import CopyButton from '@/components/CopyButton';
 import AccountDetailTabs from './AccountDetailTabs';
@@ -34,6 +38,46 @@ export default async function AccountDetailPage({ params }: Props) {
   const depositorActiveVaults = depositorVaults.filter((v) => v.status === 'Active').length;
   const depositorTotalBtc = depositorVaults.reduce((s, v) => s + v.vaultSize, 0);
 
+  // Depositor role detection (EOA + has deposited vaults + not a Provider)
+  const isDepositor = !provider && account.type === 'EOA' && depositorTotalVaults > 0;
+
+  // Outstanding loans (mock) — drives the Total Loans KPI for Depositors
+  const totalLoans = isDepositor
+    ? MOCK_COLLATERAL_POSITIONS.filter((p) => p.borrowed > 0).length
+    : 0;
+
+  // Aggregate risk metrics across portfolio positions
+  const portfolioInterest = isDepositor
+    ? MOCK_PORTFOLIO_POSITIONS.reduce((s, p) => s + (p.interest ?? 0), 0)
+    : 0;
+  const portfolioBorrowed = isDepositor
+    ? MOCK_PORTFOLIO_POSITIONS.reduce((s, p) => s + p.borrowed, 0)
+    : 0;
+  // Collateral-weighted LTV (mock — use raw collateral count as weight)
+  const portfolioLtv = isDepositor
+    ? (() => {
+        const weighted = MOCK_PORTFOLIO_POSITIONS.reduce(
+          (acc, p) => {
+            if (p.ltv == null) return acc;
+            acc.num += p.ltv * p.collateral;
+            acc.den += p.collateral;
+            return acc;
+          },
+          { num: 0, den: 0 },
+        );
+        return weighted.den > 0 ? weighted.num / weighted.den : 0;
+      })()
+    : 0;
+  // Lowest non-null Health Factor across positions
+  const portfolioHealth = isDepositor
+    ? (() => {
+        const hfs = MOCK_PORTFOLIO_POSITIONS.map((p) => p.healthFactor).filter(
+          (h): h is number => h != null,
+        );
+        return hfs.length > 0 ? Math.min(...hfs) : null;
+      })()
+    : null;
+
   const typeBadge: Record<string, string> = {
     EOA:      'bg-[#387085]/10 text-[#387085]',
     Contract: 'bg-[#cd6332]/10 text-[#cd6332]',
@@ -64,9 +108,16 @@ export default async function AccountDetailPage({ params }: Props) {
           <p>Provider인 경우 Total BTC를 최우선 지표로 강조하고 관리 vault 수를 함께 표기.</p>
         </DevNoteSection>
 
-        <DevNoteSection heading="Summary 카드">
-          <p>Depositor: Total BTC / Total Vaults / Active Vaults(녹색) / Txn Count 4개 지표.</p>
-          <p>역할 없는 계정: 동일 구조로 노출하되 Vault 관련 값은 0.</p>
+        <DevNoteSection heading="Summary 카드 (Depositor)">
+          <p>Aave 차입 활동 중심 4개 KPI: Total Loans / LTV / Health Factor / Interest Accrued.</p>
+          <p>vault 수·잔고 같은 Depositor 일반 지표는 카드에서 빼고 차입 리스크를 우선 노출.</p>
+          <p>LTV는 가중평균(담보 BTC 기준), Health Factor는 포지션 중 최저값, Interest는 누적 합산.</p>
+          <p>임계 구간에서는 컬러 분기(LTV 75%↑ amber/90%↑ red, HF 1.5↓ amber/1.0↓ red).</p>
+        </DevNoteSection>
+
+        <DevNoteSection heading="Summary 카드 (그 외 계정)">
+          <p>역할 없는 계정: Total BTC / Total Vaults / Active Vaults / Txn Count 기본 4개.</p>
+          <p>Provider는 별도 ProviderDashboard로 분기되어 이 영역 미사용.</p>
         </DevNoteSection>
 
         <DevNoteSection heading="Provider Dashboard">
@@ -75,9 +126,26 @@ export default async function AccountDetailPage({ params }: Props) {
           <p>Active Vaults는 그린 컬러로 강조해 현재 운영 규모를 직관적으로 파악.</p>
         </DevNoteSection>
 
+        <DevNoteSection heading="Positions 탭 (Depositor)">
+          <p>자산(Asset) 단위 포트폴리오 뷰. 향후 다중 담보 자산 확장을 고려해 array 구조 유지.</p>
+          <p>카드 헤더는 아코디언 토글: 자산명 아래 Health Factor + 상태 뱃지(Safe/Healthy/Caution/At Risk/Liquidation), 우측에 total collateral.</p>
+          <p>HF가 null(부채 없음)이면 헤더 보조줄을 숨겨 노이즈 제거.</p>
+          <p>펼친 본문은 세로 행 리스트(Collateral/Borrowed/LTV/Interest): 좌측 라벨+보조정보, 우측 값. 우선순위 순서.</p>
+          <p>LTV 행에는 0~100% 진행 바를 함께 표시해 위험 수준 시각화.</p>
+        </DevNoteSection>
+
+        <DevNoteSection heading="Activity 탭 (Depositor)">
+          <p>btcVaultAaveV4Activities GraphQL API 기반 Aave 이벤트 타임라인.</p>
+          <p>이벤트 타입: ADD_COLLATERAL / REMOVE_COLLATERAL / BORROW / REPAY / LIQUIDATION.</p>
+          <p>타임라인은 UTC 날짜별 그룹핑, 헤더에 "N days ago (Mon DD, YYYY)" 표기로 절대·상대 시간을 동시 제공.</p>
+          <p>패널 상단에는 타입 필터(All/Add/Remove/Borrow/Repay/Liquidation)만 좌측 정렬, 별도 타이틀 없음(탭이 타이틀 역할).</p>
+          <p>LIQUIDATION 카드는 빨간 배경+⚠ 아이콘으로 강조, amount는 ±prefix와 컬러로 자금 흐름 방향 인지.</p>
+          <p>이벤트 행 부가 정보는 tx hash · #block만 노출(시간은 그룹 헤더와 중복이라 제거).</p>
+        </DevNoteSection>
+
         <DevNoteSection heading="역할별 탭">
           <p>Provider: Transactions + Vaults.</p>
-          <p>Depositor: Transactions + Deposited Vaults.</p>
+          <p>Depositor: Positions + Deposited Vaults + Activity.</p>
           <p>역할 없는 계정: Transactions만 제공.</p>
         </DevNoteSection>
 
@@ -129,19 +197,67 @@ export default async function AccountDetailPage({ params }: Props) {
           </div>
         </div>
 
-        {/* Provider: right-aligned Total BTC + vaults managed */}
-        {provider && (
-          <div className="text-right">
-            <p className="text-2xl font-semibold text-[#cd6332]">
-              {provider.totalBtc.toFixed(2)} BTC
-            </p>
-            <p className="text-sm text-[#387085]/60">{provider.vaultCount} vaults managed</p>
-          </div>
-        )}
       </div>
 
-      {/* Summary cards (non-Provider accounts only) */}
-      {!provider && (
+      {/* Summary cards — Depositor (borrow-focused) */}
+      {isDepositor && (
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+          <div className="border border-[#387085]/10 bg-[#faf9f5] p-3">
+            <p className="text-[11px] font-medium uppercase tracking-wide text-[#387085]/50">Total Loans</p>
+            <p className="mt-0.5 text-lg font-semibold text-[#14140f]">{totalLoans.toLocaleString()}</p>
+            <p className="mt-0.5 text-[10px] text-[#387085]/40">outstanding loans</p>
+          </div>
+          <div className="border border-[#387085]/10 bg-[#faf9f5] p-3">
+            <p className="text-[11px] font-medium uppercase tracking-wide text-[#387085]/50">LTV</p>
+            <p
+              className={`mt-0.5 text-lg font-semibold ${
+                portfolioLtv >= 90
+                  ? 'text-red-500'
+                  : portfolioLtv >= 75
+                    ? 'text-amber-600'
+                    : 'text-[#14140f]'
+              }`}
+            >
+              {portfolioLtv.toFixed(1)}%
+            </p>
+            <p className="mt-0.5 text-[10px] text-[#387085]/40">weighted avg</p>
+          </div>
+          <div className="border border-[#387085]/10 bg-[#faf9f5] p-3">
+            <p className="text-[11px] font-medium uppercase tracking-wide text-[#387085]/50">Health Factor</p>
+            {portfolioHealth != null ? (
+              <p
+                className={`mt-0.5 text-lg font-semibold ${
+                  portfolioHealth < 1
+                    ? 'text-red-500'
+                    : portfolioHealth < 1.5
+                      ? 'text-amber-600'
+                      : 'text-green-600'
+                }`}
+              >
+                {portfolioHealth.toFixed(2)}
+              </p>
+            ) : (
+              <p className="mt-0.5 text-lg font-semibold text-[#387085]/30">—</p>
+            )}
+            <p className="mt-0.5 text-[10px] text-[#387085]/40">lowest across positions</p>
+          </div>
+          <div className="border border-[#387085]/10 bg-[#faf9f5] p-3">
+            <p className="text-[11px] font-medium uppercase tracking-wide text-[#387085]/50">Interest Accrued</p>
+            <p className="mt-0.5 text-lg font-semibold text-[#cd6332]">
+              {portfolioInterest.toLocaleString('en-US', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+              })}
+            </p>
+            <p className="mt-0.5 text-[10px] text-[#387085]/40">
+              across {portfolioBorrowed > 0 ? 'open loans' : 'positions'}
+            </p>
+          </div>
+        </div>
+      )}
+
+      {/* Summary cards — fallback (non-Provider, non-Depositor accounts) */}
+      {!provider && !isDepositor && (
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
           <div className="border border-[#387085]/10 bg-[#faf9f5] p-3">
             <p className="text-[11px] font-medium uppercase tracking-wide text-[#387085]/50">Total BTC</p>
@@ -180,6 +296,7 @@ export default async function AccountDetailPage({ params }: Props) {
         address={account.address}
         accountType={account.type}
         isProvider={!!provider}
+        isDepositor={isDepositor}
       />
     </div>
   );

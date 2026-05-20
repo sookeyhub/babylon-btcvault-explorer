@@ -342,7 +342,10 @@ export default function AnalyticsClient({
   return (
     <div className="mx-auto max-w-[1200px] space-y-5 px-4 py-8 sm:px-6">
       {/* Title */}
-      <h1 className="text-lg font-semibold text-[#14140f]">Analytics</h1>
+      <h1 className="text-lg font-semibold text-[#14140f]">
+        Analytics
+        <span className="ml-2 text-sm font-normal text-[#387085]/40">· Vaults</span>
+      </h1>
 
       {/* 4 KPI cards */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">

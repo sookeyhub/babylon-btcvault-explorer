@@ -8,6 +8,7 @@ import { usePathname } from 'next/navigation';
 interface SubMenuItem {
   href: string;
   label: string;
+  desc?: string;
 }
 
 interface NavItem {
@@ -28,7 +29,14 @@ const EXPLORER_NAV: NavItem[] = [
       { href: '/depositors', label: 'Depositors' },
     ],
   },
-  { href: '/analytics', label: 'Analytics' },
+  {
+    href: '/analytics',
+    label: 'Analytics',
+    submenu: [
+      { href: '/analytics', label: 'Vaults', desc: 'TVL, vault counts and activity' },
+      { href: '/analytics/borrowing', label: 'Borrowing', desc: 'Aave lending statistics' },
+    ],
+  },
 ];
 
 export default function Header() {
@@ -134,10 +142,18 @@ export default function Header() {
                     </Link>
 
                     {/* Dropdown */}
-                    {openMenu === item.label && (
-                      <div className="absolute top-full left-0 z-50 w-52 border border-[#387085]/10 bg-white py-1 shadow-sm">
+                    {openMenu === item.label && (() => {
+                      // Pick the most specific (longest) submenu href that matches
+                      const activeSubHref = item.submenu.reduce<string | null>((best, sub) => {
+                        const matches = pathname === sub.href || pathname.startsWith(sub.href + '/');
+                        if (!matches) return best;
+                        if (!best || sub.href.length > best.length) return sub.href;
+                        return best;
+                      }, null);
+                      return (
+                      <div className="absolute left-0 top-full z-50 w-52 border border-[#387085]/10 bg-white py-1 shadow-sm">
                         {item.submenu.map((sub) => {
-                          const isSubActive = pathname === sub.href || pathname.startsWith(sub.href + '/');
+                          const isSubActive = sub.href === activeSubHref;
                           return (
                             <Link
                               key={sub.href}
@@ -163,7 +179,8 @@ export default function Header() {
                           );
                         })}
                       </div>
-                    )}
+                      );
+                    })()}
                   </div>
                 );
               }
