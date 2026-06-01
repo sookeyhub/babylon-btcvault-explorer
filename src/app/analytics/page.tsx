@@ -1,5 +1,5 @@
 import { getAnalyticsData, getDashboardKPIs, getVaults } from '@/lib/data';
-import AnalyticsClient from './AnalyticsClient';
+import AnalyticsTabsClient from './AnalyticsTabsClient';
 
 export const revalidate = 60;
 
@@ -36,7 +36,7 @@ export default async function AnalyticsPage() {
   const vaultCreationData = buildVaultCreationData(allVaults);
 
   return (
-    <AnalyticsClient
+    <AnalyticsTabsClient
       kpis={kpis}
       tvlHistory={analytics.tvlHistory}
       activeVaultHistory={analytics.activeVaultHistory}

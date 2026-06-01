@@ -6,6 +6,7 @@ import type { Transaction, TxListParams, PaginatedResult } from '@/lib/types';
 import { MOCK_TRANSACTIONS } from '@/lib/mock-data';
 import { truncateAddress, formatRelativeTime } from '@/lib/utils';
 import { LoadingSkeleton } from '@/components/LoadingState';
+import DevNote, { DevNoteSection } from '@/components/DevNote';
 
 const PAGE_SIZE = 25;
 
@@ -81,7 +82,22 @@ export default function TransactionsPage() {
   }, [fetchTxs]);
 
   return (
-    <div className="mx-auto max-w-[1200px] space-y-5 px-4 py-8 sm:px-6">
+    <div className="relative mx-auto max-w-[1200px] space-y-5 px-4 py-8 sm:px-6">
+      <DevNote title="Transactions 기획 의도">
+        <DevNoteSection heading="페이지 목적">
+          <p>네트워크 전체 EVM 트랜잭션을 탐색하는 목록 페이지.</p>
+        </DevNoteSection>
+        <DevNoteSection heading="검색">
+          <p>Tx Hash / From / To 주소 / Block Number 실시간 검색.</p>
+        </DevNoteSection>
+        <DevNoteSection heading="컬럼">
+          <p>Txn Hash / Method / Block / Age / From → To / Amount / Txn Fee.</p>
+          <p>Method: 컨트랙트 호출 함수명 뱃지 표시.</p>
+        </DevNoteSection>
+        <DevNoteSection heading="페이지네이션">
+          <p>25개/페이지. 검색 시 결과 내에서 재페이지네이션.</p>
+        </DevNoteSection>
+      </DevNote>
       <h1 className="text-lg font-semibold text-[#14140f]">Transactions</h1>
 
       {/* Result count + Pagination top */}

@@ -1,8 +1,7 @@
 import { notFound } from 'next/navigation';
 import { getTransactionByHash } from '@/lib/data';
-import { truncateAddress, formatRelativeTime } from '@/lib/utils';
-import CopyButton from './CopyButton';
 import TransactionTabs from './TransactionTabs';
+import DevNote, { DevNoteSection } from '@/components/DevNote';
 
 export const revalidate = 60;
 
@@ -18,42 +17,46 @@ export default async function TransactionDetailPage({ params }: Props) {
     notFound();
   }
 
-  const timestamp = new Date(tx.timestamp);
-  const formattedTimestamp = `${timestamp.getUTCFullYear()}/${String(timestamp.getUTCMonth() + 1).padStart(2, '0')}/${String(timestamp.getUTCDate()).padStart(2, '0')} ${String(timestamp.getUTCHours()).padStart(2, '0')}:${String(timestamp.getUTCMinutes()).padStart(2, '0')}:${String(timestamp.getUTCSeconds()).padStart(2, '0')} + UTC`;
-
   return (
-    <div className="mx-auto max-w-[1200px] space-y-5 px-4 py-8 sm:px-6">
-      {/* Header */}
-      <div className="space-y-1">
-        <div className="flex items-center gap-2 text-sm text-[rgba(56,112,133,0.5)]">
-          <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M7.5 21 3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5" />
-          </svg>
-          <span>Transaction</span>
-        </div>
-        <div className="flex items-center gap-2">
-          {tx.status === 'SUCCESS' ? (
-            <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[#5a8a3c]">
-              <svg className="h-3 w-3 text-white" fill="none" viewBox="0 0 24 24" strokeWidth="3" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
-              </svg>
-            </span>
-          ) : (
-            <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[#c83232]">
-              <svg className="h-3 w-3 text-white" fill="none" viewBox="0 0 24 24" strokeWidth="3" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
-              </svg>
-            </span>
-          )}
-          <span className="font-mono text-lg font-semibold text-[#14140f]">
-            {truncateAddress(tx.hash, 6, 4)}
-          </span>
-          <CopyButton text={tx.hash} />
-        </div>
-        <p className="text-xs text-[rgba(56,112,133,0.5)]">
-          {formatRelativeTime(tx.timestamp)} ({formattedTimestamp})
-        </p>
-      </div>
+    <div className="relative mx-auto max-w-[1200px] space-y-0 px-4 py-8 sm:px-6">
+      <DevNote title="Transaction Detail 기획 의도">
+        <DevNoteSection heading="페이지 구조">
+          <p>Hero: 이벤트 평문 H1 + H2(컨텍스트 문장) + Tx/Block 메타.</p>
+          <p>Info Table: Depositor·Provider·Vault → (구분선) → Keepers·Challengers → (구분선) → dApp.</p>
+          <p>Footer Tabs: Log(디코딩된 이벤트) / Raw Data(Overview 양식).</p>
+          <p>상단 타입 스위처(dev/demo): 6가지 이벤트 케이스 전환.</p>
+        </DevNoteSection>
+        <DevNoteSection heading="H1 이벤트 분기">
+          <p>PeginActivated → "Vault activated"</p>
+          <p>BORROW → "Loan taken out"</p>
+          <p>REPAY → "Loan repaid"</p>
+          <p>ADD_COLLATERAL → "Collateral added"</p>
+          <p>REMOVE_COLLATERAL → "Collateral withdrawn"</p>
+          <p>LIQUIDATION → "Vault liquidated"</p>
+        </DevNoteSection>
+        <DevNoteSection heading="H2 이벤트별 컨텍스트 양식">
+          <p>PeginActivated: {'{amount}'} sBTC (${'{usd}'}) is now available as {'{dapp_name}'} collateral</p>
+          <p>BORROW: {'{loan_amount}'} borrowed against {'{btc_amount}'} sBTC collateral</p>
+          <p>REPAY: {'{loan_amount}'} repaid, freeing {'{btc_amount}'} sBTC collateral</p>
+          <p>ADD_COLLATERAL: {'{collateral_amount}'} sBTC added to {'{dapp_name}'} position</p>
+          <p>REMOVE_COLLATERAL: {'{collateral_amount}'} sBTC removed from {'{dapp_name}'} position</p>
+          <p>LIQUIDATION: {'{btc_amount}'} sBTC collateral seized to cover {'{loan_amount}'} debt</p>
+        </DevNoteSection>
+        <DevNoteSection heading="Success / Fail 케이스">
+          <p>PeginActivated → SUCCESS (green ✓)</p>
+          <p>BORROW → SUCCESS (green ✓)</p>
+          <p>REPAY → FAILED (red ✗ · 잔액 부족 revert)</p>
+          <p>ADD_COLLATERAL → SUCCESS (green ✓)</p>
+          <p>REMOVE_COLLATERAL → FAILED (red ✗ · LTV 초과 revert)</p>
+          <p>LIQUIDATION → SUCCESS (red ✓ · 청산 완료)</p>
+        </DevNoteSection>
+        <DevNoteSection heading="정보 위계 원칙">
+          <p>hex full값 본문 금지 → 6자...4자 truncation + copy.</p>
+          <p>commission·loan 정보는 Summary에서 제거 (Log 탭에서 확인).</p>
+          <p>Liquidator는 LIQUIDATION 케이스에서만 노출.</p>
+          <p>Hashlock은 Summary에서 제거 (Log 탭 PeginActivated params에서 확인).</p>
+        </DevNoteSection>
+      </DevNote>
 
       <TransactionTabs tx={tx} />
     </div>

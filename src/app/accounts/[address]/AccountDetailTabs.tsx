@@ -62,6 +62,9 @@ export default function AccountDetailTabs({
   isProvider,
   isDepositor = false,
 }: Props) {
+  // Provider accounts are fully handled by ProviderDetail component
+  if (isProvider) return null;
+
   // Check whether this EOA actually deposited any vaults
   const lcAddr = address.toLowerCase();
   const hasDepositedVaults = MOCK_VAULTS.some(
@@ -72,19 +75,17 @@ export default function AccountDetailTabs({
   const tabs: { key: TabKey; label: string }[] = [];
 
   if (isDepositor) {
-    // Depositor view: Positions | Deposited Vaults | Aave Activity
+    // Depositor view: Positions | Deposited Vaults | Activity
     tabs.push({ key: 'collateral', label: 'Positions' });
     tabs.push({ key: 'deposited', label: 'Deposited Vaults' });
     tabs.push({ key: 'aave_activity', label: 'Activity' });
+  } else if (isProvider) {
+    tabs.push({ key: 'managed', label: 'Vaults' });
+    tabs.push({ key: 'transactions', label: 'Transactions' });
   } else {
     tabs.push({ key: 'transactions', label: 'Transactions' });
-    if (accountType === 'EOA') {
-      if (hasDepositedVaults) {
-        tabs.push({ key: 'deposited', label: 'Deposited Vaults' });
-      }
-      if (isProvider) {
-        tabs.push({ key: 'managed', label: 'Vaults' });
-      }
+    if (accountType === 'EOA' && hasDepositedVaults) {
+      tabs.push({ key: 'deposited', label: 'Deposited Vaults' });
     }
   }
 
@@ -111,12 +112,12 @@ export default function AccountDetailTabs({
   // Get the count for each tab
   const getTabCount = (key: TabKey): number => {
     switch (key) {
-      case 'transactions': return txs.length;
-      case 'deposited': return depositedVaults.length;
-      case 'managed': return managedVaults.length;
-      case 'collateral': return MOCK_PORTFOLIO_POSITIONS.length;
+      case 'transactions':       return txs.length;
+      case 'deposited':          return depositedVaults.length;
+      case 'managed':            return managedVaults.length;
+      case 'collateral':    return MOCK_PORTFOLIO_POSITIONS.length;
       case 'aave_activity': return MOCK_AAVE_V4_ACTIVITIES.length;
-      default: return 0;
+      default:              return 0;
     }
   };
 
@@ -659,10 +660,29 @@ function VaultsTable({ vaults, address, roleLabel }: { vaults: Vault[]; address:
 /* ── Managed Vaults Panel (for Provider accounts) ──────────────────────── */
 const PAGE_SIZE_MANAGED = 20;
 
+const VAULT_STATUS_ORDER = ['Active', 'Pending', 'Redeemed', 'Expired', 'Liquidated'] as const;
+const VAULT_STATUS_COLORS: Record<string, string> = {
+  Active:     '#16a34a',
+  Pending:    '#d97706',
+  Redeemed:   '#387085',
+  Expired:    '#9ca3af',
+  Liquidated: '#dc2626',
+};
+
 function ManagedVaultsPanel({ vaults, address }: { vaults: Vault[]; address: string }) {
   const [page, setPage] = useState(1);
 
   const totalVaults = vaults.length;
+  const totalBtc = vaults.reduce((s, v) => s + v.vaultSize, 0);
+
+  // Status distribution
+  const statusDist = VAULT_STATUS_ORDER
+    .map((status) => ({
+      status,
+      count: vaults.filter((v) => v.status === status).length,
+      btc:   vaults.filter((v) => v.status === status).reduce((s, v) => s + v.vaultSize, 0),
+    }))
+    .filter((s) => s.count > 0);
 
   const totalPages = Math.max(1, Math.ceil(totalVaults / PAGE_SIZE_MANAGED));
   const safePage = Math.min(page, totalPages);
@@ -675,6 +695,66 @@ function ManagedVaultsPanel({ vaults, address }: { vaults: Vault[]; address: str
 
   return (
     <div className="space-y-4">
+      {/* Vault Status — stacked bar + list */}
+      {totalVaults > 0 && (
+        <section className="border border-[#387085]/10 bg-white">
+          <div className="flex items-center justify-between border-b border-[#387085]/10 px-5 py-3">
+            <div>
+              <h2 className="text-sm font-semibold text-[#14140f]">Vault Status</h2>
+              <p className="mt-0.5 text-[11px] text-[#387085]/50">Distribution by vault count</p>
+            </div>
+            <span className="text-[11px] text-[#387085]/50">
+              {totalVaults.toLocaleString()} vaults · {totalBtc.toFixed(2)} sBTC
+            </span>
+          </div>
+
+          <div className="px-5 py-4">
+            {/* Stacked horizontal bar */}
+            <div className="flex h-3 w-full overflow-hidden rounded-none">
+              {statusDist.map((s) => (
+                <div
+                  key={s.status}
+                  className="h-full"
+                  style={{
+                    width: `${(s.count / totalVaults) * 100}%`,
+                    background: VAULT_STATUS_COLORS[s.status],
+                  }}
+                  title={`${s.status}: ${s.count}`}
+                />
+              ))}
+            </div>
+
+            {/* Status rows */}
+            <div className="mt-3 space-y-0">
+              {statusDist.map((s) => {
+                const pct = Math.round((s.count / totalVaults) * 100);
+                return (
+                  <div
+                    key={s.status}
+                    className="flex items-center justify-between border-b border-[#387085]/6 py-2 last:border-0"
+                  >
+                    <div className="flex items-center gap-2">
+                      <span
+                        className="h-2.5 w-2.5 flex-shrink-0 rounded-sm"
+                        style={{ background: VAULT_STATUS_COLORS[s.status] }}
+                      />
+                      <span className="text-sm text-[#14140f]">{s.status}</span>
+                      <span className="text-[11px] text-[#387085]/40">{s.btc.toFixed(2)} sBTC</span>
+                    </div>
+                    <div className="flex items-center gap-4 text-right">
+                      <span className="text-[11px] font-medium text-[#387085]/50">{pct}%</span>
+                      <span className="w-20 text-sm font-semibold text-[#14140f]">
+                        {s.count.toLocaleString()} vaults
+                      </span>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </section>
+      )}
+
       {/* Managed Vaults table */}
       <div className="overflow-x-auto rounded-none border border-[#cd6332]/20 bg-white">
         {totalVaults === 0 ? (
@@ -844,71 +924,41 @@ function PositionSummaryCard() {
 
   return (
     <div className="space-y-3">
-      {/* Block 1 — Collateral / Current LTV / Debt cards */}
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-        {/* Collateral card */}
+      {/* 3-card row: Collateral | Current LTV | Debt */}
+      <div className="grid grid-cols-3 gap-3">
+        {/* Collateral */}
         <div className="border border-[#387085]/10 bg-white px-5 py-4">
-          <p className="mb-1 text-[11px] font-medium uppercase tracking-wide text-[#387085]/50">
-            Collateral
-          </p>
-          <p className="text-lg font-semibold text-[#14140f]">
-            {collateralAmount.toFixed(6)}
-            <span className="ml-1 text-sm font-normal text-[#387085]/50">
-              {p.totalCollateral.symbol}
-            </span>
+          <p className="text-[11px] font-medium uppercase tracking-wide text-[#387085]/50">Collateral</p>
+          <p className="mt-1 text-xl font-bold text-[#14140f]">
+            {collateralAmount.toFixed(3)} <span className="text-sm font-normal text-[#387085]/50">{p.totalCollateral.symbol ?? 'sBTC'}</span>
           </p>
           {collateralUsd != null && (
-            <p className="mt-0.5 text-[11px] text-[#387085]/40">
-              ≈ ${collateralUsd.toLocaleString('en-US', { maximumFractionDigits: 2 })}
-            </p>
+            <p className="mt-0.5 text-xs text-[#387085]/40">≈ ${collateralUsd.toLocaleString('en-US', { maximumFractionDigits: 1 })}</p>
           )}
         </div>
 
-        {/* Current LTV card */}
+        {/* Current LTV */}
         <div className="border border-[#387085]/10 bg-white px-5 py-4">
-          <p className="mb-1 text-[11px] font-medium uppercase tracking-wide text-[#387085]/50">
-            Current LTV
-          </p>
-          <p className="text-lg font-semibold" style={{ color: ltvColor }}>
-            {currentLtv.toFixed(2)}%
-          </p>
-          <p className="mt-0.5 text-[11px] text-[#387085]/40">
-            of {maxLtv.toFixed(0)}% max
-          </p>
-          {/* LTV mini bar */}
-          <div className="mt-2 relative h-1.5 w-full bg-[#387085]/8">
-            <div
-              className="absolute left-0 top-0 h-full transition-all"
-              style={{
-                width: `${ltvFillPct}%`,
-                background: ltvColor,
-                opacity: 0.85,
-              }}
-            />
-          </div>
+          <p className="text-[11px] font-medium uppercase tracking-wide text-[#387085]/50">Current LTV</p>
+          <p className="mt-1 text-xl font-bold text-[#14140f]">{currentLtv.toFixed(2)}%</p>
+          <p className="mt-0.5 text-xs text-[#387085]/40">of {maxLtv.toFixed(0)}% max</p>
         </div>
 
-        {/* Debt card */}
+        {/* Debt */}
         <div className="border border-[#387085]/10 bg-white px-5 py-4">
-          <p className="mb-1 text-[11px] font-medium uppercase tracking-wide text-[#387085]/50">
-            Debt
-          </p>
-          <p className="text-lg font-semibold text-[#cd6332]">
-            {debtTotal.toLocaleString('en-US', { maximumFractionDigits: 2 })}
-            <span className="ml-1 text-sm font-normal text-[#387085]/50">
-              {debtSymbol}
-            </span>
+          <p className="text-[11px] font-medium uppercase tracking-wide text-[#387085]/50">Debt</p>
+          <p className="mt-1 text-xl font-bold text-[#14140f]">
+            {debtTotal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} <span className="text-sm font-normal text-[#387085]/50">{debtSymbol}</span>
           </p>
           {interestTotal > 0 && (
-            <p className="mt-0.5 text-[11px] text-[#387085]/40">
-              +{interestTotal.toLocaleString('en-US', { maximumFractionDigits: 4 })}{' '}
-              interest
+            <p className="mt-0.5 text-xs text-green-600">
+              +{interestTotal.toLocaleString('en-US', { minimumFractionDigits: 6, maximumFractionDigits: 6 })} {debtSymbol}
             </p>
           )}
         </div>
       </div>
 
-      {/* Block 2 — Health Factor */}
+      {/* Health Factor */}
       <div className="border border-[#387085]/10 bg-white px-5 py-4">
         <div className="mb-3 flex items-center justify-between">
           <p className="text-[11px] font-medium uppercase tracking-wide text-[#387085]/50">
@@ -1022,7 +1072,7 @@ function PositionDebtsTable() {
             const interest = parsePositionAmount(d.accruedInterest, d.decimals);
             const reserve = d.reserveId;
             const reserveLabel = reserve
-              ? `${reserve.slice(0, 6)}...${reserve.slice(-4)}`
+              ? (reserve.length > 10 ? `${reserve.slice(0, 6)}...${reserve.slice(-4)}` : reserve)
               : '—';
             return (
               <tr
@@ -1032,15 +1082,14 @@ function PositionDebtsTable() {
                 {/* Reserve ID */}
                 <td className="whitespace-nowrap px-4 py-2.5">
                   {reserve ? (
-                    <div className="flex items-center">
-                      <span
-                        title={reserve}
-                        className="font-mono text-[11px] text-[#387085]"
-                      >
-                        {reserveLabel}
-                      </span>
-                      <CopyIcon text={reserve} />
-                    </div>
+                    reserve.length > 10 ? (
+                      <div className="flex items-center">
+                        <span title={reserve} className="font-mono text-[11px] text-[#387085]">{reserveLabel}</span>
+                        <CopyIcon text={reserve} />
+                      </div>
+                    ) : (
+                      <span className="text-sm text-[#14140f]">{reserveLabel}</span>
+                    )
                   ) : (
                     <span className="text-[#387085]/30">—</span>
                   )}

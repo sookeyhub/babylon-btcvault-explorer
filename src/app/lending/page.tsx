@@ -6,6 +6,7 @@ import {
   HeartPulse, Receipt, AlertTriangle, ShieldCheck, ArrowRight,
   ArrowDownToLine, ArrowUpFromLine, Settings, Search, X
 } from 'lucide-react';
+import DevNote, { DevNoteSection } from '@/components/DevNote';
 
 /* ────────────────────────────────────────────
    Transaction Data
@@ -474,7 +475,25 @@ export default function LendingPage() {
 
   /* ── Render ── */
   return (
-    <div className="mx-auto max-w-[1200px] space-y-5 px-4 py-8 sm:px-6">
+    <div className="relative mx-auto max-w-[1200px] space-y-5 px-4 py-8 sm:px-6">
+      <DevNote title="Lending 기획 의도">
+        <DevNoteSection heading="페이지 목적">
+          <p>Aave 프로토콜 기반 sBTC 담보 대출 트랜잭션 탐색 + 대출 실행 위젯 통합.</p>
+        </DevNoteSection>
+        <DevNoteSection heading="2열 레이아웃">
+          <p>좌: 트랜잭션 목록 + 확장 상세.</p>
+          <p>우: Lend &amp; Borrow 위젯 (Supply / Borrow 탭, APY, HF 바, 포지션 요약).</p>
+        </DevNoteSection>
+        <DevNoteSection heading="필터 바">
+          <p>Type: All / Supply / Borrow / Repay / Withdraw.</p>
+          <p>Status: All / Success / Failed.</p>
+          <p>검색: hash / token / protocol.</p>
+        </DevNoteSection>
+        <DevNoteSection heading="트랜잭션 행 확장">
+          <p>클릭 시 펼침: 상태 히어로 카드 + Lending Flow 다이어그램.</p>
+          <p>탭: Overview(포지션 변화·수수료) / Token Transfers / Logs.</p>
+        </DevNoteSection>
+      </DevNote>
 
       {/* Page Header */}
       <h1 className="text-lg font-semibold text-[#14140f]">Lending</h1>

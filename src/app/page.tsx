@@ -5,6 +5,7 @@ import StatusBadge from '@/components/StatusBadge';
 import HeroBanner from '@/components/HeroBanner';
 import TVLHistorySection from '@/components/TVLHistorySection';
 import CopyButton from '@/components/CopyButton';
+import DevNote, { DevNoteSection } from '@/components/DevNote';
 
 export const revalidate = 60;
 
@@ -56,7 +57,26 @@ export default async function HomePage() {
       <HeroBanner />
 
       {/* Main content */}
-      <div className="mx-auto max-w-[1200px] space-y-5 px-4 py-6 sm:px-6">
+      <div className="relative mx-auto max-w-[1200px] space-y-5 px-4 py-6 sm:px-6">
+        <DevNote title="Home 기획 의도">
+          <DevNoteSection heading="페이지 목적">
+            <p>프로토콜 전체 상태를 한눈에 파악하는 대시보드.</p>
+            <p>KPI → 추이 차트 → 최근 Vault 순서로 정보 밀도를 점층적으로 제공.</p>
+          </DevNoteSection>
+          <DevNoteSection heading="KPI 4카드">
+            <p>Total Value Locked: 현재 Active Vault BTC 합계.</p>
+            <p>Active Vaults: 현재 Active 상태 Vault 수.</p>
+            <p>Total Value Processed: 전체 누적 BTC (상태 무관).</p>
+            <p>Total Vaults: 전체 누적 Vault 수.</p>
+          </DevNoteSection>
+          <DevNoteSection heading="TVL History">
+            <p>기간별 토글(7D / 30D / …) 제공. Active Vault BTC 일별 합산.</p>
+          </DevNoteSection>
+          <DevNoteSection heading="Recent Vaults">
+            <p>최근 생성 10개 표시. "View All →"으로 전체 목록 이동.</p>
+            <p>컬럼: Vault ID / Status / BTC Address / Depositor / Amount / DApp / Created / Closed.</p>
+          </DevNoteSection>
+        </DevNote>
 
         {/* 4 KPI Cards */}
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">

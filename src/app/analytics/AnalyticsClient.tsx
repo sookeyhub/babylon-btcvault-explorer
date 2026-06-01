@@ -18,6 +18,7 @@ import CopyButton from '@/components/CopyButton';
 import StatusBadge from '@/components/StatusBadge';
 import { truncateAddress } from '@/lib/utils';
 import type { TimeSeriesPoint, Vault, DashboardKPIs } from '@/lib/types';
+import DevNote, { DevNoteSection } from '@/components/DevNote';
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
@@ -321,9 +322,9 @@ function VaultCreationChart({ data }: { data: VaultCreationPoint[] }) {
   );
 }
 
-// ── Main page ─────────────────────────────────────────────────────────────────
+// ── Vaults tab content (used by AnalyticsTabsClient) ─────────────────────────
 
-export default function AnalyticsClient({
+export function VaultsTabContent({
   kpis,
   tvlHistory,
   activeVaultHistory,
@@ -340,12 +341,7 @@ export default function AnalyticsClient({
   ];
 
   return (
-    <div className="mx-auto max-w-[1200px] space-y-5 px-4 py-8 sm:px-6">
-      {/* Title */}
-      <h1 className="text-lg font-semibold text-[#14140f]">
-        Analytics
-        <span className="ml-2 text-sm font-normal text-[#387085]/40">· Vaults</span>
-      </h1>
+    <div className="space-y-5">
 
       {/* 4 KPI cards */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -469,3 +465,6 @@ export default function AnalyticsClient({
     </div>
   );
 }
+
+// ── Legacy default export (kept for backwards compat) ─────────────────────────
+export default VaultsTabContent;

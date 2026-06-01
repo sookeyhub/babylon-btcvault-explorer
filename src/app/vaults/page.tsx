@@ -5,6 +5,7 @@ import Link from 'next/link';
 import type { Vault } from '@/lib/types';
 import { MOCK_VAULTS } from '@/lib/mock-data';
 import { truncateAddress } from '@/lib/utils';
+import DevNote, { DevNoteSection } from '@/components/DevNote';
 
 const PAGE_SIZE = 25;
 
@@ -101,7 +102,22 @@ export default function VaultsPage() {
   }
 
   return (
-    <div className="mx-auto max-w-[1200px] space-y-5 px-4 py-8 sm:px-6">
+    <div className="relative mx-auto max-w-[1200px] space-y-5 px-4 py-8 sm:px-6">
+      <DevNote title="Vaults 기획 의도">
+        <DevNoteSection heading="페이지 목적">
+          <p>프로토콜에 존재하는 모든 Vault를 탐색하는 전체 목록 페이지.</p>
+        </DevNoteSection>
+        <DevNoteSection heading="정렬">
+          <p>Status / Amount / DApp / Created 컬럼 클릭으로 오름/내림차순 전환.</p>
+          <p>기본: Created 내림차순 (최신순).</p>
+        </DevNoteSection>
+        <DevNoteSection heading="컬럼 구성">
+          <p>Vault ID (→ 상세) / Status / BTC Address / Depositor / Amount / DApp / Provider / Created / Closed.</p>
+        </DevNoteSection>
+        <DevNoteSection heading="페이지네이션">
+          <p>25개/페이지. 첫/이전/다음/마지막 버튼 제공.</p>
+        </DevNoteSection>
+      </DevNote>
       <h1 className="text-lg font-semibold text-[#14140f]">Vaults</h1>
 
       {/* Results count + Pagination */}
