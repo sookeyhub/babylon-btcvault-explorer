@@ -6,6 +6,7 @@ import { truncateAddress } from '@/lib/utils';
 import CopyButton from '@/components/CopyButton';
 import AccountDetailTabs from './AccountDetailTabs';
 import ProviderDetail from './ProviderDetail';
+import DepositorDetail from './DepositorDetail';
 import DevNote, { DevNoteSection } from '@/components/DevNote';
 
 export const revalidate = 60;
@@ -90,23 +91,17 @@ export default async function AccountDetailPage({ params }: Props) {
         </span>
       </nav>
 
-      {/* ── Header (non-provider only) ────────────────────────────────── */}
-      {!provider && (
+      {/* ── Header (non-provider, non-depositor only) ─────────────────── */}
+      {!provider && !isDepositor && (
         <div className="space-y-1.5">
           <div className="flex items-center gap-1.5 text-xs text-[rgba(56,112,133,0.55)]">
             <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" strokeWidth="1.8" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0" />
             </svg>
-            {isDepositor ? (
-              <span className="font-medium text-[#387085]">Depositor</span>
-            ) : (
-              <>
-                <span>Account</span>
-                <span className={`ml-1 rounded-full px-2 py-0.5 text-[10px] font-semibold ${typeBadge[account.type]}`}>
-                  {account.type === 'Contract' ? 'CA' : account.type}
-                </span>
-              </>
-            )}
+            <span>Account</span>
+            <span className={`ml-1 rounded-full px-2 py-0.5 text-[10px] font-semibold ${typeBadge[account.type]}`}>
+              {account.type === 'Contract' ? 'CA' : account.type}
+            </span>
           </div>
           <div className="flex items-center gap-2">
             {account.name ? (
@@ -119,28 +114,6 @@ export default async function AccountDetailPage({ params }: Props) {
               </span>
             )}
             <CopyButton text={account.address} />
-          </div>
-        </div>
-      )}
-
-      {/* ── Depositor summary cards ───────────────────────────────────── */}
-      {isDepositor && (
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-          <div className="border border-[#387085]/10 bg-[#faf9f5] p-3">
-            <p className="text-[11px] font-medium uppercase tracking-wide text-[#387085]/50">Total BTC</p>
-            <p className="mt-0.5 text-lg font-semibold text-[#14140f]">{depositorTotalBtc.toFixed(4)} sBTC</p>
-          </div>
-          <div className="border border-[#387085]/10 bg-[#faf9f5] p-3">
-            <p className="text-[11px] font-medium uppercase tracking-wide text-[#387085]/50">Total Vaults</p>
-            <p className="mt-0.5 text-lg font-semibold text-[#14140f]">{depositorTotalVaults.toLocaleString()}</p>
-          </div>
-          <div className="border border-[#387085]/10 bg-[#faf9f5] p-3">
-            <p className="text-[11px] font-medium uppercase tracking-wide text-[#387085]/50">Active Vaults</p>
-            <p className="mt-0.5 text-lg font-semibold text-green-600">{depositorActiveVaults.toLocaleString()}</p>
-          </div>
-          <div className="border border-[#387085]/10 bg-[#faf9f5] p-3">
-            <p className="text-[11px] font-medium uppercase tracking-wide text-[#387085]/50">Txn Count</p>
-            <p className="mt-0.5 text-lg font-semibold text-[#14140f]">{account.txnCount.toLocaleString()}</p>
           </div>
         </div>
       )}
@@ -188,13 +161,21 @@ export default async function AccountDetailPage({ params }: Props) {
         />
       )}
 
-      {/* ── Tabs (non-provider only) ──────────────────────────────────── */}
-      {!provider && (
+      {/* ── Depositor Detail (replaces header + tabs for depositors) ───── */}
+      {isDepositor && (
+        <DepositorDetail
+          address={account.address}
+          vaults={depositorVaults}
+        />
+      )}
+
+      {/* ── Tabs (non-provider, non-depositor only) ───────────────────── */}
+      {!provider && !isDepositor && (
         <AccountDetailTabs
           address={account.address}
           accountType={account.type}
           isProvider={false}
-          isDepositor={isDepositor}
+          isDepositor={false}
         />
       )}
     </div>

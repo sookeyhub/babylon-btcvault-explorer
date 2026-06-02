@@ -507,7 +507,7 @@ export default function TransactionTabs({ tx }: { tx: Transaction }) {
       </div>
 
       {/* ━━━━━━━━━━━ TRANSACTION TITLE (이미지 양식) ━━━━━━━━━━━━━━━━━━━━━━ */}
-      <div className="border border-[#387085]/12 bg-white px-6 py-5">
+      <div className="bg-white px-6 py-5">
         {/* ⇄ Transaction label */}
         <div className="mb-3 flex items-center gap-1.5 text-[11px] text-[#387085]/45">
           <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor">
@@ -558,28 +558,44 @@ export default function TransactionTabs({ tx }: { tx: Transaction }) {
       </div>
 
       {/* ━━━━━━━━━━━━━━━━ EVENTS 아코디언 드롭다운 ━━━━━━━━━━━━━━━━━━━━━━━━ */}
-      <div className="border border-[#387085]/12 bg-white divide-y divide-[#387085]/8">
+      <div className="space-y-2">
         {ctx.eventInstances.map((evt, idx) => {
           const evtAmount = evt.amount ?? ctx.amount;
           const evtH2 = copy.h2({ ...ctx, amount: evtAmount, linkedDapp: { ...ctx.linkedDapp, name: evt.dapp } });
           const isOpen = openEvents.has(idx);
+          const ec = EVENT_COLOR[eventType];
           return (
-            <div key={idx}>
+            <div
+              key={idx}
+              className="overflow-hidden border border-[#387085]/12 bg-white"
+              style={{ borderLeftWidth: 3, borderLeftColor: ec.border }}
+            >
               {/* Accordion toggle row */}
               <button
                 onClick={() => toggleEvent(idx)}
-                className="flex w-full items-center justify-between px-6 py-4 text-left transition-colors hover:bg-[#faf9f5]"
+                className={`flex w-full items-center justify-between px-5 py-3.5 text-left transition-colors ${
+                  isOpen ? ec.headerBg : 'hover:bg-[#faf9f5]'
+                }`}
               >
-                <div className="min-w-0">
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm font-semibold text-[#14140f]">{copy.h1}</span>
-                    {ctx.eventInstances.length > 1 && (
-                      <span className="rounded bg-[#387085]/8 px-1.5 py-0.5 text-[10px] font-medium text-[#387085]/50">
-                        {idx + 1}
+                <div className="min-w-0 flex items-start gap-2.5">
+                  {/* Colored dot */}
+                  <span
+                    className="mt-1.5 h-2 w-2 shrink-0 rounded-full"
+                    style={{ background: ec.dot }}
+                  />
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-2">
+                      <span className={`rounded px-1.5 py-0.5 text-[10px] font-semibold ${ec.badge}`}>
+                        {copy.h1}
                       </span>
-                    )}
+                      {ctx.eventInstances.length > 1 && (
+                        <span className="rounded bg-[#387085]/8 px-1.5 py-0.5 text-[10px] font-medium text-[#387085]/45">
+                          {idx + 1}
+                        </span>
+                      )}
+                    </div>
+                    <p className="mt-0.5 text-[11px] text-[#14140f]/50 truncate pr-4">{evtH2}</p>
                   </div>
-                  <p className="mt-0.5 text-[11px] text-[#14140f]/45 truncate pr-4">{evtH2}</p>
                 </div>
                 <svg
                   className={`h-4 w-4 shrink-0 text-[#387085]/35 transition-transform ${isOpen ? 'rotate-180' : ''}`}
@@ -591,7 +607,7 @@ export default function TransactionTabs({ tx }: { tx: Transaction }) {
 
               {/* Accordion content */}
               {isOpen && (
-                <div className="border-t border-[#387085]/8 bg-[#faf9f5] divide-y divide-[#387085]/8 px-6">
+                <div className="border-t border-[#387085]/8 bg-white divide-y divide-[#387085]/8 px-5">
                   <InfoRow label="Depositor">
                     <AddrCopy full={evt.depositor.address} display={fmt(evt.depositor.address)} href={`/accounts/${evt.depositor.address}`} />
                   </InfoRow>

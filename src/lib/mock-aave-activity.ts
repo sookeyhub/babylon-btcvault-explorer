@@ -488,6 +488,194 @@ export const MOCK_PORTFOLIO_POSITIONS: PortfolioPosition[] = [
   },
 ];
 
+/**
+ * Global lending activities across all depositors — used by the Lending Activity page.
+ */
+export const MOCK_GLOBAL_LENDING_ACTIVITIES: AaveV4Activity[] = [
+  ...MOCK_AAVE_V4_ACTIVITIES,
+  {
+    blockNumber: 10595000, logIndex: 3,
+    txHash: '0xf1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f12',
+    blockTime: '2026-04-09T10:15:22Z', type: 'ADD_COLLATERAL',
+    vaultId: '84b105afcf9862e0009c86a84fb924dc558f6dbfca0916ab4366b1d4604d9a87',
+    depositorAddress: '0x13eb14589c9760150662450811acfd3d0d75a439',
+    tokenAmount: { symbol: 'sBTC', decimals: 8, amount: '88344622', contractAddress: null },
+  },
+  {
+    blockNumber: 10593200, logIndex: 6,
+    txHash: '0xa1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b',
+    blockTime: '2026-04-09T02:44:11Z', type: 'BORROW',
+    vaultId: null,
+    depositorAddress: '0x13eb14589c9760150662450811acfd3d0d75a439',
+    tokenAmount: { symbol: 'USDC', decimals: 6, amount: '31840000000', contractAddress: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48' },
+  },
+  {
+    blockNumber: 10590100, logIndex: 2,
+    txHash: '0xb2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c',
+    blockTime: '2026-04-08T18:32:05Z', type: 'ADD_COLLATERAL',
+    vaultId: '6d6f1550aff811ee4a62601b215b754bc81a1961645df40b7cb4625415a2c254',
+    depositorAddress: '0x2bbf3dfbcd3b0722dd14d6c567e3ee6396c84778',
+    tokenAmount: { symbol: 'sBTC', decimals: 8, amount: '145000000', contractAddress: null },
+  },
+  {
+    blockNumber: 10588500, logIndex: 9,
+    txHash: '0xc3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d',
+    blockTime: '2026-04-08T11:05:33Z', type: 'BORROW',
+    vaultId: null,
+    depositorAddress: '0x2bbf3dfbcd3b0722dd14d6c567e3ee6396c84778',
+    tokenAmount: { symbol: 'USDT', decimals: 6, amount: '68000000000', contractAddress: '0xdac17f958d2ee523a2206206994597c13d831ec7' },
+  },
+  {
+    blockNumber: 10585000, logIndex: 1,
+    txHash: '0xd4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e',
+    blockTime: '2026-04-07T22:18:47Z', type: 'REPAY',
+    vaultId: null,
+    depositorAddress: '0xdba3377f3505e1e34b01b40f6385649b5ca4055d',
+    tokenAmount: { symbol: 'USDC', decimals: 6, amount: '15000000000', contractAddress: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48' },
+  },
+  {
+    blockNumber: 10582000, logIndex: 4,
+    txHash: '0xe5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f',
+    blockTime: '2026-04-07T15:42:19Z', type: 'ADD_COLLATERAL',
+    vaultId: '4a68a7bcf9862e0009c86a84fb924dc558f6dbfca0916ab4366b1d4604bf7e8',
+    depositorAddress: '0xdba3377f3505e1e34b01b40f6385649b5ca4055d',
+    tokenAmount: { symbol: 'sBTC', decimals: 8, amount: '62000000', contractAddress: null },
+  },
+  {
+    blockNumber: 10578000, logIndex: 7,
+    txHash: '0xf6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6a',
+    blockTime: '2026-04-06T08:30:55Z', type: 'BORROW',
+    vaultId: null,
+    depositorAddress: '0xdba3377f3505e1e34b01b40f6385649b5ca4055d',
+    tokenAmount: { symbol: 'USDC', decimals: 6, amount: '32500000000', contractAddress: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48' },
+  },
+  {
+    blockNumber: 10575000, logIndex: 5,
+    txHash: '0xa7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6a7b',
+    blockTime: '2026-04-05T19:11:42Z', type: 'LIQUIDATION',
+    vaultId: null,
+    depositorAddress: '0x2bbf3dfbcd3b0722dd14d6c567e3ee6396c84778',
+    tokenAmount: { symbol: 'sBTC', decimals: 8, amount: '8500000', contractAddress: null },
+  },
+  {
+    blockNumber: 10570000, logIndex: 10,
+    txHash: '0xb8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6a7b8c',
+    blockTime: '2026-04-04T14:55:08Z', type: 'REMOVE_COLLATERAL',
+    vaultId: '933af5bdaff811ee4a62601b215b754bc81a1961645df40b7cb4625415a5b127',
+    depositorAddress: '0x3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d',
+    tokenAmount: { symbol: 'sBTC', decimals: 8, amount: '25000000', contractAddress: null },
+  },
+  {
+    blockNumber: 10565000, logIndex: 8,
+    txHash: '0xc9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6a7b8c9d',
+    blockTime: '2026-04-03T09:22:31Z', type: 'REPAY',
+    vaultId: null,
+    depositorAddress: '0x3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d',
+    tokenAmount: { symbol: 'USDT', decimals: 6, amount: '10000000000', contractAddress: '0xdac17f958d2ee523a2206206994597c13d831ec7' },
+  },
+].sort((a, b) => new Date(b.blockTime).getTime() - new Date(a.blockTime).getTime());
+
+/**
+ * Global vault state-change events — used by the Vaults Activity tab.
+ */
+export type VaultEventType = 'VAULT_CREATED' | 'VAULT_ACTIVATED' | 'VAULT_EXPIRED' | 'VAULT_REDEEMED' | 'VAULT_LIQUIDATED';
+
+export interface VaultActivityEvent {
+  blockNumber: number;
+  logIndex: number;
+  txHash: string;
+  blockTime: string;
+  type: VaultEventType;
+  vaultId: string;
+  amount: string;
+  depositorAddress: string;
+  providerName: string;
+  dappName: string;
+}
+
+export const MOCK_VAULT_ACTIVITIES: VaultActivityEvent[] = [
+  {
+    blockNumber: 10596000, logIndex: 1,
+    txHash: '0x1111a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f1',
+    blockTime: '2026-04-09T16:30:00Z', type: 'VAULT_CREATED',
+    vaultId: '933af5bdaff811ee4a62601b215b754bc81a1961645df40b7cb4625415a5b127',
+    amount: '1.02306076', depositorAddress: '0x5a6b7c8d9e0f1a2b3c4d5e6f7a8b9c0d1e2f3a4b',
+    providerName: 'vault-provider-0', dappName: 'aave-v4',
+  },
+  {
+    blockNumber: 10594500, logIndex: 2,
+    txHash: '0x2222b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f1a2',
+    blockTime: '2026-04-09T12:45:22Z', type: 'VAULT_ACTIVATED',
+    vaultId: '933af5bdaff811ee4a62601b215b754bc81a1961645df40b7cb4625415a5b127',
+    amount: '1.02306076', depositorAddress: '0x5a6b7c8d9e0f1a2b3c4d5e6f7a8b9c0d1e2f3a4b',
+    providerName: 'vault-provider-0', dappName: 'aave-v4',
+  },
+  {
+    blockNumber: 10592000, logIndex: 5,
+    txHash: '0x3333c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f1a2b3',
+    blockTime: '2026-04-09T05:18:11Z', type: 'VAULT_CREATED',
+    vaultId: '84b105afcf9862e0009c86a84fb924dc558f6dbfca0916ab4366b1d4604d9a87',
+    amount: '0.83344622', depositorAddress: '0x13eb14589c9760150662450811acfd3d0d75a439',
+    providerName: 'cobo-custody', dappName: 'avalon',
+  },
+  {
+    blockNumber: 10589000, logIndex: 3,
+    txHash: '0x4444d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f1a2b3c4',
+    blockTime: '2026-04-08T16:42:33Z', type: 'VAULT_EXPIRED',
+    vaultId: 'b01957afcf9862e0009c86a84fb924dc558f6dbfca0916ab4366b1d4604f4f44',
+    amount: '0.79789793', depositorAddress: '0xdba3377f3505e1e34b01b40f6385649b5ca4055d',
+    providerName: 'vault-provider-0', dappName: 'aave-v4',
+  },
+  {
+    blockNumber: 10586000, logIndex: 4,
+    txHash: '0x5555e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f1a2b3c4d5',
+    blockTime: '2026-04-08T02:11:55Z', type: 'VAULT_ACTIVATED',
+    vaultId: '84b105afcf9862e0009c86a84fb924dc558f6dbfca0916ab4366b1d4604d9a87',
+    amount: '0.83344622', depositorAddress: '0x13eb14589c9760150662450811acfd3d0d75a439',
+    providerName: 'cobo-custody', dappName: 'avalon',
+  },
+  {
+    blockNumber: 10583000, logIndex: 6,
+    txHash: '0x6666f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6',
+    blockTime: '2026-04-07T18:33:42Z', type: 'VAULT_REDEEMED',
+    vaultId: '6d6f1550aff811ee4a62601b215b754bc81a1961645df40b7cb4625415a2c254',
+    amount: '0.74777066', depositorAddress: '0x2bbf3dfbcd3b0722dd14d6c567e3ee6396c84778',
+    providerName: 'anchorage-vault', dappName: 'bedrock',
+  },
+  {
+    blockNumber: 10580000, logIndex: 7,
+    txHash: '0x7777a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6f7',
+    blockTime: '2026-04-07T10:05:18Z', type: 'VAULT_LIQUIDATED',
+    vaultId: '4a68a7bcf9862e0009c86a84fb924dc558f6dbfca0916ab4366b1d4604bf7e8',
+    amount: '0.56140771', depositorAddress: '0x3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d',
+    providerName: 'vault-provider-0', dappName: 'aave-v4',
+  },
+  {
+    blockNumber: 10576000, logIndex: 2,
+    txHash: '0x8888b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6f7a8',
+    blockTime: '2026-04-06T04:22:09Z', type: 'VAULT_CREATED',
+    vaultId: '4a68a7bcf9862e0009c86a84fb924dc558f6dbfca0916ab4366b1d4604bf7e8',
+    amount: '0.56140771', depositorAddress: '0x3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d',
+    providerName: 'vault-provider-0', dappName: 'aave-v4',
+  },
+  {
+    blockNumber: 10572000, logIndex: 8,
+    txHash: '0x9999c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6f7a8b9',
+    blockTime: '2026-04-05T11:44:37Z', type: 'VAULT_ACTIVATED',
+    vaultId: '4a68a7bcf9862e0009c86a84fb924dc558f6dbfca0916ab4366b1d4604bf7e8',
+    amount: '0.56140771', depositorAddress: '0x3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d',
+    providerName: 'vault-provider-0', dappName: 'aave-v4',
+  },
+  {
+    blockNumber: 10568000, logIndex: 3,
+    txHash: '0xaaaad1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6f7a8b9c0',
+    blockTime: '2026-04-04T06:15:51Z', type: 'VAULT_CREATED',
+    vaultId: '6d6f1550aff811ee4a62601b215b754bc81a1961645df40b7cb4625415a2c254',
+    amount: '0.74777066', depositorAddress: '0x2bbf3dfbcd3b0722dd14d6c567e3ee6396c84778',
+    providerName: 'anchorage-vault', dappName: 'bedrock',
+  },
+].sort((a, b) => new Date(b.blockTime).getTime() - new Date(a.blockTime).getTime());
+
 export const MOCK_COLLATERAL_POSITIONS: CollateralPosition[] = [
   {
     vaultId: '933af5bd...5b127',

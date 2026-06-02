@@ -209,7 +209,7 @@ export default async function VaultDetailPage({ params }: Props) {
   const lifecycle = await getVaultLifecycle(id);
 
   return (
-    <div className="relative mx-auto max-w-[900px] space-y-5 px-4 py-8 sm:px-6">
+    <div className="relative mx-auto max-w-[1200px] space-y-5 px-4 py-8 sm:px-6">
       <DevNote title="Vault Detail 기획 의도">
         <DevNoteSection heading="식별 정보">
           <p>Vault ID와 현재 status 아이콘을 함께 노출해 즉시 식별 가능.</p>

@@ -19,16 +19,10 @@ interface NavItem {
 
 const EXPLORER_NAV: NavItem[] = [
   { href: '/', label: 'Home' },
+  { href: '/providers', label: 'Providers' },
+  { href: '/depositors', label: 'Depositors' },
   { href: '/vaults', label: 'Vaults' },
-  {
-    href: '/providers',
-    label: 'Accounts',
-    submenu: [
-      { href: '/providers', label: 'Providers' },
-      { href: '/depositors', label: 'Depositors' },
-    ],
-  },
-  { href: '/txs', label: 'Transactions' },
+  { href: '/lending-activity', label: 'Lending Activity' },
   { href: '/analytics', label: 'Analytics' },
 ];
 
