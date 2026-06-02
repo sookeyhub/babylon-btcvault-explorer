@@ -104,7 +104,7 @@ function VaultsActivityTab() {
                   <button onClick={() => setDropdownOpen(!dropdownOpen)} className="inline-flex items-center gap-1">
                     Status
                     <svg className={`h-3 w-3 transition-transform ${dropdownOpen ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" /></svg>
-                    {filter !== 'ALL' && <span className="ml-0.5 inline-flex h-1.5 w-1.5 rounded-full bg-white" />}
+                    <span className="ml-0.5 inline-flex h-1.5 w-1.5 rounded-full bg-white" />
                   </button>
                   {dropdownOpen && (
                     <div className="absolute left-0 top-full z-50 mt-0.5 w-40 border border-[#387085]/10 bg-white py-1 shadow-lg" onMouseLeave={() => setDropdownOpen(false)}>

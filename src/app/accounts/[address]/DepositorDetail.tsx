@@ -603,7 +603,8 @@ function PositionsByDApp() {
               <div className="px-5 py-4">
                 <div className="flex items-center gap-1">
                   <p className="text-[10px] font-medium uppercase tracking-wide text-[#387085]/40">Health Factor</p>
-                  <svg className="h-3 w-3 text-[#387085]/30" fill="none" viewBox="0 0 24 24" strokeWidth="1.8" stroke="currentColor" title="Liquidation occurs when Health Factor falls below 1.0">
+                  <svg className="h-3 w-3 text-[#387085]/30" fill="none" viewBox="0 0 24 24" strokeWidth="1.8" stroke="currentColor">
+                    <title>Liquidation occurs when Health Factor falls below 1.0</title>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z" />
                   </svg>
                 </div>
@@ -746,7 +747,8 @@ export default function DepositorDetail({ address, vaults }: DepositorDetailProp
         <div className="border border-[#387085]/10 bg-white p-4">
           <div className="flex items-center gap-1">
             <p className="text-[11px] font-semibold uppercase tracking-wide text-[#387085]/45">Total BTC</p>
-            <svg className="h-3 w-3 text-[#387085]/30" fill="none" viewBox="0 0 24 24" strokeWidth="1.8" stroke="currentColor" title="Total BTC locked across all vaults">
+            <svg className="h-3 w-3 text-[#387085]/30" fill="none" viewBox="0 0 24 24" strokeWidth="1.8" stroke="currentColor">
+              <title>Total BTC locked across all vaults</title>
               <path strokeLinecap="round" strokeLinejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z" />
             </svg>
           </div>
