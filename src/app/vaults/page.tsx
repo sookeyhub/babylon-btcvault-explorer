@@ -66,13 +66,13 @@ type PageTab = 'all' | 'activity';
 /* ── Vault Activity styles ─────────────────────────────────────────────── */
 
 const VAULT_EVENT_STYLES: Record<VaultEventType, {
-  label: string; bg: string; text: string; dot: string;
+  label: string; dot: string; color: string;
 }> = {
-  VAULT_CREATED:    { label: 'Vault Created',    bg: 'bg-[#387085]/8',  text: 'text-[#387085]',    dot: '#387085' },
-  VAULT_ACTIVATED:  { label: 'Vault Activated',  bg: 'bg-green-50',     text: 'text-green-700',    dot: '#16a34a' },
-  VAULT_EXPIRED:    { label: 'Vault Expired',    bg: 'bg-amber-50',     text: 'text-amber-700',    dot: '#d97706' },
-  VAULT_REDEEMED:   { label: 'Vault Redeemed',   bg: 'bg-blue-50',      text: 'text-blue-700',     dot: '#2563eb' },
-  VAULT_LIQUIDATED: { label: 'Vault Liquidated', bg: 'bg-red-50',       text: 'text-red-600',      dot: '#dc2626' },
+  VAULT_CREATED:    { label: 'Created',    dot: '#387085', color: '#387085' },
+  VAULT_ACTIVATED:  { label: 'Activated',  dot: '#16a34a', color: '#16a34a' },
+  VAULT_EXPIRED:    { label: 'Expired',    dot: '#d97706', color: '#d97706' },
+  VAULT_REDEEMED:   { label: 'Redeemed',   dot: '#2563eb', color: '#2563eb' },
+  VAULT_LIQUIDATED: { label: 'Liquidated', dot: '#dc2626', color: '#dc2626' },
 };
 
 const VAULT_FILTER_OPTIONS: { value: VaultEventType | 'ALL'; label: string }[] = [
@@ -84,161 +84,147 @@ const VAULT_FILTER_OPTIONS: { value: VaultEventType | 'ALL'; label: string }[] =
   { value: 'VAULT_LIQUIDATED', label: 'Liquidated' },
 ];
 
-function formatFullDate(iso: string): string {
-  return (
-    new Date(iso)
-      .toLocaleString('en-US', {
-        year: 'numeric', month: '2-digit', day: '2-digit',
-        hour: '2-digit', minute: '2-digit', second: '2-digit',
-        timeZone: 'UTC', hour12: false,
-      })
-      .replace(',', '') + ' UTC'
-  );
-}
-
-function formatActivityDateGroup(dateKey: string): string {
-  const day = new Date(dateKey);
-  const today = new Date();
-  const dayUtc = Date.UTC(day.getUTCFullYear(), day.getUTCMonth(), day.getUTCDate());
-  const todayUtc = Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate());
-  const days = Math.floor((todayUtc - dayUtc) / 86400000);
-  const rel = days <= 0 ? 'Today' : days === 1 ? 'Yesterday' : `${days} days ago`;
-  return `${rel} (${dateKey})`;
-}
-
-function groupVaultActivityByDate(events: VaultActivityEvent[]): [string, VaultActivityEvent[]][] {
-  const groups: Record<string, VaultActivityEvent[]> = {};
-  for (const e of events) {
-    const key = new Date(e.blockTime).toLocaleDateString('en-US', {
-      year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC',
-    });
-    (groups[key] ||= []).push(e);
-  }
-  return Object.entries(groups).sort(
-    (a, b) => new Date(b[0]).getTime() - new Date(a[0]).getTime(),
-  );
-}
-
 /* ── Vaults Activity Tab ───────────────────────────────────────────────── */
 
 function VaultsActivityTab() {
   const [filter, setFilter] = useState<VaultEventType | 'ALL'>('ALL');
+  const [dropdownOpen, setDropdownOpen] = useState(false);
   const filtered = filter === 'ALL'
     ? MOCK_VAULT_ACTIVITIES
     : MOCK_VAULT_ACTIVITIES.filter((e) => e.type === filter);
-  const grouped = groupVaultActivityByDate(filtered);
 
   return (
-    <div className="border border-[#cd6332]/20 bg-white">
-      <div className="flex flex-wrap items-center gap-1 border-b border-[#387085]/10 px-5 py-3">
-        {VAULT_FILTER_OPTIONS.map((opt) => {
-          const isActive = filter === opt.value;
-          return (
-            <button
-              key={opt.value}
-              onClick={() => setFilter(opt.value)}
-              className={`rounded-full px-2.5 py-1 text-[10px] font-medium transition-colors ${
-                isActive
-                  ? 'bg-[#cd6332] text-white'
-                  : 'bg-[#387085]/8 text-[#387085]/60 hover:bg-[#387085]/15'
-              }`}
-            >
-              {opt.label}
-            </button>
-          );
-        })}
-        <span className="ml-auto text-[11px] text-[#387085]/40">{filtered.length} events</span>
-      </div>
-      {filtered.length === 0 ? (
-        <div className="py-16 text-center">
-          <p className="text-sm text-[#387085]/40">No vault events found</p>
-          {filter !== 'ALL' && (
+    <div className="overflow-x-auto rounded-none border border-[#cd6332]/20 bg-white">
+      {filtered.length === 0 && filter !== 'ALL' ? (
+        <>
+          <table className="w-full text-left text-xs">
+            <thead>
+              <tr className="bg-[#cd6332] text-[11px] font-medium uppercase tracking-wider text-white">
+                <th className="relative whitespace-nowrap px-4 py-2.5 font-medium">
+                  <button onClick={() => setDropdownOpen(!dropdownOpen)} className="inline-flex items-center gap-1">
+                    Status
+                    <svg className={`h-3 w-3 transition-transform ${dropdownOpen ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" /></svg>
+                    {filter !== 'ALL' && <span className="ml-0.5 inline-flex h-1.5 w-1.5 rounded-full bg-white" />}
+                  </button>
+                  {dropdownOpen && (
+                    <div className="absolute left-0 top-full z-50 mt-0.5 w-40 border border-[#387085]/10 bg-white py-1 shadow-lg" onMouseLeave={() => setDropdownOpen(false)}>
+                      {VAULT_FILTER_OPTIONS.map((opt) => (
+                        <button key={opt.value} onClick={() => { setFilter(opt.value); setDropdownOpen(false); }}
+                          className={`block w-full px-3 py-1.5 text-left text-[11px] transition-colors ${filter === opt.value ? 'bg-[#cd6332]/8 font-semibold text-[#cd6332]' : 'text-[#14140f] hover:bg-[#faf9f5]'}`}>
+                          {opt.label}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </th>
+                <th className="whitespace-nowrap px-4 py-2.5 font-medium">Age</th>
+                <th className="whitespace-nowrap px-4 py-2.5 font-medium">Vault ID</th>
+                <th className="whitespace-nowrap px-4 py-2.5 font-medium">Depositor</th>
+                <th className="whitespace-nowrap px-4 py-2.5 font-medium">Provider</th>
+                <th className="whitespace-nowrap px-4 py-2.5 font-medium">Txn Hash</th>
+                <th className="whitespace-nowrap px-4 py-2.5 font-medium">Block</th>
+              </tr>
+            </thead>
+          </table>
+          <div className="py-16 text-center">
+            <p className="text-sm text-[#387085]/40">No vault events found</p>
             <button onClick={() => setFilter('ALL')} className="mx-auto mt-1 block text-xs text-[#cd6332] hover:underline">
               Show all events
             </button>
-          )}
-        </div>
+          </div>
+        </>
       ) : (
-        <div className="space-y-6 px-5 py-4">
-          {grouped.map(([date, events]) => (
-            <div key={date}>
-              <div className="mb-3 flex items-center gap-3">
-                <span className="whitespace-nowrap text-[11px] font-semibold uppercase tracking-wide text-[#387085]/50">
-                  {formatActivityDateGroup(date)}
-                </span>
-                <div className="h-px flex-1 bg-[#387085]/10" />
-              </div>
-              <div className="space-y-2">
-                {events.map((event) => {
-                  const style = VAULT_EVENT_STYLES[event.type];
-                  const isLiquidation = event.type === 'VAULT_LIQUIDATED';
-                  return (
-                    <div
-                      key={`${event.txHash}-${event.logIndex}`}
-                      className={`flex items-start gap-3 border px-4 py-3 transition-colors ${
-                        isLiquidation
-                          ? 'border-red-200/60 bg-red-50/50'
-                          : 'border-[#387085]/10 bg-white hover:bg-[#faf9f5]'
-                      }`}
-                    >
-                      <div className="mt-1 flex-shrink-0">
-                        <div className="h-2 w-2 rounded-full" style={{ background: style.dot }} />
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <div className="flex items-center justify-between gap-2">
-                          <div className="flex items-center gap-2">
-                            <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-medium ${style.bg} ${style.text}`}>
-                              {isLiquidation && <span className="text-red-500">⚠</span>}
-                              {style.label}
-                            </span>
-                          </div>
-                          <span className="flex-shrink-0 font-mono text-sm font-semibold text-[#14140f]">
-                            {event.amount} sBTC
-                          </span>
-                        </div>
-                        <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-0.5 text-[10px] text-[#387085]/50">
-                          <span className="inline-flex items-center gap-1">
-                            <span className="text-[9px] font-medium uppercase tracking-wide text-[#387085]/35">Vault</span>
-                            <Link href={`/vaults/${event.vaultId}`} className="font-mono text-[#cd6332]/70 hover:text-[#cd6332] hover:underline">
-                              {event.vaultId.slice(0, 6)}...{event.vaultId.slice(-4)}
-                            </Link>
-                            <CopyIcon text={event.vaultId} />
-                          </span>
-                          <span className="text-[#387085]/20">·</span>
-                          <span className="inline-flex items-center gap-1">
-                            <span className="text-[9px] font-medium uppercase tracking-wide text-[#387085]/35">Depositor</span>
-                            <Link href={`/accounts/${event.depositorAddress}`} className="font-mono text-[#387085]/60 hover:text-[#cd6332] hover:underline">
-                              {truncateAddress(event.depositorAddress, 6, 4)}
-                            </Link>
-                          </span>
-                          <span className="text-[#387085]/20">·</span>
-                          <span className="text-[#387085]/40">{event.providerName}</span>
-                          <span className="text-[#387085]/20">·</span>
-                          <span className="text-[#387085]/40">{event.dappName}</span>
-                        </div>
-                        <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-0.5 text-[10px] text-[#387085]/50">
-                          <span className="inline-flex items-center gap-1">
-                            <span className="text-[9px] font-medium uppercase tracking-wide text-[#387085]/35">Tx</span>
-                            <Link href={`/tx/${event.txHash}`} className="font-mono text-[#cd6332]/70 hover:text-[#cd6332] hover:underline">
-                              {event.txHash.slice(0, 6)}...{event.txHash.slice(-4)}
-                            </Link>
-                          </span>
-                          <span className="text-[#387085]/20">·</span>
-                          <span className="inline-flex items-center gap-1">
-                            <span className="text-[9px] font-medium uppercase tracking-wide text-[#387085]/35">Block</span>
-                            <span title={formatFullDate(event.blockTime)} className="font-mono text-[#387085]/40">
-                              #{event.blockNumber.toLocaleString()}
-                            </span>
-                          </span>
-                        </div>
-                      </div>
+        <table className="w-full text-left text-xs">
+          <thead>
+            <tr className="bg-[#cd6332] text-[11px] font-medium uppercase tracking-wider text-white">
+              <th className="relative whitespace-nowrap px-4 py-2.5 font-medium">
+                <button onClick={() => setDropdownOpen(!dropdownOpen)} className="inline-flex items-center gap-1">
+                  Status
+                  <svg className={`h-3 w-3 transition-transform ${dropdownOpen ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" /></svg>
+                  {filter !== 'ALL' && <span className="ml-0.5 inline-flex h-1.5 w-1.5 rounded-full bg-white" />}
+                </button>
+                {dropdownOpen && (
+                  <div className="absolute left-0 top-full z-50 mt-0.5 w-40 border border-[#387085]/10 bg-white py-1 shadow-lg" onMouseLeave={() => setDropdownOpen(false)}>
+                    {VAULT_FILTER_OPTIONS.map((opt) => (
+                      <button key={opt.value} onClick={() => { setFilter(opt.value); setDropdownOpen(false); }}
+                        className={`block w-full px-3 py-1.5 text-left text-[11px] transition-colors ${filter === opt.value ? 'bg-[#cd6332]/8 font-semibold text-[#cd6332]' : 'text-[#14140f] hover:bg-[#faf9f5]'}`}>
+                        {opt.label}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </th>
+              <th className="whitespace-nowrap px-4 py-2.5 font-medium">Age</th>
+              <th className="whitespace-nowrap px-4 py-2.5 font-medium">Vault ID</th>
+              <th className="whitespace-nowrap px-4 py-2.5 font-medium">Depositor</th>
+              <th className="whitespace-nowrap px-4 py-2.5 font-medium">Provider</th>
+              <th className="whitespace-nowrap px-4 py-2.5 font-medium">Txn Hash</th>
+              <th className="whitespace-nowrap px-4 py-2.5 font-medium">Block</th>
+            </tr>
+          </thead>
+          <tbody>
+            {filtered.map((event) => {
+              const style = VAULT_EVENT_STYLES[event.type];
+              return (
+                <tr
+                  key={`${event.txHash}-${event.logIndex}`}
+                  className="h-10 border-b border-[#cd6332]/10 transition-colors hover:bg-[rgba(56,112,133,0.03)]"
+                >
+                  <td className="whitespace-nowrap px-4 py-2.5">
+                    <span className="inline-flex items-center gap-1.5">
+                      <span className="inline-block h-1.5 w-1.5 rounded-full" style={{ backgroundColor: style.dot }} />
+                      <span className="text-xs font-medium" style={{ color: style.color }}>
+                        {style.label}
+                      </span>
+                    </span>
+                  </td>
+                  <td className="whitespace-nowrap px-4 py-2.5 text-[rgba(56,112,133,0.5)]">
+                    {formatRelativeTime(event.blockTime)}
+                  </td>
+                  <td className="whitespace-nowrap px-4 py-2.5">
+                    <div className="flex items-center">
+                      <Link
+                        href={`/vaults/${event.vaultId}`}
+                        className="font-mono text-[11px] font-medium text-[#cd6332] hover:text-[#b8562b]"
+                      >
+                        {truncateAddress(event.vaultId, 6, 4)}
+                      </Link>
+                      <CopyIcon text={event.vaultId} />
                     </div>
-                  );
-                })}
-              </div>
-            </div>
-          ))}
-        </div>
+                  </td>
+                  <td className="whitespace-nowrap px-4 py-2.5">
+                    <div className="flex items-center">
+                      <Link
+                        href={`/accounts/${event.depositorAddress}`}
+                        className="font-mono text-[11px] text-[#387085] hover:text-[#cd6332]"
+                      >
+                        {truncateAddress(event.depositorAddress, 6, 4)}
+                      </Link>
+                      <CopyIcon text={event.depositorAddress} />
+                    </div>
+                  </td>
+                  <td className="whitespace-nowrap px-4 py-2.5 text-[#14140f]">
+                    {event.providerName}
+                  </td>
+                  <td className="whitespace-nowrap px-4 py-2.5">
+                    <div className="flex items-center">
+                      <Link
+                        href={`/tx/${event.txHash}`}
+                        className="font-mono text-[11px] font-medium text-[#cd6332] hover:text-[#b8562b]"
+                      >
+                        {truncateAddress(event.txHash, 6, 4)}
+                      </Link>
+                      <CopyIcon text={event.txHash} />
+                    </div>
+                  </td>
+                  <td className="whitespace-nowrap px-4 py-2.5 text-[#387085]">
+                    {event.blockNumber.toLocaleString()}
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
       )}
     </div>
   );

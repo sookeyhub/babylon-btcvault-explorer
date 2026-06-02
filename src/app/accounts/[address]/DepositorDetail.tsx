@@ -490,11 +490,188 @@ function PositionDebtsTable() {
   );
 }
 
+/* ── Mock per-dApp positions ────────────────────────────────────────────── */
+
+const MOCK_DAPP_POSITIONS = [
+  {
+    dapp: 'Aave v4',
+    collateral: 0.02001685,
+    collateralSymbol: 'sBTC',
+    collateralUsd: 1382.44,
+    debts: [
+      { symbol: 'USDC', amountUsd: 498.15, interest: 0.002221, interestSymbol: 'USDC', principal: 498.148, totalRepay: 498.152221 },
+    ],
+    ltv: 64.34,
+    maxLtv: 75,
+    healthFactor: 1.16,
+  },
+  {
+    dapp: 'Compound v3',
+    collateral: 0.01000000,
+    collateralSymbol: 'sBTC',
+    collateralUsd: 690.14,
+    debts: [
+      { symbol: 'USDT', amountUsd: 125.40, interest: 0.400000, interestSymbol: 'USDT', principal: 125.00, totalRepay: 125.40 },
+    ],
+    ltv: 18.17,
+    maxLtv: 75,
+    healthFactor: 2.81,
+  },
+];
+
+/* ── Positions by dApp ──────────────────────────────────────────────────── */
+
+const HF_GAUGE_MAX = 3;
+
+function HFBar({ hf, color }: { hf: number; color: string }) {
+  const hfPct = Math.min((hf / HF_GAUGE_MAX) * 100, 100);
+  const liqM = (1.0 / HF_GAUGE_MAX) * 100;
+  const cautionM = (1.5 / HF_GAUGE_MAX) * 100;
+  const safeM = (2.0 / HF_GAUGE_MAX) * 100;
+  return (
+    <div className="relative mt-2">
+      <div className="h-1.5 w-full" style={{
+        background: `linear-gradient(to right, #dc2626 0%, #dc2626 ${liqM}%, #d97706 ${liqM}%, #d97706 ${cautionM}%, #387085 ${cautionM}%, #387085 ${safeM}%, #16a34a ${safeM}%, #16a34a 100%)`,
+        opacity: 0.45,
+      }} />
+      <div className="absolute top-[-3px] h-[12px] w-[2px] rounded-full bg-[#14140f]"
+        style={{ left: `calc(${hfPct}% - 1px)` }}
+        title={`HF ${hf.toFixed(2)}`}
+      />
+      <div className="mt-1 flex justify-between text-[9px] text-[#387085]/35">
+        <span>1.0</span><span>1.5</span><span>2.0</span><span>3.0+</span>
+      </div>
+    </div>
+  );
+}
+
+function PositionsByDApp() {
+  return (
+    <div className="space-y-4">
+      {MOCK_DAPP_POSITIONS.map((pos) => {
+        const hfStatus = getPositionHealthStatus(pos.healthFactor);
+        const ltvPct = Math.min((pos.ltv / pos.maxLtv) * 100, 100);
+        const ltvColor =
+          pos.ltv >= pos.maxLtv * 0.9 ? '#dc2626'
+          : pos.ltv >= pos.maxLtv * 0.7 ? '#d97706'
+          : '#16a34a';
+        const totalDebtUsd = pos.debts.reduce((s, d) => s + d.amountUsd, 0);
+        const totalInterest = pos.debts.reduce((s, d) => s + d.interest, 0);
+
+        return (
+          <section key={pos.dapp} className="border border-[#387085]/10 bg-white">
+            {/* dApp header — name only, no icon */}
+            <div className="border-b border-[#387085]/10 px-5 py-3">
+              <span className="text-sm font-semibold text-[#14140f]">{pos.dapp}</span>
+            </div>
+
+            {/* Stat row */}
+            <div className="grid grid-cols-2 gap-0 divide-x divide-y divide-[#387085]/8 sm:grid-cols-4 sm:divide-y-0">
+              {/* Collateral */}
+              <div className="px-5 py-4">
+                <p className="text-[10px] font-medium uppercase tracking-wide text-[#387085]/40">Collateral</p>
+                <p className="mt-1 text-xl font-bold text-[#14140f]">
+                  {pos.collateral.toFixed(4)} <span className="text-xs font-normal text-[#387085]/50">{pos.collateralSymbol}</span>
+                </p>
+                <p className="mt-0.5 text-[11px] text-[#387085]/40">≈ ${pos.collateralUsd.toLocaleString('en-US', { maximumFractionDigits: 2 })}</p>
+              </div>
+
+              {/* Debt — in USD */}
+              <div className="px-5 py-4">
+                <p className="text-[10px] font-medium uppercase tracking-wide text-[#387085]/40">Debt</p>
+                <p className="mt-1 text-xl font-bold text-[#14140f]">
+                  ${totalDebtUsd.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                </p>
+                <p className="mt-0.5 text-[11px] text-green-600">
+                  Interest {totalInterest.toLocaleString('en-US', { minimumFractionDigits: 6, maximumFractionDigits: 6 })}
+                </p>
+              </div>
+
+              {/* LTV */}
+              <div className="px-5 py-4">
+                <p className="text-[10px] font-medium uppercase tracking-wide text-[#387085]/40">Current LTV</p>
+                <p className="mt-1 text-xl font-bold text-[#14140f]">{pos.ltv.toFixed(2)}%</p>
+                <div className="mt-2 flex items-center gap-1.5">
+                  <div className="h-1.5 w-full bg-[#387085]/10">
+                    <div className="h-full transition-all" style={{ width: `${ltvPct}%`, background: ltvColor }} />
+                  </div>
+                </div>
+                <p className="mt-1 text-[10px] text-[#387085]/40">max {pos.maxLtv}%</p>
+              </div>
+
+              {/* Health Factor with mini gradient bar */}
+              <div className="px-5 py-4">
+                <div className="flex items-center gap-1">
+                  <p className="text-[10px] font-medium uppercase tracking-wide text-[#387085]/40">Health Factor</p>
+                  <svg className="h-3 w-3 text-[#387085]/30" fill="none" viewBox="0 0 24 24" strokeWidth="1.8" stroke="currentColor" title="Liquidation occurs when Health Factor falls below 1.0">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z" />
+                  </svg>
+                </div>
+                <div className="mt-1 flex items-center gap-2">
+                  <p className="text-xl font-bold" style={{ color: hfStatus.color }}>{pos.healthFactor.toFixed(2)}</p>
+                  <span className={`rounded-full px-1.5 py-0.5 text-[9px] font-semibold ${hfStatus.bg} ${hfStatus.text}`}>
+                    {hfStatus.label}
+                  </span>
+                </div>
+                <HFBar hf={pos.healthFactor} color={hfStatus.color} />
+              </div>
+            </div>
+
+            {/* Assets table */}
+            <div className="border-t border-[#387085]/8">
+              <table className="w-full text-xs">
+                <thead>
+                  <tr className="border-b border-[#387085]/8 bg-[#faf9f5]">
+                    <th className="px-5 py-2 text-left text-[10px] font-medium uppercase tracking-wide text-[#387085]/40">Assets</th>
+                    <th className="px-5 py-2 text-right text-[10px] font-medium uppercase tracking-wide text-[#387085]/40">Amount Borrowed</th>
+                    <th className="px-5 py-2 text-right text-[10px] font-medium uppercase tracking-wide text-[#387085]/40">Interest</th>
+                    <th className="px-5 py-2 text-right text-[10px] font-medium uppercase tracking-wide text-[#387085]/40">
+                      <span className="inline-flex items-center gap-0.5">
+                        Amount to Repay
+                        <svg className="h-3 w-3 text-[#387085]/30" fill="none" viewBox="0 0 24 24" strokeWidth="1.8" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z" /></svg>
+                      </span>
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {pos.debts.map((d) => (
+                    <tr key={d.symbol} className="border-b border-[#387085]/6 last:border-0 hover:bg-[#faf9f5]">
+                      <td className="px-5 py-2.5">
+                        <div className="flex items-center gap-2">
+                          <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[#387085]/8 text-[9px] font-bold text-[#387085]">
+                            {d.symbol.charAt(0)}
+                          </span>
+                          <span className="font-medium text-[#14140f]">{d.symbol} ({d.symbol})</span>
+                        </div>
+                      </td>
+                      <td className="px-5 py-2.5 text-right tabular-nums font-semibold text-[#14140f]">
+                        {d.principal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                        <span className="ml-1 text-[10px] font-normal text-[#387085]/40">{d.symbol}</span>
+                      </td>
+                      <td className="px-5 py-2.5 text-right tabular-nums text-[#14140f]">
+                        {d.interest.toFixed(6)}
+                        <span className="ml-1 text-[10px] text-[#387085]/40">{d.interestSymbol}</span>
+                      </td>
+                      <td className="px-5 py-2.5 text-right tabular-nums font-semibold text-[#cd6332]">
+                        {d.totalRepay.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 6 })}
+                        <span className="ml-1 text-[10px] font-normal text-[#387085]/40">{d.symbol}</span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </section>
+        );
+      })}
+    </div>
+  );
+}
+
 function CollateralPositionsTab() {
   return (
     <div className="space-y-4">
-      <PositionSummaryCard />
-      <PositionDebtsTable />
+      <PositionsByDApp />
     </div>
   );
 }
@@ -515,6 +692,7 @@ export default function DepositorDetail({ address, vaults }: DepositorDetailProp
 
   const totalVaults = vaults.length;
   const activeVaults = vaults.filter((v) => v.status === 'Active').length;
+  const totalBtc = vaults.reduce((s, v) => s + v.vaultSize, 0);
 
   const joinedFormatted = depositor ? formatDate(depositor.firstDeposit) : '—';
   const addrShort = truncateAddress(address, 6, 4);
@@ -525,9 +703,9 @@ export default function DepositorDetail({ address, vaults }: DepositorDetailProp
   const collateralUsd = pos.totalCollateral.priceUsd
     ? collateralAmount * parseFloat(pos.totalCollateral.priceUsd)
     : null;
-  const debtTotal = pos.debts.reduce((s, d) => s + parsePositionAmount(d.totalAmount, d.decimals), 0);
-  const interestTotal = pos.debts.reduce((s, d) => s + parsePositionAmount(d.accruedInterest, d.decimals), 0);
-  const debtSymbol = pos.debts[0]?.symbol ?? '';
+  // Total debt in USD (assume stablecoin = 1:1 USD)
+  const debtTotalUsd = pos.debts.reduce((s, d) => s + parsePositionAmount(d.totalAmount, d.decimals), 0);
+  const debtAssetCount = pos.debts.length;
   const currentLtv = parseFloat(pos.currentLtv);
   const maxLtv = pos.avgCollateralFactor ? parseFloat(pos.avgCollateralFactor) * 100 : 75;
   const hf = parseFloat(pos.healthFactor);
@@ -553,58 +731,76 @@ export default function DepositorDetail({ address, vaults }: DepositorDetailProp
       <p className="text-[11px] font-medium uppercase tracking-widest text-[#387085]/35">Depositor</p>
 
       {/* ── Identity strip ──────────────────────────────────────────── */}
-      <div className="space-y-0.5">
+      <div className="flex items-center justify-between gap-4">
         <div className="flex items-center gap-2">
           <h1 className="text-2xl font-bold text-[#14140f]">{addrShort}</h1>
           <CopyIcon text={address} />
         </div>
-        <div className="flex flex-wrap items-center gap-1.5 text-xs text-[#387085]/55">
-          <span>joined {joinedFormatted}</span>
-          <span className="text-[#387085]/25">·</span>
-          <span>{totalVaults} vaults to date</span>
-        </div>
+        <span className="text-xs text-[#387085]/55">joined {joinedFormatted}</span>
       </div>
 
-      {/* ── 4 stat cards: Collateral · Total Debt · Current LTV · Health Factor ── */}
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-        {/* Collateral */}
+      {/* ── 4 stat cards: 2 left + 2 right ─────────────────────────── */}
+      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+
+        {/* 1. Total BTC */}
         <div className="border border-[#387085]/10 bg-white p-4">
-          <p className="text-[11px] font-semibold uppercase tracking-wide text-[#387085]/45">Collateral</p>
+          <div className="flex items-center gap-1">
+            <p className="text-[11px] font-semibold uppercase tracking-wide text-[#387085]/45">Total BTC</p>
+            <svg className="h-3 w-3 text-[#387085]/30" fill="none" viewBox="0 0 24 24" strokeWidth="1.8" stroke="currentColor" title="Total BTC locked across all vaults">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z" />
+            </svg>
+          </div>
           <p className="mt-1.5 text-2xl font-bold text-[#14140f]">
-            {collateralAmount.toFixed(2)} <span className="text-sm font-normal text-[#387085]/50">BTC</span>
+            {totalBtc.toFixed(4)} <span className="text-sm font-normal text-[#387085]/50">BTC</span>
           </p>
           <p className="mt-0.5 text-[11px] text-[#387085]/40">
-            {collateralUsd != null ? `≈ $${collateralUsd.toLocaleString('en-US', { maximumFractionDigits: 0 })}` : ''}
+            ≈ ${(totalBtc * BTC_USD_RATE).toLocaleString('en-US', { maximumFractionDigits: 0 })}
           </p>
-          <p className="text-[11px] text-[#387085]/40">{activeVaults} active</p>
         </div>
 
-        {/* Total Debt */}
+        {/* 2. Total Collateral */}
         <div className="border border-[#387085]/10 bg-white p-4">
-          <p className="text-[11px] font-semibold uppercase tracking-wide text-[#387085]/45">Total Debt</p>
+          <p className="text-[11px] font-semibold uppercase tracking-wide text-[#387085]/45">Total Collateral</p>
           <p className="mt-1.5 text-2xl font-bold text-[#14140f]">
-            {debtTotal.toLocaleString('en-US', { maximumFractionDigits: 0 })} <span className="text-sm font-normal text-[#387085]/50">{debtSymbol}</span>
+            {collateralAmount.toFixed(4)} <span className="text-sm font-normal text-[#387085]/50">BTC</span>
           </p>
-          {interestTotal > 0 && (
-            <p className="mt-0.5 text-[11px] text-green-600">+ interest</p>
-          )}
+          <p className="mt-0.5 text-[11px] text-[#387085]/40">
+            {collateralUsd != null ? `≈ $${collateralUsd.toLocaleString('en-US', { maximumFractionDigits: 0 })}` : '—'}
+          </p>
         </div>
 
-        {/* Current LTV */}
+        {/* 3. Total Debt */}
         <div className="border border-[#387085]/10 bg-white p-4">
-          <p className="text-[11px] font-semibold uppercase tracking-wide text-[#387085]/45">Current LTV</p>
-          <p className="mt-1.5 text-2xl font-bold text-[#14140f]">{currentLtv.toFixed(0)}%</p>
-          <p className="mt-0.5 text-[11px] text-[#387085]/40">max {maxLtv.toFixed(0)}%</p>
+          <div className="flex items-start justify-between">
+            <p className="text-[11px] font-semibold uppercase tracking-wide text-[#387085]/45">Total Debt</p>
+            <button
+              onClick={() => setActiveTab('collateral')}
+              className="text-[10px] font-medium text-[#cd6332] hover:underline"
+            >
+              View All Assets ›
+            </button>
+          </div>
+          <p className="mt-1.5 text-2xl font-bold text-[#14140f]">
+            ${debtTotalUsd.toLocaleString('en-US', { maximumFractionDigits: 0 })}
+          </p>
+          <p className="mt-0.5 text-[11px] text-[#387085]/40">{debtAssetCount} Asset{debtAssetCount !== 1 ? 's' : ''}</p>
         </div>
 
-        {/* Health Factor */}
+        {/* 4. Vaults */}
         <div className="border border-[#387085]/10 bg-white p-4">
-          <p className="text-[11px] font-semibold uppercase tracking-wide text-[#387085]/45">Health Factor</p>
-          <p className="mt-1.5 text-2xl font-bold text-[#14140f]">{hf.toFixed(2)}</p>
-          <p className="mt-0.5 flex items-center gap-1 text-[11px]">
-            <span className="inline-block h-2 w-2 rounded-full" style={{ background: hfStatus.color }} />
-            <span style={{ color: hfStatus.color }}>{hfStatus.label.toLowerCase()}</span>
+          <div className="flex items-start justify-between">
+            <p className="text-[11px] font-semibold uppercase tracking-wide text-[#387085]/45">Vaults</p>
+            <button
+              onClick={() => setActiveTab('deposited')}
+              className="text-[10px] font-medium text-[#cd6332] hover:underline"
+            >
+              View All Vaults ›
+            </button>
+          </div>
+          <p className="mt-1.5 text-2xl font-bold text-[#14140f]">
+            {activeVaults} <span className="text-sm font-normal text-[#387085]/50">/ {totalVaults}</span>
           </p>
+          <p className="mt-0.5 text-[11px] text-[#387085]/40">active / total</p>
         </div>
       </div>
 

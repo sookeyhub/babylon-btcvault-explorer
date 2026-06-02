@@ -672,27 +672,18 @@ export default function ProviderDetail({
       <p className="text-[11px] font-medium uppercase tracking-widest text-[#387085]/35">Provider</p>
 
       {/* ── Row A: Identity strip ────────────────────────────────────────── */}
-      <div className="space-y-0.5">
-        <h1 className="text-2xl font-bold text-[#14140f]">{displayName}</h1>
-        {providerName && (
+      <div className="flex items-center justify-between gap-4">
+        <div className="space-y-0.5">
+          <h1 className="text-2xl font-bold text-[#14140f]">{displayName}</h1>
           <div className="flex flex-wrap items-center gap-1.5 text-xs text-[#387085]/55">
             <span className="font-mono">{addrShort}</span>
             <CopyIcon text={address} />
-            <span className="text-[#387085]/25">·</span>
-            <span>commission {commissionPct}%</span>
-            <span className="text-[#387085]/25">·</span>
-            <span>joined {joinedFormatted}</span>
           </div>
-        )}
-        {!providerName && (
-          <div className="flex flex-wrap items-center gap-1.5 text-xs text-[#387085]/55">
-            <CopyIcon text={address} />
-            <span className="text-[#387085]/25">·</span>
-            <span>commission {commissionPct}%</span>
-            <span className="text-[#387085]/25">·</span>
-            <span>joined {joinedFormatted}</span>
-          </div>
-        )}
+        </div>
+        <div className="flex flex-shrink-0 flex-col items-end gap-1 text-xs text-[#387085]/55">
+          <span>commission <span className="font-medium text-[#14140f]">{commissionPct}%</span></span>
+          <span>joined <span className="font-medium text-[#14140f]">{joinedFormatted}</span></span>
+        </div>
       </div>
 
       {/* ── Row B: Status bar ────────────────────────────────────────────── */}
