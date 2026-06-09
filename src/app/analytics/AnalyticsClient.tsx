@@ -15,10 +15,8 @@ import {
   Legend,
 } from 'recharts';
 import CopyButton from '@/components/CopyButton';
-import StatusBadge from '@/components/StatusBadge';
-import { truncateAddress } from '@/lib/utils';
+import { truncateAddress, formatRelativeTime, toUsd } from '@/lib/utils';
 import type { TimeSeriesPoint, Vault, DashboardKPIs } from '@/lib/types';
-import DevNote, { DevNoteSection } from '@/components/DevNote';
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
@@ -165,7 +163,8 @@ interface LineChartCardProps {
 }
 
 function LineChartCard({ title, data, color, valueSuffix = '', yTickFormatter }: LineChartCardProps) {
-  const [period, setPeriod] = useState<Period>('30D');
+  const isBtc = valueSuffix.includes('sBTC') || valueSuffix.includes('BTC');
+  const [period, setPeriod] = useState<Period>('ALL');
   const filtered = filterByPeriod(data, period);
 
   // Thin out x-axis labels
@@ -210,7 +209,11 @@ function LineChartCard({ title, data, color, valueSuffix = '', yTickFormatter }:
                 fontSize: 11,
               }}
               labelFormatter={(label) => formatDateLabel(String(label))}
-              formatter={(value) => [`${Number(value).toLocaleString()}${valueSuffix}`, '']}
+              formatter={(value) => {
+                const v = Number(value);
+                const base = `${v.toLocaleString()}${valueSuffix}`;
+                return [isBtc ? `${base} ${toUsd(v)}` : base, ''];
+              }}
             />
             <Line
               type="monotone"
@@ -230,7 +233,7 @@ function LineChartCard({ title, data, color, valueSuffix = '', yTickFormatter }:
 // ── Vault Creation combo chart ────────────────────────────────────────────────
 
 function VaultCreationChart({ data }: { data: VaultCreationPoint[] }) {
-  const [period, setPeriod] = useState<Period>('30D');
+  const [period, setPeriod] = useState<Period>('ALL');
   const filtered = filterCreationByPeriod(data, period);
 
   const xTicks: string[] = [];
@@ -289,7 +292,7 @@ function VaultCreationChart({ data }: { data: VaultCreationPoint[] }) {
               labelFormatter={(label) => formatDateLabel(String(label))}
               formatter={(value, name) => {
                 if (name === 'count') return [`${value}`, 'Daily new vaults created'];
-                return [`${Number(value).toFixed(4)} sBTC`, 'Daily new vault amount'];
+                return [`${Number(value).toFixed(4)} sBTC ${toUsd(Number(value))}`, 'Daily new vault amount'];
               }}
             />
             <Legend
@@ -334,25 +337,34 @@ export function VaultsTabContent({
   vaultCreationData,
 }: AnalyticsClientProps) {
   const kpiCards = [
-    { label: 'Total Value Locked', value: `${kpis.currentTVL.toFixed(2)} sBTC` },
-    { label: 'Active Vaults', value: String(kpis.activeVaultCount) },
-    { label: 'Total Value Processed', value: `${kpis.totalValueProcessed.toFixed(2)} sBTC` },
-    { label: 'Total Vaults', value: String(kpis.totalNumberOfVaults) },
+    { label: 'Total Value Locked (TVL)', value: `${kpis.currentTVL.toFixed(2)} sBTC`, subValue: toUsd(kpis.currentTVL), hasInfo: true },
+    { label: 'Active Vaults', value: String(kpis.activeVaultCount), subValue: '', hasInfo: false },
+    { label: 'Total Value Processed (TVP)', value: `${kpis.totalValueProcessed.toFixed(2)} sBTC`, subValue: toUsd(kpis.totalValueProcessed), hasInfo: true },
+    { label: 'Total Vaults', value: String(kpis.totalNumberOfVaults), subValue: '', hasInfo: false },
   ];
 
   return (
     <div className="space-y-5">
 
       {/* 4 KPI cards */}
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
         {kpiCards.map((card) => (
           <div
             key={card.label}
-            className="rounded-none border border-[#387085]/20 bg-white px-5 py-4"
+            className="relative rounded-none border border-[#387085]/20 bg-white px-5 py-4"
           >
-            <p className="text-xs text-[rgba(56,112,133,0.55)]">{card.label}</p>
+            <CornerBrackets />
+            <p className="flex items-center gap-1 text-xs text-[rgba(56,112,133,0.55)]">
+              {card.label}
+              {card.hasInfo && (
+                <svg className="h-3.5 w-3.5 text-[rgba(56,112,133,0.3)]" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z" />
+                </svg>
+              )}
+            </p>
             <p className="mt-1.5 text-xl font-bold tabular-nums text-[#14140f]">{card.value}</p>
-            <p className="mt-1 text-xs text-[rgba(56,112,133,0.4)]">0% (24h)</p>
+            {card.subValue && <p className="mt-0.5 text-xs text-[#387085]/40">{card.subValue}</p>}
+            <p className="mt-1 text-xs text-green-600">+0% (24h)</p>
           </div>
         ))}
       </div>
@@ -398,13 +410,11 @@ export function VaultsTabContent({
             <thead>
               <tr className="bg-[#cd6332] text-[11px] font-medium uppercase tracking-wider text-white">
                 <th className="whitespace-nowrap px-4 py-2.5 font-medium">Vault ID</th>
-                <th className="whitespace-nowrap px-4 py-2.5 font-medium">Status</th>
-                <th className="whitespace-nowrap px-4 py-2.5 font-medium">BTC Address</th>
-                <th className="whitespace-nowrap px-4 py-2.5 font-medium">Depositor</th>
                 <th className="whitespace-nowrap px-4 py-2.5 font-medium">Amount</th>
+                <th className="whitespace-nowrap px-4 py-2.5 font-medium">Depositor</th>
+                <th className="whitespace-nowrap px-4 py-2.5 font-medium">Provider</th>
                 <th className="whitespace-nowrap px-4 py-2.5 font-medium">DApp</th>
-                <th className="whitespace-nowrap px-4 py-2.5 font-medium">Created (UTC)</th>
-                <th className="whitespace-nowrap px-4 py-2.5 font-medium">Closed (UTC)</th>
+                <th className="whitespace-nowrap px-4 py-2.5 font-medium">Created (Age)</th>
               </tr>
             </thead>
             <tbody>
@@ -424,16 +434,8 @@ export function VaultsTabContent({
                       <CopyButton text={vault.id} />
                     </div>
                   </td>
-                  <td className="whitespace-nowrap px-4 py-2.5">
-                    <StatusBadge status={vault.status} />
-                  </td>
-                  <td className="whitespace-nowrap px-4 py-2.5">
-                    <div className="flex items-center">
-                      <span className="font-mono text-[11px] text-[rgba(56,112,133,0.5)]">
-                        {truncateAddress(vault.btcAddress, 6, 4)}
-                      </span>
-                      <CopyButton text={vault.btcAddress} />
-                    </div>
+                  <td className="whitespace-nowrap px-4 py-2.5 font-medium tabular-nums text-[#14140f]">
+                    {vault.vaultSize} sBTC <span className="text-[10px] font-normal text-[#387085]/40">{toUsd(vault.vaultSize)}</span>
                   </td>
                   <td className="whitespace-nowrap px-4 py-2.5">
                     <div className="flex items-center">
@@ -446,15 +448,17 @@ export function VaultsTabContent({
                       <CopyButton text={vault.depositorAddress} />
                     </div>
                   </td>
-                  <td className="whitespace-nowrap px-4 py-2.5 font-medium tabular-nums text-[#14140f]">
-                    {vault.vaultSize.toFixed(8)} sBTC
+                  <td className="whitespace-nowrap px-4 py-2.5">
+                    <Link
+                      href={`/accounts/${vault.providerAddress}`}
+                      className="text-[11px] text-[#14140f] hover:text-[#cd6332]"
+                    >
+                      {vault.providerName}
+                    </Link>
                   </td>
                   <td className="whitespace-nowrap px-4 py-2.5 text-[#387085]">{vault.dappName}</td>
-                  <td className="whitespace-nowrap px-4 py-2.5 font-mono text-[11px] text-[rgba(56,112,133,0.5)]">
-                    {formatDateUTC(vault.createdAt)}
-                  </td>
-                  <td className="whitespace-nowrap px-4 py-2.5 font-mono text-[11px] text-[rgba(56,112,133,0.5)]">
-                    {formatDateUTC(vault.closedAt)}
+                  <td className="whitespace-nowrap px-4 py-2.5 text-[11px] text-[rgba(56,112,133,0.5)]">
+                    {vault.createdAt ? formatRelativeTime(vault.createdAt) : '—'}
                   </td>
                 </tr>
               ))}

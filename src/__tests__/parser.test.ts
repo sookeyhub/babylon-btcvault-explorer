@@ -70,7 +70,7 @@ describe('Vault Row Parser', () => {
     const rows = [{
       'Vault ID': 'vault-001',
       'Vault Name': 'Test Vault',
-      'Status': 'Active',
+      'Status': 'Available',
       'BTC Address': 'bc1qtest123',
       'ETH Address': '0xabc123',
       'Vault Size': '10.5',
@@ -87,12 +87,12 @@ describe('Vault Row Parser', () => {
     expect(errors).toHaveLength(0);
     expect(vaults).toHaveLength(1);
     expect(vaults[0].id).toBe('vault-001');
-    expect(vaults[0].status).toBe('Active');
+    expect(vaults[0].status).toBe('Available');
     expect(vaults[0].vaultSize).toBe(10.5);
     expect(vaults[0].closedAt).toBeNull();
   });
 
-  test('normalizes invalid status to Active', () => {
+  test('normalizes invalid status to Available', () => {
     const rows = [{
       'Vault ID': 'vault-002',
       'Status': 'InvalidStatus',
@@ -100,7 +100,7 @@ describe('Vault Row Parser', () => {
     }];
 
     const { vaults } = parseVaultRows(headers, rows as any);
-    expect(vaults[0].status).toBe('Active');
+    expect(vaults[0].status).toBe('Available');
   });
 
   test('handles comma-separated vault size', () => {
@@ -126,7 +126,7 @@ describe('Vault Row Parser', () => {
   test('skips rows with missing vault_id', () => {
     const rows = [{
       'Vault ID': '',
-      'Status': 'Active',
+      'Status': 'Available',
     }];
 
     const { vaults, errors } = parseVaultRows(headers, rows as any);

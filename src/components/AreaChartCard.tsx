@@ -10,8 +10,9 @@ import {
 } from 'recharts';
 import { useState } from 'react';
 import type { TimeSeriesPoint } from '@/lib/types';
+import { toUsd } from '@/lib/utils';
 
-const RANGES = ['7D', '30D', '180D', 'All'] as const;
+const RANGES = ['7D', '30D', '180D', 'YTD', '1Y', 'ALL'] as const;
 
 interface AreaChartCardProps {
   title: string;
@@ -22,7 +23,15 @@ interface AreaChartCardProps {
 }
 
 function filterByRange(data: TimeSeriesPoint[], range: string): TimeSeriesPoint[] {
-  if (range === 'All') return data;
+  if (range === 'ALL') return data;
+  if (range === 'YTD') {
+    const cutoff = new Date(new Date().getFullYear(), 0, 1);
+    return data.filter((d) => new Date(d.date) >= cutoff);
+  }
+  if (range === '1Y') {
+    const cutoff = new Date(Date.now() - 365 * 24 * 60 * 60 * 1000);
+    return data.filter((d) => new Date(d.date) >= cutoff);
+  }
   const days = range === '7D' ? 7 : range === '30D' ? 30 : 180;
   return data.slice(-days);
 }
@@ -34,7 +43,7 @@ export default function AreaChartCard({
   valuePrefix = '',
   valueSuffix = '',
 }: AreaChartCardProps) {
-  const [range, setRange] = useState<string>('30D');
+  const [range, setRange] = useState<string>('ALL');
   const filtered = filterByRange(data, range);
   const latestValue = filtered.length > 0 ? filtered[filtered.length - 1].value : 0;
   const gradId = `grad-${title.replace(/\s+/g, '-').toLowerCase()}`;
@@ -48,6 +57,9 @@ export default function AreaChartCard({
           </p>
           <p className="mt-1 text-xl font-bold tabular-nums" style={{ color }}>
             {valuePrefix}{latestValue.toLocaleString()}{valueSuffix}
+          </p>
+          <p className="text-xs text-[#387085]/40">
+            {toUsd(latestValue)}
           </p>
         </div>
         <div className="flex gap-0.5 rounded-none border border-[#cd6332]/15 bg-[#faf9f5] p-0.5">
@@ -93,7 +105,7 @@ export default function AreaChartCard({
                 color: '#387085',
               }}
               labelStyle={{ color: 'rgba(56,112,133,0.5)', fontSize: '10px' }}
-              formatter={(value) => [`${valuePrefix}${Number(value).toLocaleString()}${valueSuffix}`, '']}
+              formatter={(value) => [`${valuePrefix}${Number(value).toLocaleString()}${valueSuffix} ${toUsd(Number(value))}`, '']}
             />
             <Area
               type="monotone"

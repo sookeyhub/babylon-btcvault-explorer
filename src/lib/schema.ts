@@ -1,13 +1,13 @@
 import { z } from 'zod';
 
 /** Vault status enum for runtime validation */
-export const VaultStatusSchema = z.enum(['Active', 'Closed', 'Pending', 'Liquidated']);
+export const VaultStatusSchema = z.enum(['Available', 'Pending', 'Verified', 'Signature Collected', 'Redeemed', 'Expired', 'Liquidated']);
 
 /** Raw vault row — what comes from CSV / API before mapping */
 export const RawVaultRowSchema = z.object({
   vault_id: z.string().min(1),
   vault_name: z.string().default('Unknown'),
-  status: z.string().default('Active'),
+  status: z.string().default('Available'),
   btc_address: z.string().default(''),
   eth_address: z.string().default(''),
   vault_size: z.union([z.string(), z.number()]).transform((v) => {

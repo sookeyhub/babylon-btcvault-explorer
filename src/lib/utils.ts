@@ -1,5 +1,24 @@
 import type { Vault, VaultListParams, PaginatedResult } from './types';
 
+/** Mock token prices (USD) — replace with live API in production */
+export const TOKEN_PRICES: Record<string, number> = {
+  sBTC: 104_820,
+  BTC: 104_820,
+  WBTC: 62_794,
+  vaultBTC: 62_794,
+  USDC: 1,
+  USDT: 1,
+  ETH: 2_510,
+};
+
+/** Convert a token amount to USD string, e.g. "($104,820)" */
+export function toUsd(amount: number, symbol: string = 'sBTC'): string {
+  const price = TOKEN_PRICES[symbol] ?? 0;
+  const usd = amount * price;
+  if (usd < 0.01 && usd > 0) return '($<0.01)';
+  return `($${usd.toLocaleString('en-US', { maximumFractionDigits: usd >= 100 ? 0 : 2 })})`;
+}
+
 /** Format sBTC amount with proper precision */
 export function formatBTC(amount: number): string {
   return `${amount.toFixed(8)} sBTC`;
@@ -105,16 +124,20 @@ export function getStatusColor(status: Vault['status']): {
   dot: string;
 } {
   switch (status) {
-    case 'Active':
+    case 'Available':
       return { bg: 'bg-emerald-500/10', text: 'text-emerald-400', dot: 'bg-emerald-400' };
-    case 'Expired':
-      return { bg: 'bg-zinc-500/10', text: 'text-zinc-400', dot: 'bg-zinc-400' };
     case 'Pending':
       return { bg: 'bg-amber-500/10', text: 'text-amber-400', dot: 'bg-amber-400' };
-    case 'Liquidated':
-      return { bg: 'bg-red-500/10', text: 'text-red-400', dot: 'bg-red-400' };
+    case 'Verified':
+      return { bg: 'bg-purple-500/10', text: 'text-purple-400', dot: 'bg-purple-400' };
+    case 'Signature Collected':
+      return { bg: 'bg-yellow-500/10', text: 'text-yellow-500', dot: 'bg-yellow-500' };
     case 'Redeemed':
       return { bg: 'bg-blue-500/10', text: 'text-blue-400', dot: 'bg-blue-400' };
+    case 'Expired':
+      return { bg: 'bg-zinc-500/10', text: 'text-zinc-400', dot: 'bg-zinc-400' };
+    case 'Liquidated':
+      return { bg: 'bg-red-500/10', text: 'text-red-400', dot: 'bg-red-400' };
     default:
       return { bg: 'bg-zinc-500/10', text: 'text-zinc-400', dot: 'bg-zinc-400' };
   }

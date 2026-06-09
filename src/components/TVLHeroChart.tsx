@@ -9,6 +9,7 @@ import {
   ResponsiveContainer,
 } from 'recharts';
 import type { TimeSeriesPoint } from '@/lib/types';
+import { toUsd } from '@/lib/utils';
 
 interface TVLHeroChartProps {
   data: TimeSeriesPoint[];
@@ -39,7 +40,7 @@ export default function TVLHeroChart({ data }: TVLHeroChartProps) {
                 color: '#387085',
               }}
               labelStyle={{ color: 'rgba(56,112,133,0.5)', fontSize: '10px' }}
-              formatter={(value) => [`${Number(value).toLocaleString()} BTC`, '']}
+              formatter={(value) => [`${Number(value).toLocaleString()} BTC ${toUsd(Number(value))}`, '']}
             />
             <Area
               type="monotone"

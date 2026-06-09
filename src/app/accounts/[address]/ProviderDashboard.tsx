@@ -32,8 +32,8 @@ export default function ProviderDashboard({ provider }: { provider: ProviderInfo
       {/* Operator Address */}
       <span className="flex items-center gap-1 text-[#387085]/40">
         Operator
-        <span title={provider.address} className="ml-1 font-mono text-[11px] text-[#387085]/60">
-          {truncateAddress(provider.address, 6, 4)}
+        <span title={provider.address} className="ml-1 font-mono text-[11px] text-[#387085]/60 break-all">
+          {provider.address}
         </span>
         <CopyButton text={provider.address} />
       </span>
@@ -43,8 +43,8 @@ export default function ProviderDashboard({ provider }: { provider: ProviderInfo
       {/* DApp Address */}
       <span className="flex items-center gap-1 text-[#387085]/40">
         DApp
-        <span title={provider.appAddress} className="ml-1 font-mono text-[11px] text-[#387085]/60">
-          {truncateAddress(provider.appAddress, 6, 4)}
+        <span title={provider.appAddress} className="ml-1 font-mono text-[11px] text-[#387085]/60 break-all">
+          {provider.appAddress}
         </span>
         <CopyButton text={provider.appAddress} />
       </span>

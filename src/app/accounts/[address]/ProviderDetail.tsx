@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import type { Vault } from '@/lib/types';
-import { truncateAddress, formatRelativeTime } from '@/lib/utils';
+import { truncateAddress, formatRelativeTime, toUsd } from '@/lib/utils';
 
 /* ── Mock data ──────────────────────────────────────────────────────────── */
 
@@ -23,7 +23,7 @@ const MOCK_STATUS = { status: 'Operational' as const, lastActivity: '8 min ago' 
 /* ── Provider-specific activity mock data ───────────────────────────────── */
 // Events a provider sees: vault activation success/failure, liquidations
 
-type ProviderEventType = 'PEGIN_ACTIVATED' | 'VAULT_EXPIRED' | 'VAULT_LIQUIDATED';
+type ProviderEventType = 'PEGIN_SUBMITTED' | 'PEGIN_VERIFIED' | 'SIGS_COLLECTED' | 'PEGIN_ACTIVATED' | 'VAULT_REDEEMED' | 'VAULT_EXPIRED' | 'VAULT_LIQUIDATED';
 type FailureReason = 'ack_timeout' | 'activation_timeout';
 
 const PROVIDER_ADDR = '0xbac46a70f5b8cc87f053d0afe8e6fb9cfe5880b5';
@@ -51,7 +51,7 @@ const MOCK_PROVIDER_ACTIVITIES: ProviderActivity[] = [
     blockNumber: 10892304,
     txHash: '0xdead...0001', fullTxHash: '0xdead00015a6b7c8d9e0f1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d',
     blockTime: '2026-05-21T02:09:00Z',
-    type: 'VAULT_LIQUIDATED', fromState: 'Active', toState: 'Liquidated',
+    type: 'VAULT_LIQUIDATED', fromState: 'Available', toState: 'Liquidated',
     vaultId: '0x7e8f...9a0b', fullVaultId: '0x7e8f9a0b1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f',
     amount: '1.00000000', success: false,
     depositor: '0x8c52...e740', fullDepositor: '0x8c52f3e1d4a7b9c0e2f1a3b5c7d9e8f0a1b2c3d4e740',
@@ -71,7 +71,7 @@ const MOCK_PROVIDER_ACTIVITIES: ProviderActivity[] = [
     blockNumber: 10834210,
     txHash: '0xcafe...babe', fullTxHash: '0xcafebabe1c9d7e6f3a4b5c8d9e0f1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f',
     blockTime: '2026-05-03T09:17:00Z',
-    type: 'PEGIN_ACTIVATED', fromState: 'Verified', toState: 'Active',
+    type: 'PEGIN_ACTIVATED', fromState: 'Verified', toState: 'Available',
     vaultId: '0x1c2d...3e4f', fullVaultId: '0x1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d',
     amount: '0.70000000', success: true,
     depositor: '0x7f4a...b281', fullDepositor: '0x7f4ae1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8b281',
@@ -91,7 +91,7 @@ const MOCK_PROVIDER_ACTIVITIES: ProviderActivity[] = [
     blockNumber: 10781033,
     txHash: '0xfeed...beef', fullTxHash: '0xfeedbeef3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f',
     blockTime: '2026-04-15T11:03:00Z',
-    type: 'PEGIN_ACTIVATED', fromState: 'Verified', toState: 'Active',
+    type: 'PEGIN_ACTIVATED', fromState: 'Verified', toState: 'Available',
     vaultId: '0x3a4b...5c6d', fullVaultId: '0x3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6f7a8b9c0d1e2f3a4b',
     amount: '0.30000000', success: true,
     depositor: '0x8c52...e740', fullDepositor: '0x8c52f3e1d4a7b9c0e2f1a3b5c7d9e8f0a1b2c3d4e740',
@@ -101,7 +101,7 @@ const MOCK_PROVIDER_ACTIVITIES: ProviderActivity[] = [
     blockNumber: 10547310,
     txHash: '0xd523...424e', fullTxHash: '0xd523721ea5c314ddfe56afafb0562318fdddf57cd6b6c6750baa61e78387424e',
     blockTime: '2026-04-09T05:48:00Z',
-    type: 'PEGIN_ACTIVATED', fromState: 'Verified', toState: 'Active',
+    type: 'PEGIN_ACTIVATED', fromState: 'Verified', toState: 'Available',
     vaultId: '0xd388...5031', fullVaultId: '0xd388f2c3e1a94b7d5f6a8b9c0d1e2f3a4b5c6d7e5f8a1b2c3d4e5f6a7b8c5031',
     amount: '1.00000000', success: true,
     depositor: '0x8c52...e740', fullDepositor: '0x8c52f3e1d4a7b9c0e2f1a3b5c7d9e8f0a1b2c3d4e740',
@@ -111,7 +111,7 @@ const MOCK_PROVIDER_ACTIVITIES: ProviderActivity[] = [
     blockNumber: 10547088,
     txHash: '0x9876...5432', fullTxHash: '0x98765432c9d7e6f3a4b5c8d9e0f1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e280c',
     blockTime: '2026-04-09T03:31:00Z',
-    type: 'PEGIN_ACTIVATED', fromState: 'Verified', toState: 'Active',
+    type: 'PEGIN_ACTIVATED', fromState: 'Verified', toState: 'Available',
     vaultId: '0xc9d0...e1f2', fullVaultId: '0xc9d0e1f2c9d7e6f3a4b5c8d9e0f1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e280c',
     amount: '2.10000000', success: true,
     depositor: '0x7f4a...b281', fullDepositor: '0x7f4ae1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8b281',
@@ -127,6 +127,46 @@ const MOCK_PROVIDER_ACTIVITIES: ProviderActivity[] = [
     depositor: '0x3d4e...e3f4', fullDepositor: '0x3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4',
     dapp: 'Compound',
   },
+  {
+    blockNumber: 10893001,
+    txHash: '0xbb11...cc22', fullTxHash: '0xbb11cc22d3e4f5a6b7c8d9e0f1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f901',
+    blockTime: '2026-05-22T08:15:00Z',
+    type: 'PEGIN_SUBMITTED', fromState: 'Pending', toState: 'Pending',
+    vaultId: '0x2f3a...4b5c', fullVaultId: '0x2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6f7a8b9c0d1e2f3a',
+    amount: '0.45000000', success: true,
+    depositor: '0x8c52...e740', fullDepositor: '0x8c52f3e1d4a7b9c0e2f1a3b5c7d9e8f0a1b2c3d4e740',
+    dapp: 'Aave',
+  },
+  {
+    blockNumber: 10893120,
+    txHash: '0xdd33...ee44', fullTxHash: '0xdd33ee44a5b6c7d8e9f0a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c102',
+    blockTime: '2026-05-22T09:42:00Z',
+    type: 'PEGIN_VERIFIED', fromState: 'Pending', toState: 'Verified',
+    vaultId: '0x2f3a...4b5c', fullVaultId: '0x2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6f7a8b9c0d1e2f3a',
+    amount: '0.45000000', success: true,
+    depositor: '0x8c52...e740', fullDepositor: '0x8c52f3e1d4a7b9c0e2f1a3b5c7d9e8f0a1b2c3d4e740',
+    dapp: 'Aave',
+  },
+  {
+    blockNumber: 10893250,
+    txHash: '0xff55...0066', fullTxHash: '0xff550066b7c8d9e0f1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d303',
+    blockTime: '2026-05-22T10:18:00Z',
+    type: 'SIGS_COLLECTED', fromState: 'Verified', toState: 'Signature Collected',
+    vaultId: '0x2f3a...4b5c', fullVaultId: '0x2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6f7a8b9c0d1e2f3a',
+    amount: '0.45000000', success: true,
+    depositor: '0x8c52...e740', fullDepositor: '0x8c52f3e1d4a7b9c0e2f1a3b5c7d9e8f0a1b2c3d4e740',
+    dapp: 'Aave',
+  },
+  {
+    blockNumber: 10870500,
+    txHash: '0xaa77...bb88', fullTxHash: '0xaa77bb88c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e504',
+    blockTime: '2026-05-18T15:30:00Z',
+    type: 'VAULT_REDEEMED', fromState: 'Available', toState: 'Redeemed',
+    vaultId: '0x6e7f...8a9b', fullVaultId: '0x6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f',
+    amount: '0.90000000', success: true,
+    depositor: '0xdba3...055d', fullDepositor: '0xdba3377f3505e1e34b01b40f6385649b5ca4055d',
+    dapp: 'Compound',
+  },
 ];
 
 const MOCK_QUEUE = [
@@ -140,45 +180,17 @@ const MOCK_QUEUE = [
 type TabKey = 'vaults' | 'activity';
 type VaultSubTab = 'in_progress' | 'all';
 
-const PROVIDER_EVENT_STYLES: Record<ProviderEventType, {
-  label: (r?: FailureReason) => string;
-  dot: string;
-  amountColor: string;
-  bg: string;
-  text: string;
-}> = {
-  PEGIN_ACTIVATED:  {
-    label: () => 'Vault activated',
-    dot: '#16a34a',
-    amountColor: 'text-[#16a34a]',
-    bg: 'bg-green-50',
-    text: 'text-green-700',
-  },
-  VAULT_EXPIRED: {
-    label: (r) => r === 'ack_timeout' ? 'Vault expired (ack_timeout)' : 'Vault expired (activation_timeout)',
-    dot: '#dc2626',
-    amountColor: 'text-red-500',
-    bg: 'bg-red-50',
-    text: 'text-red-600',
-  },
-  VAULT_LIQUIDATED: {
-    label: () => 'Vault liquidated',
-    dot: '#7f1d1d',
-    amountColor: 'text-red-700',
-    bg: 'bg-red-100',
-    text: 'text-red-800',
-  },
-};
-
 const VAULT_STATUS_COLORS: Record<string, string> = {
-  Active:     '#16a34a',
-  Pending:    '#d97706',
-  Redeemed:   '#387085',
-  Expired:    '#9ca3af',
-  Liquidated: '#dc2626',
+  Available:            '#16a34a',
+  Pending:              '#d97706',
+  Verified:             '#7c3aed',
+  'Signature Collected':'#ca8a04',
+  Redeemed:             '#2563eb',
+  Expired:              '#9ca3af',
+  Liquidated:           '#dc2626',
 };
 
-const VAULT_STATUS_ORDER = ['Active', 'Pending', 'Redeemed', 'Expired', 'Liquidated'] as const;
+const VAULT_STATUS_ORDER = ['Available', 'Pending', 'Verified', 'Signature Collected', 'Redeemed', 'Expired', 'Liquidated'] as const;
 const PAGE_SIZE = 20;
 
 const STATUS_DOT_COLOR: Record<string, string> = {
@@ -207,187 +219,271 @@ function CopyIcon({ text }: { text: string }) {
   );
 }
 
-/* ── Activity date grouping helpers ─────────────────────────────────────── */
+/* ── Activity Tab — Lending-Activity timeline style ────────────────────── */
 
-function formatDateGroup(isoDate: string): string {
-  const d = new Date(isoDate);
-  const y = d.getUTCFullYear();
-  const m = String(d.getUTCMonth() + 1).padStart(2, '0');
-  const day = String(d.getUTCDate()).padStart(2, '0');
-  return `${y}/${m}/${day}`;
-}
-
-function formatTimeUTC(isoDate: string): string {
-  const d = new Date(isoDate);
-  const h = String(d.getUTCHours()).padStart(2, '0');
-  const min = String(d.getUTCMinutes()).padStart(2, '0');
-  return `${h}:${min} (UTC)`;
-}
-
-/* ── Activity Tab ──────────────────────────────────────────────────────────── */
-
-// Event styles — same visual language as Depositor activity
 const ACTIVITY_STYLE: Record<ProviderEventType, {
   label: (r?: FailureReason) => string;
-  dot: string;
-  bg: string;          // badge bg
-  text: string;        // badge text
-  rowBg: string;       // row background
-  rowBorder: string;   // row border
+  color: string;
   amountColor: string;
   amountPrefix: string;
 }> = {
+  PEGIN_SUBMITTED: {
+    label: () => 'Vault Submitted',
+    color: 'text-amber-600',
+    amountColor: 'text-[#387085]',
+    amountPrefix: '',
+  },
+  PEGIN_VERIFIED: {
+    label: () => 'Vault Verified',
+    color: 'text-purple-600',
+    amountColor: 'text-[#387085]',
+    amountPrefix: '',
+  },
+  SIGS_COLLECTED: {
+    label: () => 'Signatures Collected',
+    color: 'text-yellow-600',
+    amountColor: 'text-[#387085]',
+    amountPrefix: '',
+  },
   PEGIN_ACTIVATED: {
-    label: () => 'Vault activated',
-    dot: '#16a34a',
-    bg: 'bg-green-50', text: 'text-green-700',
-    rowBg: 'bg-white hover:bg-[#faf9f5]', rowBorder: 'border-[#387085]/10',
-    amountColor: 'text-green-600', amountPrefix: '+',
+    label: () => 'Vault Activated',
+    color: 'text-green-600',
+    amountColor: 'text-green-600',
+    amountPrefix: '+',
+  },
+  VAULT_REDEEMED: {
+    label: () => 'Vault Redeemed',
+    color: 'text-blue-600',
+    amountColor: 'text-blue-600',
+    amountPrefix: '-',
   },
   VAULT_EXPIRED: {
-    label: (r) => r === 'ack_timeout' ? 'Vault expired · ack_timeout' : 'Vault expired · activation_timeout',
-    dot: '#d97706',
-    bg: 'bg-amber-50', text: 'text-amber-700',
-    rowBg: 'bg-amber-50/40 hover:bg-amber-50/60', rowBorder: 'border-amber-200/60',
-    amountColor: 'text-amber-600', amountPrefix: '',
+    label: (r) => r === 'ack_timeout' ? 'Vault Expired (ack_timeout)' : 'Vault Expired (activation_timeout)',
+    color: 'text-gray-500',
+    amountColor: 'text-gray-500',
+    amountPrefix: '',
   },
   VAULT_LIQUIDATED: {
-    label: () => 'Vault liquidated',
-    dot: '#dc2626',
-    bg: 'bg-red-50', text: 'text-red-600',
-    rowBg: 'bg-red-50/50 hover:bg-red-50/70', rowBorder: 'border-red-200/60',
-    amountColor: 'text-red-600', amountPrefix: '-',
+    label: () => 'Vault Liquidated',
+    color: 'text-red-600',
+    amountColor: 'text-red-500',
+    amountPrefix: '-',
   },
 };
 
-// State pill colors
 const STATE_PILL: Record<string, string> = {
-  Active:     'bg-green-50 text-green-700',
-  Verified:   'bg-[#387085]/8 text-[#387085]',
-  Pending:    'bg-amber-50 text-amber-600',
-  Expired:    'bg-gray-100 text-gray-500',
-  Liquidated: 'bg-red-50 text-red-600',
+  Available:            'bg-green-50 text-green-700',
+  Pending:              'bg-amber-50 text-amber-600',
+  Verified:             'bg-purple-50 text-purple-700',
+  'Signature Collected':'bg-yellow-50 text-yellow-700',
+  Redeemed:             'bg-blue-50 text-blue-700',
+  Expired:              'bg-gray-100 text-gray-500',
+  Liquidated:           'bg-red-50 text-red-600',
 };
 
-function groupProviderActivities(activities: ProviderActivity[]): [string, ProviderActivity[]][] {
+type ProviderFilterKey = ProviderEventType | 'ALL';
+
+const PROVIDER_FILTER_OPTIONS: { value: ProviderFilterKey; label: string }[] = [
+  { value: 'ALL', label: 'All' },
+  { value: 'PEGIN_SUBMITTED', label: 'Submitted' },
+  { value: 'PEGIN_VERIFIED', label: 'Verified' },
+  { value: 'SIGS_COLLECTED', label: 'Sigs Collected' },
+  { value: 'PEGIN_ACTIVATED', label: 'Activated' },
+  { value: 'VAULT_REDEEMED', label: 'Redeemed' },
+  { value: 'VAULT_EXPIRED', label: 'Expired' },
+  { value: 'VAULT_LIQUIDATED', label: 'Liquidated' },
+];
+
+const ACTIVITY_PAGE_SIZE = 25;
+
+function formatTimeHHMM(iso: string): string {
+  const d = new Date(iso);
+  return `${String(d.getUTCHours()).padStart(2, '0')}:${String(d.getUTCMinutes()).padStart(2, '0')}`;
+}
+
+function formatDateGroupHeader(dateKey: string): string {
+  const day = new Date(dateKey);
+  const today = new Date();
+  const dayUtc = Date.UTC(day.getUTCFullYear(), day.getUTCMonth(), day.getUTCDate());
+  const todayUtc = Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate());
+  const days = Math.floor((todayUtc - dayUtc) / 86400000);
+
+  const monthNames = ['JANUARY', 'FEBRUARY', 'MARCH', 'APRIL', 'MAY', 'JUNE', 'JULY', 'AUGUST', 'SEPTEMBER', 'OCTOBER', 'NOVEMBER', 'DECEMBER'];
+  const dateStr = `${monthNames[day.getUTCMonth()]} ${day.getUTCDate()}, ${day.getUTCFullYear()}`;
+
+  if (days <= 0) return `TODAY (${dateStr})`;
+  if (days === 1) return `YESTERDAY (${dateStr})`;
+  return dateStr;
+}
+
+function groupByDate(activities: ProviderActivity[]): [string, ProviderActivity[]][] {
   const groups: Record<string, ProviderActivity[]> = {};
   for (const a of activities) {
-    const key = formatDateGroup(a.blockTime);
+    const key = new Date(a.blockTime).toLocaleDateString('en-US', {
+      year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC',
+    });
     (groups[key] ||= []).push(a);
   }
-  return Object.entries(groups).sort((a, b) => b[0].localeCompare(a[0]));
+  return Object.entries(groups).sort(
+    (a, b) => new Date(b[0]).getTime() - new Date(a[0]).getTime(),
+  );
 }
 
 function ActivityTab() {
-  const grouped = groupProviderActivities(MOCK_PROVIDER_ACTIVITIES);
+  const [filter, setFilter] = useState<ProviderFilterKey>('ALL');
+  const [page, setPage] = useState(1);
+
+  const filtered =
+    filter === 'ALL'
+      ? MOCK_PROVIDER_ACTIVITIES
+      : MOCK_PROVIDER_ACTIVITIES.filter((a) => a.type === filter);
+
+  const total = filtered.length;
+  const totalPages = Math.max(1, Math.ceil(total / ACTIVITY_PAGE_SIZE));
+  const safePage = Math.min(page, totalPages);
+  const paged = filtered.slice((safePage - 1) * ACTIVITY_PAGE_SIZE, safePage * ACTIVITY_PAGE_SIZE);
+  const grouped = groupByDate(paged);
+
+  const PaginationControls = () => (
+    <div className="flex items-center gap-1 text-xs text-[rgba(56,112,133,0.5)]">
+      <button onClick={() => setPage(1)} disabled={safePage <= 1} className="rounded px-1.5 py-1 hover:bg-[rgba(56,112,133,0.05)] disabled:opacity-30">&laquo;</button>
+      <button onClick={() => setPage(safePage - 1)} disabled={safePage <= 1} className="rounded px-1.5 py-1 hover:bg-[rgba(56,112,133,0.05)] disabled:opacity-30">&lsaquo;</button>
+      <span className="px-2 text-[#14140f]">Page <span className="font-semibold">{safePage}</span> of <span className="font-semibold">{totalPages}</span></span>
+      <button onClick={() => setPage(safePage + 1)} disabled={safePage >= totalPages} className="rounded px-1.5 py-1 hover:bg-[rgba(56,112,133,0.05)] disabled:opacity-30">&rsaquo;</button>
+      <button onClick={() => setPage(totalPages)} disabled={safePage >= totalPages} className="rounded px-1.5 py-1 hover:bg-[rgba(56,112,133,0.05)] disabled:opacity-30">&raquo;</button>
+    </div>
+  );
 
   return (
-    <div className="border border-[#cd6332]/20 bg-white">
-      {grouped.length === 0 ? (
-        <div className="py-12 text-center text-sm text-[#387085]/40">No activity found</div>
+    <div className="space-y-4">
+      {/* Filter tabs */}
+      <div className="flex items-center gap-1">
+        {PROVIDER_FILTER_OPTIONS.map((opt) => {
+          const isActive = filter === opt.value;
+          return (
+            <button
+              key={opt.value}
+              onClick={() => { setFilter(opt.value); setPage(1); }}
+              className={`rounded-sm px-3 py-1.5 text-xs font-medium transition-colors ${
+                isActive
+                  ? 'bg-[#cd6332] text-white'
+                  : 'text-[#387085]/60 hover:text-[#14140f]'
+              }`}
+            >
+              {opt.label}
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Results count + Pagination */}
+      <div className="flex items-center justify-between">
+        <p className="text-sm text-[rgba(56,112,133,0.5)]">
+          Showing all <span className="font-semibold text-[#14140f]">{total}</span> results
+        </p>
+        <PaginationControls />
+      </div>
+
+      {/* Timeline */}
+      {filtered.length === 0 ? (
+        <div className="py-16 text-center">
+          <p className="text-sm text-[#387085]/40">No activity found</p>
+          {filter !== 'ALL' && (
+            <button onClick={() => setFilter('ALL')} className="mx-auto mt-1 block text-xs text-[#cd6332] hover:underline">
+              Show all activity
+            </button>
+          )}
+        </div>
       ) : (
-        <div className="space-y-6 px-5 py-4">
-          {grouped.map(([dateKey, activities]) => (
-            <div key={dateKey}>
-              {/* Date divider — same as Depositor */}
+        <div className="space-y-6">
+          {grouped.map(([date, activities]) => (
+            <div key={date}>
               <div className="mb-3 flex items-center gap-3">
                 <span className="whitespace-nowrap text-[11px] font-semibold uppercase tracking-wide text-[#387085]/50">
-                  {dateKey}
+                  {formatDateGroupHeader(date)}
                 </span>
                 <div className="h-px flex-1 bg-[#387085]/10" />
               </div>
-
               <div className="space-y-2">
                 {activities.map((activity) => {
                   const s = ACTIVITY_STYLE[activity.type];
-                  const evtLabel = s.label(activity.failureReason);
-                  const d = new Date(activity.blockTime);
-                  const pad = (n: number) => String(n).padStart(2, '0');
-                  const timeUTC = `${pad(d.getUTCHours())}:${pad(d.getUTCMinutes())} (UTC)`;
+                  const bt = new Date(activity.blockTime);
+                  const fullTs = `${bt.getUTCFullYear()}/${String(bt.getUTCMonth() + 1).padStart(2, '0')}/${String(bt.getUTCDate()).padStart(2, '0')} ${String(bt.getUTCHours()).padStart(2, '0')}:${String(bt.getUTCMinutes()).padStart(2, '0')}:${String(bt.getUTCSeconds()).padStart(2, '0')} +UTC`;
 
                   return (
                     <div
                       key={activity.fullTxHash}
-                      className={`flex items-start gap-3 border px-4 py-3 transition-colors ${s.rowBg} ${s.rowBorder}`}
+                      className="flex items-start gap-3 border border-[#387085]/10 bg-white px-4 py-3 transition-colors hover:bg-[#faf9f5]"
                     >
-                      {/* Type dot */}
-                      <div className="mt-1 shrink-0">
+                      {/* Time column */}
+                      <div className="flex w-16 shrink-0 flex-col items-end pt-0.5">
+                        <span className="font-mono text-[11px] font-medium text-[#387085]/40">{formatTimeHHMM(activity.blockTime)}</span>
+                        <span className="text-[9px] text-[#387085]/30">{formatRelativeTime(activity.blockTime)}</span>
+                      </div>
+
+                      {/* Dot */}
+                      <div className="mt-1.5 flex-shrink-0">
                         <div className="h-2 w-2 rounded-full" style={{ background: s.dot }} />
                       </div>
 
+                      {/* Content */}
                       <div className="min-w-0 flex-1">
-                        {/* Row 1: badge + time | amount */}
+                        {/* Row 1: Status chip + amount (for terminal states) */}
                         <div className="flex items-center justify-between gap-2">
-                          <div className="flex flex-wrap items-center gap-2">
-                            <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-medium ${s.bg} ${s.text}`}>
-                              {evtLabel}
-                            </span>
-                            <span className="text-[10px] text-[#387085]/45">{timeUTC}</span>
-                          </div>
-                          <span className={`shrink-0 font-mono text-sm font-semibold tabular-nums ${s.amountColor}`}>
-                            {s.amountPrefix}{activity.amount} sBTC
-                          </span>
-                        </div>
-
-                        {/* Row 2: State transition pill */}
-                        <div className="mt-1.5 flex items-center gap-1.5">
-                          <span className={`rounded px-1.5 py-0.5 text-[9px] font-semibold ${STATE_PILL[activity.fromState] ?? 'bg-gray-100 text-gray-500'}`}>
-                            {activity.fromState}
-                          </span>
-                          <svg className="h-3 w-3 shrink-0 text-[#387085]/30" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
-                          </svg>
-                          <span className={`rounded px-1.5 py-0.5 text-[9px] font-semibold ${STATE_PILL[activity.toState] ?? 'bg-gray-100 text-gray-500'}`}>
+                          <span className={`inline-block rounded-full px-2 py-0.5 text-[10px] font-medium ${STATE_PILL[activity.toState] ?? 'bg-gray-100 text-gray-500'}`}>
                             {activity.toState}
                           </span>
+                          {/* 물량 표시 기준: 볼트 라이프사이클이 완료된(terminal) 상태에서만 표시
+                              - Available: peg-in 완료, 볼트 활성화 → 확정 물량
+                              - Redeemed: 정상 상환 완료 → 상환 물량
+                              - Expired: 타임아웃으로 만료 → 잠겼던 물량
+                              - Liquidated: 청산 처리 완료 → 청산 물량
+                              * Pending/Verified/Signature Collected: 아직 진행 중이라 물량 미확정 → 미표시 */}
+                          {['Available', 'Redeemed', 'Expired', 'Liquidated'].includes(activity.toState) && (
+                            <span className="flex-shrink-0 font-mono text-sm font-semibold text-[#14140f]">
+                              {parseFloat(activity.amount).toFixed(6)} <span className="text-xs font-normal text-[#387085]/50">sBTC</span>
+                            </span>
+                          )}
                         </div>
 
-                        {/* Row 3: Tx · Block · Vault */}
-                        <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-0.5 text-[10px] text-[#387085]/50">
+                        {/* Row 2: Vault | Depositor */}
+                        <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-0.5">
                           <span className="inline-flex items-center gap-1">
-                            <span className="text-[9px] font-medium uppercase tracking-wide text-[#387085]/35">Tx</span>
-                            <Link
-                              href={`/tx/${activity.fullTxHash}`}
-                              className="font-mono text-[#cd6332]/70 hover:text-[#cd6332] hover:underline"
-                            >
+                            <span className="text-[9px] font-medium uppercase tracking-wide text-[#387085]/40">Vault</span>
+                            <svg className="h-3 w-3 text-[#387085]/30" fill="none" viewBox="0 0 24 24" strokeWidth="1.8" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z" />
+                            </svg>
+                            <Link href={`/vaults/${activity.fullVaultId}`} className="font-mono text-[10px] text-[#cd6332]/70 hover:text-[#cd6332] hover:underline">
+                              {activity.vaultId}
+                            </Link>
+                          </span>
+                          <span className="text-[#387085]/20">·</span>
+                          <span className="inline-flex items-center gap-1">
+                            <span className="text-[9px] font-medium uppercase tracking-wide text-[#387085]/40">Depositor</span>
+                            <svg className="h-3 w-3 text-[#387085]/30" fill="none" viewBox="0 0 24 24" strokeWidth="1.8" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0" />
+                            </svg>
+                            <Link href={`/accounts/${activity.fullDepositor}`} className="font-mono text-[10px] text-[#387085]/70 hover:text-[#cd6332] hover:underline">
+                              {activity.depositor}
+                            </Link>
+                          </span>
+                        </div>
+
+                        {/* Row 3: Txn | Block */}
+                        <div className="mt-1 flex flex-wrap items-center gap-3">
+                          <span className="inline-flex items-center gap-1">
+                            <span className="text-[9px] font-medium uppercase tracking-wide text-[#387085]/40">Tx</span>
+                            <Link href={`/tx/${activity.fullTxHash}`} className="font-mono text-[10px] text-[#cd6332]/70 hover:text-[#cd6332] hover:underline">
                               {activity.txHash}
                             </Link>
                             <CopyIcon text={activity.fullTxHash} />
                           </span>
-                          <span className="text-[#387085]/20">·</span>
+                          <span className="text-[10px] text-[#387085]/20">·</span>
                           <span className="inline-flex items-center gap-1">
-                            <span className="text-[9px] font-medium uppercase tracking-wide text-[#387085]/35">Block</span>
-                            <span className="font-mono text-[#387085]/40">#{activity.blockNumber.toLocaleString()}</span>
-                          </span>
-                          <span className="text-[#387085]/20">·</span>
-                          <span className="inline-flex items-center gap-1">
-                            <span className="text-[9px] font-medium uppercase tracking-wide text-[#387085]/35">Vault</span>
-                            <Link
-                              href={`/vaults/${activity.fullVaultId}`}
-                              className="font-mono text-[#cd6332]/70 hover:text-[#cd6332] hover:underline"
-                            >
-                              {activity.vaultId}
-                            </Link>
-                            <CopyIcon text={activity.fullVaultId} />
-                          </span>
-                        </div>
-
-                        {/* Row 4: Provider-specific — Depositor · dApp */}
-                        <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-0.5 text-[10px] text-[#387085]/50">
-                          <span className="inline-flex items-center gap-1">
-                            <span className="text-[9px] font-medium uppercase tracking-wide text-[#387085]/35">Depositor</span>
-                            <Link
-                              href={`/accounts/${activity.fullDepositor}`}
-                              className="font-mono text-[#387085]/60 hover:text-[#cd6332] hover:underline"
-                            >
-                              {activity.depositor}
-                            </Link>
-                            <CopyIcon text={activity.fullDepositor} />
-                          </span>
-                          <span className="text-[#387085]/20">·</span>
-                          <span className="inline-flex items-center gap-1">
-                            <span className="text-[9px] font-medium uppercase tracking-wide text-[#387085]/35">dApp</span>
-                            <span className="font-medium text-[#387085]/60">{activity.dapp}</span>
+                            <span className="text-[9px] font-medium uppercase tracking-wide text-[#387085]/40">Block</span>
+                            <span className="font-mono text-[10px] text-[#387085]/40">
+                              #{activity.blockNumber.toLocaleString()}
+                            </span>
                           </span>
                         </div>
                       </div>
@@ -397,6 +493,13 @@ function ActivityTab() {
               </div>
             </div>
           ))}
+        </div>
+      )}
+
+      {/* Bottom pagination */}
+      {total > ACTIVITY_PAGE_SIZE && (
+        <div className="flex items-center justify-end">
+          <PaginationControls />
         </div>
       )}
     </div>
@@ -437,7 +540,7 @@ function VaultsTab({ vaults }: { vaults: Vault[] }) {
               <p className="mt-0.5 text-[11px] text-[#387085]/50">Distribution by vault count</p>
             </div>
             <span className="text-[11px] text-[#387085]/50">
-              {totalVaults.toLocaleString()} vaults · {totalBtc.toFixed(2)} sBTC
+              {totalVaults.toLocaleString()} vaults · {totalBtc.toFixed(2)} sBTC {toUsd(totalBtc)}
             </span>
           </div>
           <div className="px-5 py-4">
@@ -461,7 +564,7 @@ function VaultsTab({ vaults }: { vaults: Vault[] }) {
                     <div className="flex items-center gap-2">
                       <span className="h-2.5 w-2.5 shrink-0 rounded-sm" style={{ background: VAULT_STATUS_COLORS[s.status] }} />
                       <span className="text-sm text-[#14140f]">{s.status}</span>
-                      <span className="text-[11px] text-[#387085]/40">{s.btc.toFixed(2)} sBTC</span>
+                      <span className="text-[11px] text-[#387085]/40">{s.btc.toFixed(2)} sBTC {toUsd(s.btc)}</span>
                     </div>
                     <div className="flex items-center gap-4 text-right">
                       <span className="text-[11px] font-medium text-[#387085]/50">{pct}%</span>
@@ -571,7 +674,6 @@ function VaultsTab({ vaults }: { vaults: Vault[] }) {
               </thead>
               <tbody>
                 {pageVaults.map((vault) => {
-                  const usdValue = vault.vaultSize * 60000;
                   return (
                     <tr key={vault.id} className="h-10 border-b border-[#cd6332]/10 transition-colors hover:bg-[rgba(56,112,133,0.03)]">
                       <td className="whitespace-nowrap px-4 py-2.5">
@@ -589,8 +691,8 @@ function VaultsTab({ vaults }: { vaults: Vault[] }) {
                         </span>
                       </td>
                       <td className="whitespace-nowrap px-4 py-2.5 text-right tabular-nums">
-                        <div className="font-semibold text-[#14140f]">{vault.vaultSize.toFixed(8)}</div>
-                        <div className="text-[10px] text-[#387085]/40">≈ ${usdValue.toLocaleString('en-US', { maximumFractionDigits: 0 })}</div>
+                        <div className="font-semibold text-[#14140f]">{vault.vaultSize.toFixed(8)} sBTC</div>
+                        <div className="text-[10px] text-[#387085]/40">{toUsd(vault.vaultSize)}</div>
                       </td>
                       <td className="whitespace-nowrap px-4 py-2.5">
                         <div className="flex items-center">
@@ -656,13 +758,13 @@ export default function ProviderDetail({
   const joinedFormatted = new Date(joinedDate).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
   const statusColor = STATUS_DOT_COLOR[MOCK_STATUS.status] ?? '#9ca3af';
 
-  // Display name: use providerName if present, else truncated address
-  const displayName = providerName || truncateAddress(address, 6, 4);
-  const addrShort = truncateAddress(address, 6, 4);
+  // Display name: use providerName if present, else full address
+  const displayName = providerName || address;
+  const addrDisplay = address;
 
   const tabs: { key: TabKey; label: string }[] = [
     { key: 'vaults',   label: 'Vaults' },
-    { key: 'activity', label: 'Activity' },
+    { key: 'activity', label: 'Vaults History' },
   ];
 
   return (
@@ -676,7 +778,7 @@ export default function ProviderDetail({
         <div className="space-y-0.5">
           <h1 className="text-2xl font-bold text-[#14140f]">{displayName}</h1>
           <div className="flex flex-wrap items-center gap-1.5 text-xs text-[#387085]/55">
-            <span className="font-mono">{addrShort}</span>
+            <span className="font-mono break-all">{addrDisplay}</span>
             <CopyIcon text={address} />
           </div>
         </div>
@@ -717,8 +819,8 @@ export default function ProviderDetail({
           className="group relative border border-[#387085]/10 bg-white p-4 text-left transition-colors hover:border-[#cd6332]/20 hover:bg-[#faf9f5]"
         >
           <p className="text-[11px] font-semibold uppercase tracking-wide text-[#387085]/45">BTC Locked</p>
-          <p className="mt-1.5 text-2xl font-bold text-[#14140f]">{totalBtc.toFixed(2)}</p>
-          <p className="mt-0.5 text-[11px] text-[#387085]/40">≈ ${(totalBtc * MOCK_PERF.btcLockedUsdRate).toLocaleString('en-US', { maximumFractionDigits: 0 })}</p>
+          <p className="mt-1.5 text-2xl font-bold text-[#14140f]">{totalBtc.toFixed(2)} sBTC</p>
+          <p className="mt-0.5 text-[11px] text-[#387085]/40">{toUsd(totalBtc)}</p>
           <span className="absolute bottom-2 right-2 text-[10px] text-[#cd6332] opacity-0 transition-opacity group-hover:opacity-100">View details ›</span>
         </button>
 

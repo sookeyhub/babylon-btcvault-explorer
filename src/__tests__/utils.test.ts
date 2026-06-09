@@ -49,7 +49,7 @@ describe('formatDate', () => {
 describe('queryVaults', () => {
   const mockVaults: Vault[] = [
     {
-      id: 'v-001', name: 'Vault 1', status: 'Active', btcAddress: 'bc1q1',
+      id: 'v-001', name: 'Vault 1', status: 'Available', btcAddress: 'bc1q1',
       ethAddress: '0x1', depositorAddress: '0xd1', vaultSize: 10, dappName: 'Lombard', providerName: 'Cobo',
       providerAddress: '0xp1', createdAt: '2025-06-01T00:00:00Z', closedAt: null,
       btcPegInTxHash: 'tx1', ethPegInTxHash: 'etx1', hashlock: 'h1', blockNumber: 1, createdTxHash: 'ct1',
@@ -61,7 +61,7 @@ describe('queryVaults', () => {
       btcPegInTxHash: 'tx2', ethPegInTxHash: 'etx2', hashlock: 'h2', blockNumber: 2, createdTxHash: 'ct2',
     },
     {
-      id: 'v-003', name: 'Vault 3', status: 'Active', btcAddress: 'bc1q3',
+      id: 'v-003', name: 'Vault 3', status: 'Available', btcAddress: 'bc1q3',
       ethAddress: '0x3', depositorAddress: '0xd3', vaultSize: 20, dappName: 'Lombard', providerName: 'Fireblocks',
       providerAddress: '0xp3', createdAt: '2025-09-01T00:00:00Z', closedAt: null,
       btcPegInTxHash: 'tx3', ethPegInTxHash: 'etx3', hashlock: 'h3', blockNumber: 3, createdTxHash: 'ct3',
@@ -76,10 +76,10 @@ describe('queryVaults', () => {
   });
 
   test('filters by status', () => {
-    const params: VaultListParams = { search: '', status: 'Active', sortBy: 'newest', page: 1, pageSize: 10 };
+    const params: VaultListParams = { search: '', status: 'Available', sortBy: 'newest', page: 1, pageSize: 10 };
     const result = queryVaults(mockVaults, params);
     expect(result.data).toHaveLength(2);
-    expect(result.data.every(v => v.status === 'Active')).toBe(true);
+    expect(result.data.every(v => v.status === 'Available')).toBe(true);
   });
 
   test('sorts by size descending', () => {
@@ -106,7 +106,7 @@ describe('queryVaults', () => {
 
 describe('getStatusColor', () => {
   test('returns correct colors for each status', () => {
-    expect(getStatusColor('Active').text).toContain('emerald');
+    expect(getStatusColor('Available').text).toContain('emerald');
     expect(getStatusColor('Expired').text).toContain('zinc');
     expect(getStatusColor('Pending').text).toContain('amber');
     expect(getStatusColor('Liquidated').text).toContain('red');

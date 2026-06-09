@@ -40,11 +40,13 @@ function CopyIcon({ text }: { text: string }) {
 }
 
 const STATUS_COLORS: Record<string, string> = {
-  Active:     '#5a8a3c',
-  Expired:    '#6b7280',
-  Pending:    '#cd6332',
-  Liquidated: '#c83232',
-  Redeemed:   '#387085',
+  Available:            '#5a8a3c',
+  Pending:              '#cd6332',
+  Verified:             '#7c3aed',
+  'Signature Collected':'#ca8a04',
+  Redeemed:             '#2563eb',
+  Expired:              '#6b7280',
+  Liquidated:           '#c83232',
 };
 
 interface Props {
@@ -384,6 +386,9 @@ function AaveActivityTable() {
                                 <span className="text-[9px] font-medium uppercase tracking-wide text-[#387085]/40">
                                   Vault
                                 </span>
+                                <svg className="h-3 w-3 text-[#387085]/30" fill="none" viewBox="0 0 24 24" strokeWidth="1.8" stroke="currentColor">
+                                  <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z" />
+                                </svg>
                                 <Link
                                   href={`/vaults/${activity.vaultId}`}
                                   title={`Vault ${activity.vaultId}`}
@@ -660,13 +665,15 @@ function VaultsTable({ vaults, address, roleLabel }: { vaults: Vault[]; address:
 /* ── Managed Vaults Panel (for Provider accounts) ──────────────────────── */
 const PAGE_SIZE_MANAGED = 20;
 
-const VAULT_STATUS_ORDER = ['Active', 'Pending', 'Redeemed', 'Expired', 'Liquidated'] as const;
+const VAULT_STATUS_ORDER = ['Available', 'Pending', 'Verified', 'Signature Collected', 'Redeemed', 'Expired', 'Liquidated'] as const;
 const VAULT_STATUS_COLORS: Record<string, string> = {
-  Active:     '#16a34a',
-  Pending:    '#d97706',
-  Redeemed:   '#387085',
-  Expired:    '#9ca3af',
-  Liquidated: '#dc2626',
+  Available:            '#16a34a',
+  Pending:              '#d97706',
+  Verified:             '#7c3aed',
+  'Signature Collected':'#ca8a04',
+  Redeemed:             '#2563eb',
+  Expired:              '#9ca3af',
+  Liquidated:           '#dc2626',
 };
 
 function ManagedVaultsPanel({ vaults, address }: { vaults: Vault[]; address: string }) {

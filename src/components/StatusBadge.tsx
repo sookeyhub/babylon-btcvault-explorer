@@ -6,16 +6,20 @@ interface StatusBadgeProps {
 
 function getColors(status: VaultStatus) {
   switch (status) {
-    case 'Active':
+    case 'Available':
       return { bg: 'bg-[rgba(137,170,116,0.15)]', text: 'text-[#5a8a3c]', dot: 'bg-[#5a8a3c]' };
-    case 'Expired':
-      return { bg: 'bg-[rgba(56,112,133,0.08)]', text: 'text-[rgba(56,112,133,0.5)]', dot: 'bg-[rgba(56,112,133,0.4)]' };
     case 'Pending':
       return { bg: 'bg-[rgba(205,99,50,0.1)]', text: 'text-[#cd6332]', dot: 'bg-[#cd6332]' };
-    case 'Liquidated':
-      return { bg: 'bg-[rgba(200,50,50,0.1)]', text: 'text-[#c83232]', dot: 'bg-[#c83232]' };
+    case 'Verified':
+      return { bg: 'bg-[rgba(147,51,234,0.1)]', text: 'text-[#7c3aed]', dot: 'bg-[#7c3aed]' };
+    case 'Signature Collected':
+      return { bg: 'bg-[rgba(202,138,4,0.12)]', text: 'text-[#ca8a04]', dot: 'bg-[#ca8a04]' };
     case 'Redeemed':
       return { bg: 'bg-[rgba(37,99,235,0.1)]', text: 'text-[#2563eb]', dot: 'bg-[#2563eb]' };
+    case 'Expired':
+      return { bg: 'bg-[rgba(56,112,133,0.08)]', text: 'text-[rgba(56,112,133,0.5)]', dot: 'bg-[rgba(56,112,133,0.4)]' };
+    case 'Liquidated':
+      return { bg: 'bg-[rgba(200,50,50,0.1)]', text: 'text-[#c83232]', dot: 'bg-[#c83232]' };
     default:
       return { bg: 'bg-[rgba(56,112,133,0.08)]', text: 'text-[#387085]', dot: 'bg-[#387085]' };
   }

@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { MOCK_AAVE_POSITIONS } from '@/lib/mock-aave-activity';
+import { toUsd } from '@/lib/utils';
 
 function parseAmount(amount: string, decimals: number): number {
   return parseFloat(amount) / Math.pow(10, decimals);
@@ -156,6 +157,7 @@ export default function ProviderPositions() {
                       <p className="text-sm font-semibold text-[#14140f]">
                         {coll.toFixed(4)}
                         <span className="ml-1 text-[11px] font-normal text-[#387085]/40">sBTC</span>
+                        <span className="ml-1 text-[10px] font-normal text-[#387085]/30">{toUsd(coll)}</span>
                       </p>
                     </div>
 

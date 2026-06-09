@@ -3,18 +3,22 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { MOCK_VAULTS, MOCK_DEPOSITORS } from '@/lib/mock-data';
+import { toUsd, TOKEN_PRICES } from '@/lib/utils';
 import {
   MOCK_PORTFOLIO_POSITIONS,
   MOCK_AAVE_V4_ACTIVITIES,
   MOCK_DEPOSITOR_AAVE_POSITION,
+  MOCK_DEPOSITOR_DAPP_POSITIONS,
   type AaveV4Activity,
   type AaveV4ActivityType,
+  type AaveV4Position,
   type TokenAmount,
+  type DAppPosition,
 } from '@/lib/mock-aave-activity';
 import { truncateAddress, formatDate, formatRelativeTime } from '@/lib/utils';
 import type { Vault } from '@/lib/types';
 
-const BTC_USD_RATE = 65000;
+const BTC_USD_RATE = TOKEN_PRICES['sBTC'];
 
 /* ── CopyIcon ──────────────────────────────────────────────────────────── */
 
@@ -84,18 +88,23 @@ const FILTER_OPTIONS: { value: AaveV4ActivityType | 'ALL'; label: string }[] = [
 ];
 
 const STATUS_COLORS: Record<string, string> = {
-  Active:     '#5a8a3c',
-  Expired:    '#6b7280',
-  Pending:    '#cd6332',
-  Liquidated: '#c83232',
-  Redeemed:   '#387085',
+  Available:            '#5a8a3c',
+  Pending:              '#cd6332',
+  Verified:             '#7c3aed',
+  'Signature Collected':'#ca8a04',
+  Redeemed:             '#2563eb',
+  Expired:              '#6b7280',
+  Liquidated:           '#c83232',
 };
 
 function formatTokenAmount(t: TokenAmount): string {
   const raw = parseFloat(t.amount);
   const value = raw / Math.pow(10, t.decimals);
-  if (t.symbol === 'sBTC') return `${value.toFixed(6)} sBTC`;
-  return `${value.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ${t.symbol}`;
+  const price = TOKEN_PRICES[t.symbol] ?? 0;
+  const usd = value * price;
+  const usdStr = usd < 0.01 && usd > 0 ? '$<0.01' : `$${usd.toLocaleString('en-US', { maximumFractionDigits: usd >= 100 ? 0 : 2 })}`;
+  if (t.symbol === 'sBTC') return `${value.toFixed(6)} sBTC (${usdStr})`;
+  return `${value.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ${t.symbol} (${usdStr})`;
 }
 
 function formatFull(iso: string): string {
@@ -214,6 +223,9 @@ function AaveActivityTable() {
                             {activity.vaultId && (
                               <span className="inline-flex items-center gap-1">
                                 <span className="text-[9px] font-medium uppercase tracking-wide text-[#387085]/40">Vault</span>
+                                <svg className="h-3 w-3 text-[#387085]/30" fill="none" viewBox="0 0 24 24" strokeWidth="1.8" stroke="currentColor">
+                                  <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z" />
+                                </svg>
                                 <Link href={`/vaults/${activity.vaultId}`} title={`Vault ${activity.vaultId}`} className="font-mono text-[10px] text-[#cd6332]/70 transition-colors hover:text-[#cd6332] hover:underline">
                                   {activity.vaultId.slice(0, 6)}...{activity.vaultId.slice(-4)}
                                 </Link>
@@ -290,6 +302,7 @@ function DepositedVaultsTable({ vaults, address }: { vaults: Vault[]; address: s
                 </td>
                 <td className="whitespace-nowrap px-4 py-2.5 tabular-nums text-[#14140f]">
                   {vault.vaultSize.toFixed(8)} <span className="text-[rgba(56,112,133,0.5)]">sBTC</span>
+                  <span className="ml-1 text-[10px] text-[#387085]/35">{toUsd(vault.vaultSize)}</span>
                 </td>
                 <td className="whitespace-nowrap px-4 py-2.5 text-[#14140f]">{vault.dappName}</td>
                 <td className="whitespace-nowrap px-4 py-2.5 text-[#14140f]">{vault.providerName}</td>
@@ -310,9 +323,9 @@ function parsePositionAmount(amount: string, decimals: number): number {
 }
 
 function getPositionHealthStatus(hf: number): { label: string; color: string; bg: string; text: string } {
-  if (hf >= 2.0) return { label: 'Safe', color: '#16a34a', bg: 'bg-green-50', text: 'text-green-700' };
-  if (hf >= 1.5) return { label: 'Healthy', color: '#387085', bg: 'bg-[#387085]/8', text: 'text-[#387085]' };
-  if (hf >= 1.2) return { label: 'Caution', color: '#d97706', bg: 'bg-amber-50', text: 'text-amber-700' };
+  if (hf >= 3.0) return { label: 'Safe', color: '#16a34a', bg: 'bg-green-50', text: 'text-green-700' };
+  if (hf >= 2.0) return { label: 'Healthy', color: '#16a34a', bg: 'bg-green-50', text: 'text-green-700' };
+  if (hf >= 1.5) return { label: 'Caution', color: '#d97706', bg: 'bg-amber-50', text: 'text-amber-700' };
   if (hf >= 1.0) return { label: 'At Risk', color: '#f97316', bg: 'bg-orange-50', text: 'text-orange-700' };
   return { label: 'Liquidation', color: '#dc2626', bg: 'bg-red-50', text: 'text-red-600' };
 }
@@ -669,10 +682,185 @@ function PositionsByDApp() {
   );
 }
 
-function CollateralPositionsTab() {
+/* ── Single dApp position section ──────────────────────────────────────── */
+
+function DAppPositionSection({ position, isFirst }: { position: DAppPosition; isFirst: boolean }) {
+  const p = position;
+  const collateral = parsePositionAmount(p.totalCollateral.amount, p.totalCollateral.decimals);
+  const collateralUsdVal = p.totalCollateral.priceUsd
+    ? collateral * parseFloat(p.totalCollateral.priceUsd)
+    : null;
+  const ltv = parseFloat(p.currentLtv);
+  const maxLtv = p.avgCollateralFactor ? parseFloat(p.avgCollateralFactor) * 100 : 78;
+  const ltvPct = Math.min((ltv / maxLtv) * 100, 100);
+  const ltvColor = ltv >= maxLtv * 0.9 ? '#dc2626' : ltv >= maxLtv * 0.7 ? '#d97706' : '#16a34a';
+
+  const debtUsd = p.debts.reduce((s, d) => {
+    const amt = parsePositionAmount(d.totalAmount, d.decimals);
+    const price = TOKEN_PRICES[d.symbol] ?? 1;
+    return s + amt * price;
+  }, 0);
+  const debtBreakdown = p.debts.map((d) => {
+    const amt = parsePositionAmount(d.totalAmount, d.decimals);
+    return `${amt < 1 ? amt.toFixed(7) : amt.toLocaleString('en-US', { maximumFractionDigits: 2 })} ${d.symbol}`;
+  }).join(' / ');
+
+  const hf = parseFloat(p.healthFactor);
+  const hfStatus = getPositionHealthStatus(hf);
+  const HF_MAX = 3;
+  const hfPct = Math.min((hf / HF_MAX) * 100, 100);
+  const markers = [
+    { pct: (1.0 / HF_MAX) * 100, label: '1' },
+    { pct: (1.5 / HF_MAX) * 100, label: '1.5' },
+    { pct: (2.0 / HF_MAX) * 100, label: '2' },
+    { pct: (3.0 / HF_MAX) * 100, label: '3+' },
+  ];
+
   return (
-    <div className="space-y-4">
-      <PositionsByDApp />
+    <section className={isFirst ? '' : 'mt-6'}>
+      {/* dApp name header */}
+      {!isFirst && (
+        <div className="mb-3 flex items-center gap-3">
+          <span className="whitespace-nowrap text-sm font-semibold text-[#14140f]">{p.dappName}</span>
+          <div className="h-px flex-1 bg-[#387085]/10" />
+        </div>
+      )}
+      {isFirst && (
+        <div className="mb-3">
+          <span className="text-sm font-semibold text-[#14140f]">{p.dappName}</span>
+        </div>
+      )}
+
+      {/* 2×2 summary grid */}
+      <div className="grid grid-cols-2 gap-0 border border-[#387085]/10 bg-white">
+        {/* Collateral */}
+        <div className="border-b border-r border-[#387085]/10 px-5 py-4">
+          <p className="text-[11px] font-medium uppercase tracking-wide text-[#387085]/50">Collateral</p>
+          <p className="mt-1.5 text-xl font-bold text-[#14140f]">
+            {collateral.toFixed(3)} <span className="text-sm font-normal text-[#387085]/50">{p.totalCollateral.symbol}</span>
+          </p>
+          {collateralUsdVal != null && (
+            <p className="mt-0.5 text-xs text-[#387085]/40">≈ $ {collateralUsdVal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
+          )}
+        </div>
+
+        {/* Debt */}
+        <div className="border-b border-[#387085]/10 px-5 py-4">
+          <p className="text-[11px] font-medium uppercase tracking-wide text-[#387085]/50">Debt</p>
+          <p className="mt-1.5 text-xl font-bold text-[#14140f]">
+            $ {debtUsd.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+          </p>
+          <p className="mt-0.5 text-xs text-[#387085]/40">{p.debts.length} Asset{p.debts.length !== 1 ? 's' : ''}</p>
+        </div>
+
+        {/* Current LTV */}
+        <div className="border-r border-[#387085]/10 px-5 py-4">
+          <p className="text-[11px] font-medium uppercase tracking-wide text-[#387085]/50">Current LTV</p>
+          <p className="mt-1.5 text-xl font-bold text-[#14140f]">{ltv.toFixed(2)}%</p>
+          <p className="mt-0.5 text-xs text-[#387085]/40">of {maxLtv.toFixed(0)}% max</p>
+          <div className="mt-2 h-2 w-full bg-[#e5e7eb]">
+            <div className="h-full transition-all" style={{ width: `${ltvPct}%`, background: ltvColor }} />
+          </div>
+        </div>
+
+        {/* Health Factor */}
+        <div className="px-5 py-4">
+          <p className="text-[11px] font-medium uppercase tracking-wide text-[#387085]/50">Health Factor</p>
+          <div className="mt-1.5 flex items-center gap-2">
+            <p className="text-xl font-bold" style={{ color: hfStatus.color }}>{hf.toFixed(2)}</p>
+            <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${hfStatus.bg} ${hfStatus.text}`}>
+              {hf < 1 && '⚠ '}{hfStatus.label}
+            </span>
+          </div>
+          <div className="relative mt-3">
+            <div className="flex h-2.5 w-full overflow-hidden">
+              <div className="h-full" style={{ width: `${(1.0 / HF_MAX) * 100}%`, background: '#dc2626' }} />
+              <div className="h-full" style={{ width: `${((1.5 - 1.0) / HF_MAX) * 100}%`, background: '#f97316' }} />
+              <div className="h-full" style={{ width: `${((2.0 - 1.5) / HF_MAX) * 100}%`, background: '#eab308' }} />
+              <div className="h-full" style={{ width: `${((HF_MAX - 2.0) / HF_MAX) * 100}%`, background: '#16a34a' }} />
+            </div>
+            <div
+              className="absolute top-[-2px] h-[14px] w-[3px] rounded-sm bg-[#14140f]"
+              style={{ left: `calc(${hfPct}% - 1.5px)` }}
+            />
+            <div className="mt-1 flex justify-between text-[9px] text-[#387085]/40">
+              {markers.map((m) => (
+                <span key={m.label} style={{ position: 'absolute', left: `${m.pct}%`, transform: 'translateX(-50%)' }}>{m.label}</span>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Borrowed assets table */}
+      <div className="mt-3 overflow-x-auto border border-[#cd6332]/20 bg-white">
+        <table className="w-full text-left text-xs">
+          <thead>
+            <tr className="bg-[#cd6332] text-[11px] font-medium uppercase tracking-wider text-white">
+              <th className="whitespace-nowrap px-4 py-2.5 font-medium">Assets</th>
+              <th className="whitespace-nowrap px-4 py-2.5 font-medium">Amount Borrowed</th>
+              <th className="whitespace-nowrap px-4 py-2.5 font-medium">Interest</th>
+              <th className="whitespace-nowrap px-4 py-2.5 font-medium">
+                <span className="inline-flex items-center gap-1">
+                  Amount to Repay
+                  <svg className="h-3 w-3 text-white/60" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z" />
+                  </svg>
+                </span>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {p.debts.map((d, i) => {
+              const principal = parsePositionAmount(d.principal, d.decimals);
+              const interest = parsePositionAmount(d.accruedInterest, d.decimals);
+              const totalRepay = parsePositionAmount(d.totalAmount, d.decimals);
+              return (
+                <tr key={`${d.symbol}-${i}`} className="h-12 border-b border-[#387085]/8 transition-colors last:border-0 hover:bg-[#faf9f5]">
+                  <td className="whitespace-nowrap px-4 py-3">
+                    <div className="flex items-center gap-2">
+                      <span className="flex h-6 w-6 items-center justify-center rounded-full bg-[#387085]/10 text-[9px] font-bold text-[#387085]">
+                        {d.symbol.charAt(0)}
+                      </span>
+                      <span className="text-sm font-medium text-[#14140f]">{d.symbol} ({d.symbol})</span>
+                      {d.reserveId && <CopyIcon text={d.reserveId} />}
+                    </div>
+                  </td>
+                  <td className="whitespace-nowrap px-4 py-3 tabular-nums">
+                    <span className="text-sm font-semibold text-[#14140f]">
+                      {principal < 1 ? principal.toFixed(8) : principal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    </span>
+                    <span className="ml-1 text-[11px] text-[#387085]/40">{d.symbol}</span>
+                  </td>
+                  <td className="whitespace-nowrap px-4 py-3 tabular-nums">
+                    <span className="text-sm text-[#14140f]">
+                      {interest < 0.001 ? interest.toFixed(6) : interest.toLocaleString('en-US', { minimumFractionDigits: 6, maximumFractionDigits: 6 })}
+                    </span>
+                    <span className="ml-1 text-[11px] text-[#387085]/40">{d.symbol}</span>
+                  </td>
+                  <td className="whitespace-nowrap px-4 py-3 tabular-nums">
+                    <span className="text-sm font-semibold text-[#14140f]">
+                      {totalRepay < 1 ? totalRepay.toFixed(7) : totalRepay.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 2 })}
+                    </span>
+                    <span className="ml-1 text-[11px] text-[#387085]/40">{d.symbol}</span>
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+    </section>
+  );
+}
+
+function CollateralPositionsTab() {
+  const positions = MOCK_DEPOSITOR_DAPP_POSITIONS;
+  return (
+    <div>
+      {positions.map((pos, i) => (
+        <DAppPositionSection key={pos.dappName} position={pos} isFirst={i === 0} />
+      ))}
     </div>
   );
 }
@@ -692,11 +880,11 @@ export default function DepositorDetail({ address, vaults }: DepositorDetailProp
   );
 
   const totalVaults = vaults.length;
-  const activeVaults = vaults.filter((v) => v.status === 'Active').length;
+  const activeVaults = vaults.filter((v) => v.status === 'Available').length;
   const totalBtc = vaults.reduce((s, v) => s + v.vaultSize, 0);
 
   const joinedFormatted = depositor ? formatDate(depositor.firstDeposit) : '—';
-  const addrShort = truncateAddress(address, 6, 4);
+  const addrDisplay = address;
 
   // Position data for stat cards
   const pos = MOCK_DEPOSITOR_AAVE_POSITION;
@@ -705,7 +893,11 @@ export default function DepositorDetail({ address, vaults }: DepositorDetailProp
     ? collateralAmount * parseFloat(pos.totalCollateral.priceUsd)
     : null;
   // Total debt in USD (assume stablecoin = 1:1 USD)
-  const debtTotalUsd = pos.debts.reduce((s, d) => s + parsePositionAmount(d.totalAmount, d.decimals), 0);
+  const debtTotalUsd = pos.debts.reduce((s, d) => {
+    const amt = parsePositionAmount(d.totalAmount, d.decimals);
+    const price = TOKEN_PRICES[d.symbol] ?? 1;
+    return s + amt * price;
+  }, 0);
   const debtAssetCount = pos.debts.length;
   const currentLtv = parseFloat(pos.currentLtv);
   const maxLtv = pos.avgCollateralFactor ? parseFloat(pos.avgCollateralFactor) * 100 : 75;
@@ -719,10 +911,10 @@ export default function DepositorDetail({ address, vaults }: DepositorDetailProp
       )[0]
     : null;
 
-  const tabs: { key: TabKey; label: string; count: number }[] = [
-    { key: 'collateral', label: 'Positions', count: MOCK_PORTFOLIO_POSITIONS.length },
-    { key: 'deposited', label: 'Deposited Vaults', count: totalVaults },
-    { key: 'aave_activity', label: 'Activity', count: MOCK_AAVE_V4_ACTIVITIES.length },
+  const tabs: { key: TabKey; label: string }[] = [
+    { key: 'collateral', label: 'Positions' },
+    { key: 'deposited', label: 'Deposited Vaults' },
+    { key: 'aave_activity', label: 'Lending Activity' },
   ];
 
   return (
@@ -734,7 +926,7 @@ export default function DepositorDetail({ address, vaults }: DepositorDetailProp
       {/* ── Identity strip ──────────────────────────────────────────── */}
       <div className="flex items-center justify-between gap-4">
         <div className="flex items-center gap-2">
-          <h1 className="text-2xl font-bold text-[#14140f]">{addrShort}</h1>
+          <h1 className="text-2xl font-bold text-[#14140f] break-all">{addrDisplay}</h1>
           <CopyIcon text={address} />
         </div>
         <span className="text-xs text-[#387085]/55">joined {joinedFormatted}</span>
@@ -753,7 +945,7 @@ export default function DepositorDetail({ address, vaults }: DepositorDetailProp
             </svg>
           </div>
           <p className="mt-1.5 text-2xl font-bold text-[#14140f]">
-            {totalBtc.toFixed(4)} <span className="text-sm font-normal text-[#387085]/50">BTC</span>
+            {totalBtc.toFixed(3)} <span className="text-sm font-normal text-[#387085]/50">sBTC</span>
           </p>
           <p className="mt-0.5 text-[11px] text-[#387085]/40">
             ≈ ${(totalBtc * BTC_USD_RATE).toLocaleString('en-US', { maximumFractionDigits: 0 })}
@@ -764,7 +956,7 @@ export default function DepositorDetail({ address, vaults }: DepositorDetailProp
         <div className="border border-[#387085]/10 bg-white p-4">
           <p className="text-[11px] font-semibold uppercase tracking-wide text-[#387085]/45">Total Collateral</p>
           <p className="mt-1.5 text-2xl font-bold text-[#14140f]">
-            {collateralAmount.toFixed(4)} <span className="text-sm font-normal text-[#387085]/50">BTC</span>
+            {collateralAmount.toFixed(3)} <span className="text-sm font-normal text-[#387085]/50">vaultBTC</span>
           </p>
           <p className="mt-0.5 text-[11px] text-[#387085]/40">
             {collateralUsd != null ? `≈ $${collateralUsd.toLocaleString('en-US', { maximumFractionDigits: 0 })}` : '—'}
@@ -783,7 +975,7 @@ export default function DepositorDetail({ address, vaults }: DepositorDetailProp
             </button>
           </div>
           <p className="mt-1.5 text-2xl font-bold text-[#14140f]">
-            ${debtTotalUsd.toLocaleString('en-US', { maximumFractionDigits: 0 })}
+            $ {debtTotalUsd.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
           </p>
           <p className="mt-0.5 text-[11px] text-[#387085]/40">{debtAssetCount} Asset{debtAssetCount !== 1 ? 's' : ''}</p>
         </div>
@@ -791,7 +983,7 @@ export default function DepositorDetail({ address, vaults }: DepositorDetailProp
         {/* 4. Vaults */}
         <div className="border border-[#387085]/10 bg-white p-4">
           <div className="flex items-start justify-between">
-            <p className="text-[11px] font-semibold uppercase tracking-wide text-[#387085]/45">Vaults</p>
+            <p className="text-[11px] font-semibold uppercase tracking-wide text-[#387085]/45">Active Vaults</p>
             <button
               onClick={() => setActiveTab('deposited')}
               className="text-[10px] font-medium text-[#cd6332] hover:underline"
@@ -800,9 +992,9 @@ export default function DepositorDetail({ address, vaults }: DepositorDetailProp
             </button>
           </div>
           <p className="mt-1.5 text-2xl font-bold text-[#14140f]">
-            {activeVaults} <span className="text-sm font-normal text-[#387085]/50">/ {totalVaults}</span>
+            {activeVaults}
           </p>
-          <p className="mt-0.5 text-[11px] text-[#387085]/40">active / total</p>
+          <p className="mt-0.5 text-[11px] text-[#387085]/40">out of {totalVaults} vault{totalVaults !== 1 ? 's' : ''}</p>
         </div>
       </div>
 
@@ -810,25 +1002,35 @@ export default function DepositorDetail({ address, vaults }: DepositorDetailProp
       {latestActivity && (() => {
         const style = ACTIVITY_STYLES[latestActivity.type];
         const formattedAmount = formatTokenAmount(latestActivity.tokenAmount);
+        const bt = new Date(latestActivity.blockTime);
+        const pad = (n: number) => n.toString().padStart(2, '0');
+        const fullTimestamp = `${bt.getUTCFullYear()}/${pad(bt.getUTCMonth() + 1)}/${pad(bt.getUTCDate())} ${pad(bt.getUTCHours())}:${pad(bt.getUTCMinutes())}:${pad(bt.getUTCSeconds())} +UTC`;
         return (
-          <div className="flex items-center justify-between border border-[#387085]/12 bg-white px-4 py-2.5">
-            <div className="flex items-center gap-2 text-sm">
-              <span className="text-[#387085]/50">Last activity:</span>
-              <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-medium ${style.bg} ${style.text}`}>
-                {style.label}
-              </span>
-              <span className="font-medium text-[#14140f]">
-                {style.amountPrefix}{formattedAmount}
-              </span>
-              <span className="text-[#387085]/40">·</span>
-              <span className="text-xs text-[#387085]/50">{formatRelativeTime(latestActivity.blockTime)}</span>
+          <div className="border border-[#387085]/12 bg-white px-4 py-2.5">
+            <div className="flex items-center justify-between text-sm">
+              <div className="flex items-center gap-2">
+                <span className="text-[#387085]/50">Latest Activity</span>
+                <div className="flex flex-col">
+                  <div className="flex items-center gap-2">
+                    <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-medium ${style.bg} ${style.text}`}>
+                      {style.label}
+                    </span>
+                    <span className="font-medium text-[#14140f]">
+                      {style.amountPrefix}{formattedAmount}
+                    </span>
+                  </div>
+                  <p className="mt-0.5 text-[11px] text-[#387085]/45">
+                    {formatRelativeTime(latestActivity.blockTime)} ({fullTimestamp})
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => setActiveTab('aave_activity')}
+                className="text-[10px] font-medium text-[#cd6332] hover:underline"
+              >
+                View All Activities ›
+              </button>
             </div>
-            <button
-              onClick={() => setActiveTab('aave_activity')}
-              className="text-xs text-[#cd6332] hover:underline"
-            >
-              View All Activities ›
-            </button>
           </div>
         );
       })()}
@@ -845,7 +1047,7 @@ export default function DepositorDetail({ address, vaults }: DepositorDetailProp
                 : 'text-[#387085]/50 hover:text-[#14140f]'
             }`}
           >
-            {tab.label} ({tab.count})
+            {tab.label}
           </button>
         ))}
       </div>

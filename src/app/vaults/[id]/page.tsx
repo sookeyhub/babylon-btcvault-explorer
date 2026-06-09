@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation';
 import { getVaultById, getVaultLifecycle } from '@/lib/data';
-import { truncateAddress } from '@/lib/utils';
+import { truncateAddress, toUsd } from '@/lib/utils';
 import CopyButton from '@/components/CopyButton';
 import type { VaultStatus, VaultLifecycleEvent } from '@/lib/types';
 import VaultDetailTabs from './VaultDetailTabs';
@@ -16,16 +16,30 @@ interface Props {
 
 function StatusIcon({ status }: { status: VaultStatus }) {
   switch (status) {
-    case 'Active':
+    case 'Available':
       return (
         <svg className="h-4 w-4 text-emerald-500" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor">
           <circle cx="12" cy="12" r="10" />
           <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
         </svg>
       );
+    case 'Verified':
+      return (
+        <svg className="h-4 w-4 text-purple-500" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor">
+          <circle cx="12" cy="12" r="10" />
+          <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+        </svg>
+      );
+    case 'Signature Collected':
+      return (
+        <svg className="h-4 w-4 text-yellow-500" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor">
+          <circle cx="12" cy="12" r="10" />
+          <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6l4 2" />
+        </svg>
+      );
     case 'Redeemed':
       return (
-        <svg className="h-4 w-4 text-zinc-400" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor">
+        <svg className="h-4 w-4 text-blue-500" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor">
           <circle cx="12" cy="12" r="10" />
           <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
         </svg>
@@ -84,12 +98,12 @@ interface BannerConfig {
 
 function getBannerConfig(status: VaultStatus, lifecycle: VaultLifecycleEvent[]): BannerConfig {
   switch (status) {
-    case 'Active':
+    case 'Available':
       return {
         bg: 'bg-green-50',
         border: 'border-green-500',
         dot: 'bg-green-500',
-        label: 'Active',
+        label: 'Available',
         desc: 'Vault is live — BTC locked and usable as collateral',
         labelText: 'text-green-700',
         subText: 'text-green-600/70',
@@ -106,6 +120,27 @@ function getBannerConfig(status: VaultStatus, lifecycle: VaultLifecycleEvent[]):
         subText: 'text-amber-600/70',
         pulse: true,
       };
+    case 'Verified':
+      return {
+        bg: 'bg-purple-50',
+        border: 'border-purple-500',
+        dot: 'bg-purple-500',
+        label: 'Verified',
+        desc: 'Vault verification completed by committee',
+        labelText: 'text-purple-700',
+        subText: 'text-purple-600/70',
+      };
+    case 'Signature Collected':
+      return {
+        bg: 'bg-yellow-50',
+        border: 'border-yellow-500',
+        dot: 'bg-yellow-500',
+        label: 'Signature Collected',
+        desc: 'BTC signatures have been collected and posted',
+        labelText: 'text-yellow-700',
+        subText: 'text-yellow-600/70',
+        pulse: true,
+      };
     case 'Expired': {
       const expiredEvent = lifecycle.find((e) => e.event_type === 'EXPIRED');
       const reason =
@@ -115,13 +150,13 @@ function getBannerConfig(status: VaultStatus, lifecycle: VaultLifecycleEvent[]):
             ? 'Activation not completed within timeout'
             : 'Timeout exceeded';
       return {
-        bg: 'bg-[#387085]/5',
-        border: 'border-[#387085]',
-        dot: 'bg-[#387085]',
+        bg: 'bg-zinc-50',
+        border: 'border-zinc-400',
+        dot: 'bg-zinc-400',
         label: 'Expired',
         desc: reason,
-        labelText: 'text-[#387085]',
-        subText: 'text-[#387085]/60',
+        labelText: 'text-zinc-600',
+        subText: 'text-zinc-500/60',
       };
     }
     case 'Liquidated':
@@ -136,13 +171,13 @@ function getBannerConfig(status: VaultStatus, lifecycle: VaultLifecycleEvent[]):
       };
     case 'Redeemed':
       return {
-        bg: 'bg-[#387085]/5',
-        border: 'border-[#387085]',
-        dot: 'bg-[#387085]',
+        bg: 'bg-blue-50',
+        border: 'border-blue-500',
+        dot: 'bg-blue-500',
         label: 'Redeemed',
         desc: 'BTC has been successfully withdrawn',
-        labelText: 'text-[#387085]',
-        subText: 'text-[#387085]/60',
+        labelText: 'text-blue-700',
+        subText: 'text-blue-600/70',
       };
     default:
       return {
@@ -170,7 +205,7 @@ function StatusBanner({
 }) {
   const cfg = getBannerConfig(status, lifecycle);
   const timeText =
-    status === 'Active' || status === 'Pending'
+    status === 'Available' || status === 'Pending' || status === 'Verified' || status === 'Signature Collected'
       ? `${formatRelativeTime(createdAt)} · created`
       : closedAt
         ? `${formatRelativeTime(closedAt)} · closed`
@@ -269,8 +304,8 @@ export default async function VaultDetailPage({ params }: Props) {
         {/* ID row */}
         <div className="flex items-center gap-2">
           <StatusIcon status={vault.status} />
-          <span className="font-mono text-base font-semibold text-[#14140f]">
-            {truncateAddress(vault.id, 6, 4)}
+          <span className="break-all font-mono text-base font-semibold text-[#14140f]">
+            {vault.id}
           </span>
           <CopyButton text={vault.id} />
         </div>
@@ -287,7 +322,7 @@ export default async function VaultDetailPage({ params }: Props) {
       {/* ── 3 summary cards ───────────────────────────────────────────────── */}
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
         {[
-          { label: 'Amount',   value: `${vault.vaultSize.toFixed(2)} sBTC` },
+          { label: 'Amount',   value: `${vault.vaultSize.toFixed(2)} sBTC ${toUsd(vault.vaultSize)}` },
           { label: 'DApp',     value: vault.dappName },
           { label: 'Provider', value: vault.providerName },
         ].map(({ label, value }) => (

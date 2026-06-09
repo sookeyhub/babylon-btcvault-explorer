@@ -265,34 +265,96 @@ export const MOCK_DEPOSITOR_AAVE_POSITION: AaveV4Position = {
   depositorFull: '0x5a6b7c8d9e0f1a2b3c4d5e6f7a8b9c0d1e2f3a4b',
   proxyContract: '0x45df05cb7128227dabc8ff175219697a08d49233',
   totalCollateral: {
-    symbol: 'sBTC',
+    symbol: 'vaultBTC',
     decimals: 8,
-    amount: '3001229',
-    priceUsd: '69014.43',
+    amount: '5500000',
+    priceUsd: '62794.36',
   },
-  healthFactor: '1.16',
-  currentLtv: '64.34',
-  avgCollateralFactor: '0.75',
+  healthFactor: '2.41',
+  currentLtv: '32.27',
+  avgCollateralFactor: '0.78',
   riskPremium: '10.00',
   debts: [
     {
       reserveId: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',
       symbol: 'USDC',
       decimals: 6,
-      totalAmount: '498150000',
-      principal: '498148000',
-      accruedInterest: '2221',
+      totalAmount: '100000000',
+      principal: '99990000',
+      accruedInterest: '81',
     },
     {
       reserveId: '0xdac17f958d2ee523a2206206994597c13d831ec7',
       symbol: 'USDT',
       decimals: 6,
-      totalAmount: '125400000',
-      principal: '125000000',
-      accruedInterest: '400000',
+      totalAmount: '10000000',
+      principal: '10000000',
+      accruedInterest: '4',
+    },
+    {
+      reserveId: '0x2260fac5e5542a773aa44fbcfedf7c193bc2c599',
+      symbol: 'WBTC',
+      decimals: 8,
+      totalAmount: '1600004',
+      principal: '1599894',
+      accruedInterest: '146',
     },
   ],
 };
+
+/* ── Multi-dApp positions for the Depositor Detail Positions tab ────────── */
+
+export interface DAppPosition extends AaveV4Position {
+  dappName: string;
+}
+
+export const MOCK_DEPOSITOR_DAPP_POSITIONS: DAppPosition[] = [
+  {
+    dappName: 'Aave v4',
+    depositor: '0x8c52...e740',
+    depositorFull: '0x8c5283a3f2995ecf78319bb1ca3bd9a179b3e740',
+    proxyContract: '0x45df05cb7128227dabc8ff175219697a08d49233',
+    totalCollateral: { symbol: 'vaultBTC', decimals: 8, amount: '5500000', priceUsd: '62794.36' },
+    healthFactor: '2.41',
+    currentLtv: '32.27',
+    avgCollateralFactor: '0.78',
+    riskPremium: '10.00',
+    debts: [
+      { reserveId: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48', symbol: 'USDC', decimals: 6, totalAmount: '100000000', principal: '99990000', accruedInterest: '81' },
+      { reserveId: '0xdac17f958d2ee523a2206206994597c13d831ec7', symbol: 'USDT', decimals: 6, totalAmount: '10000000', principal: '10000000', accruedInterest: '4' },
+      { reserveId: '0x2260fac5e5542a773aa44fbcfedf7c193bc2c599', symbol: 'WBTC', decimals: 8, totalAmount: '1600004', principal: '1599894', accruedInterest: '146' },
+    ],
+  },
+  {
+    dappName: 'Compound v3',
+    depositor: '0x8c52...e740',
+    depositorFull: '0x8c5283a3f2995ecf78319bb1ca3bd9a179b3e740',
+    proxyContract: '0x72ab3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9012',
+    totalCollateral: { symbol: 'vaultBTC', decimals: 8, amount: '3200000', priceUsd: '62794.36' },
+    healthFactor: '3.85',
+    currentLtv: '19.48',
+    avgCollateralFactor: '0.75',
+    riskPremium: '8.00',
+    debts: [
+      { reserveId: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48', symbol: 'USDC', decimals: 6, totalAmount: '391200000', principal: '390000000', accruedInterest: '1200000' },
+    ],
+  },
+  {
+    dappName: 'Morpho Blue',
+    depositor: '0x8c52...e740',
+    depositorFull: '0x8c5283a3f2995ecf78319bb1ca3bd9a179b3e740',
+    proxyContract: '0x93bc4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f901234',
+    totalCollateral: { symbol: 'vaultBTC', decimals: 8, amount: '1800000', priceUsd: '62794.36' },
+    healthFactor: '1.24',
+    currentLtv: '60.48',
+    avgCollateralFactor: '0.75',
+    riskPremium: '12.00',
+    debts: [
+      { reserveId: '0xdac17f958d2ee523a2206206994597c13d831ec7', symbol: 'USDT', decimals: 6, totalAmount: '684120000', principal: '680000000', accruedInterest: '4120000' },
+      { symbol: 'WBTC', decimals: 8, totalAmount: '420015', principal: '420000', accruedInterest: '15' },
+    ],
+  },
+];
 
 export const MOCK_AAVE_POSITIONS: AaveV4Position[] = [
   {

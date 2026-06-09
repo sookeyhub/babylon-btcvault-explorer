@@ -2,15 +2,17 @@ import { RawVaultRowSchema } from './schema';
 import { buildHeaderMap, type InternalField } from './column-mapping';
 import type { Vault, VaultStatus } from './types';
 
-const VALID_STATUSES: VaultStatus[] = ['Active', 'Expired', 'Pending', 'Liquidated', 'Redeemed'];
+const VALID_STATUSES: VaultStatus[] = ['Available', 'Pending', 'Verified', 'Signature Collected', 'Redeemed', 'Expired', 'Liquidated'];
 
 /** Normalize a raw status string to a valid VaultStatus */
 function normalizeStatus(raw: string): VaultStatus {
   const trimmed = raw.trim();
+  // Handle legacy 'Active' → 'Available'
+  if (trimmed.toLowerCase() === 'active') return 'Available';
   const match = VALID_STATUSES.find(
     (s) => s.toLowerCase() === trimmed.toLowerCase(),
   );
-  return match ?? 'Active';
+  return match ?? 'Available';
 }
 
 /** Normalize a timestamp string — handles empty, ISO, and Unix epoch */
@@ -55,7 +57,7 @@ export function parseVaultRows(
       const parsed = RawVaultRowSchema.parse({
         vault_id: mapped.vault_id ?? '',
         vault_name: mapped.vault_name ?? 'Unknown',
-        status: mapped.status ?? 'Active',
+        status: mapped.status ?? 'Available',
         btc_address: mapped.btc_address ?? '',
         eth_address: mapped.eth_address ?? '',
         vault_size: mapped.vault_size ?? '0',

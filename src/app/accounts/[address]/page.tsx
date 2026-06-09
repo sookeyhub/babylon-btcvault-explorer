@@ -34,7 +34,7 @@ export default async function AccountDetailPage({ params }: Props) {
   // ── Depositor stats ─────────────────────────────────────────────
   const depositorVaults      = MOCK_VAULTS.filter((v) => v.depositorAddress?.toLowerCase() === lcAddress);
   const depositorTotalVaults = depositorVaults.length;
-  const depositorActiveVaults = depositorVaults.filter((v) => v.status === 'Active').length;
+  const depositorActiveVaults = depositorVaults.filter((v) => v.status === 'Available').length;
   const depositorTotalBtc    = depositorVaults.reduce((s, v) => s + v.vaultSize, 0);
   const isDepositor          = !provider && account.type === 'EOA' && depositorTotalVaults > 0;
 
@@ -80,6 +80,20 @@ export default async function AccountDetailPage({ params }: Props) {
           <p>Health Factor 카드(전체 너비): 값 + 상태 배지 + 그라디언트 게이지.</p>
           <p>Debt 테이블: Reserve ID / Token / Amount / Principal / Accrued Interest.</p>
         </DevNoteSection>
+        <DevNoteSection heading="Vaults History 탭 (Provider)">
+          <p>Provider가 관리하는 볼트 상태 변경 이벤트를 날짜별 그룹으로 시간순 표시.</p>
+          <p>레이아웃: 왼쪽 시간(HH:MM + ago) → 상태 chip → 엔티티 정보 → Tx/Block.</p>
+          <p>엔티티 표시 순서: 라벨 → 아이콘 → 주소 (예: VAULT 🔒 0x1234...abcd).</p>
+          <p>엔티티 구성: Vault | Depositor.</p>
+        </DevNoteSection>
+        <DevNoteSection heading="물량(Amount) 표시 기준">
+          <p>볼트 라이프사이클이 완료된 terminal 상태에서만 오른쪽에 물량(sBTC) 표시.</p>
+          <p>✅ Available: peg-in 완료, 볼트 활성화 → 확정 물량.</p>
+          <p>✅ Redeemed: 정상 상환 완료 → 상환 물량.</p>
+          <p>✅ Expired: 타임아웃 만료 → 잠겼던 물량.</p>
+          <p>✅ Liquidated: 청산 처리 완료 → 청산 물량.</p>
+          <p>❌ Pending / Verified / Signature Collected: 진행 중이라 물량 미확정 → 미표시.</p>
+        </DevNoteSection>
       </DevNote>
 
       {/* Breadcrumb */}
@@ -87,7 +101,7 @@ export default async function AccountDetailPage({ params }: Props) {
         <Link href="/providers" className="transition-colors hover:text-[#cd6332]">Accounts</Link>
         <span>/</span>
         <span className="font-medium text-[#14140f]">
-          {account.name ?? truncateAddress(account.address, 6, 4)}
+          {account.name ?? account.address}
         </span>
       </nav>
 
@@ -109,8 +123,8 @@ export default async function AccountDetailPage({ params }: Props) {
                 {account.name}
               </span>
             ) : (
-              <span title={account.address} className="font-mono text-base font-semibold text-[#14140f]">
-                {truncateAddress(account.address, 6, 4)}
+              <span title={account.address} className="font-mono text-base font-semibold text-[#14140f] break-all">
+                {account.address}
               </span>
             )}
             <CopyButton text={account.address} />

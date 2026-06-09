@@ -66,7 +66,7 @@ const MOCK_CONTEXTS: Record<EventName, CtxShape> = {
     ...BASE,
     eventName: 'PeginActivated',
     txStatus: 'SUCCESS',
-    fromState: 'Verified', toState: 'Active',
+    fromState: 'Verified', toState: 'Available',
     secretRevealed: true,
     amount: { btc: 1.0, usd: 65_000 },
     linkedDapp: { name: 'Aave', loan: '30,000 USDC' },
@@ -105,7 +105,7 @@ const MOCK_CONTEXTS: Record<EventName, CtxShape> = {
     vaultTimeline: [
       { state: 'Pending',  time: 'Apr 9, 2026 · 03:14 UTC', note: 'Vault created' },
       { state: 'Verified', time: 'Apr 9, 2026 · 05:22 UTC', note: '3/5 keepers ACKed' },
-      { state: 'Active',   time: 'Apr 9, 2026 · 05:48 UTC', note: 'Secret revealed · this tx', current: true },
+      { state: 'Available',   time: 'Apr 9, 2026 · 05:48 UTC', note: 'Secret revealed · this tx', current: true },
     ] as TimelineStep[],
   },
 
@@ -113,7 +113,7 @@ const MOCK_CONTEXTS: Record<EventName, CtxShape> = {
     ...BASE,
     eventName: 'BORROW',
     txStatus: 'SUCCESS',
-    fromState: 'Active', toState: 'Active',
+    fromState: 'Available', toState: 'Available',
     secretRevealed: false,
     amount: { btc: 1.0, usd: 65_000 },
     linkedDapp: { name: 'Aave', loan: '30,000 USDC' },
@@ -163,8 +163,8 @@ const MOCK_CONTEXTS: Record<EventName, CtxShape> = {
     vaultTimeline: [
       { state: 'Pending',  time: 'Apr 9, 2026 · 03:14 UTC', note: 'Vault created' },
       { state: 'Verified', time: 'Apr 9, 2026 · 05:22 UTC', note: '3/5 keepers ACKed' },
-      { state: 'Active',   time: 'Apr 9, 2026 · 05:48 UTC', note: 'Vault activated' },
-      { state: 'Active',   time: 'Apr 15, 2026 · 11:03 UTC', note: 'Loan taken · this tx', current: true },
+      { state: 'Available',   time: 'Apr 9, 2026 · 05:48 UTC', note: 'Vault activated' },
+      { state: 'Available',   time: 'Apr 15, 2026 · 11:03 UTC', note: 'Loan taken · this tx', current: true },
     ] as TimelineStep[],
   },
 
@@ -172,7 +172,7 @@ const MOCK_CONTEXTS: Record<EventName, CtxShape> = {
     ...BASE,
     eventName: 'REPAY',
     txStatus: 'FAILED',            // 잔액 부족으로 reverted
-    fromState: 'Active', toState: 'Active',
+    fromState: 'Available', toState: 'Available',
     secretRevealed: false,
     amount: { btc: 1.0, usd: 65_000 },
     linkedDapp: { name: 'Aave', loan: '30,512 USDC' },
@@ -220,9 +220,9 @@ const MOCK_CONTEXTS: Record<EventName, CtxShape> = {
     vaultTimeline: [
       { state: 'Pending',  time: 'Apr 9, 2026 · 03:14 UTC', note: 'Vault created' },
       { state: 'Verified', time: 'Apr 9, 2026 · 05:22 UTC', note: '3/5 keepers ACKed' },
-      { state: 'Active',   time: 'Apr 9, 2026 · 05:48 UTC', note: 'Vault activated' },
-      { state: 'Active',   time: 'Apr 15, 2026 · 11:03 UTC', note: 'Loan taken' },
-      { state: 'Active',   time: 'May 3, 2026 · 09:17 UTC',  note: 'Loan repaid · this tx', current: true },
+      { state: 'Available',   time: 'Apr 9, 2026 · 05:48 UTC', note: 'Vault activated' },
+      { state: 'Available',   time: 'Apr 15, 2026 · 11:03 UTC', note: 'Loan taken' },
+      { state: 'Available',   time: 'May 3, 2026 · 09:17 UTC',  note: 'Loan repaid · this tx', current: true },
     ] as TimelineStep[],
   },
 
@@ -230,7 +230,7 @@ const MOCK_CONTEXTS: Record<EventName, CtxShape> = {
     ...BASE,
     eventName: 'ADD_COLLATERAL',
     txStatus: 'SUCCESS',
-    fromState: 'Active', toState: 'Active',
+    fromState: 'Available', toState: 'Available',
     secretRevealed: false,
     amount: { btc: 0.5, usd: 32_500 },
     linkedDapp: { name: 'Aave', loan: '30,000 USDC' },
@@ -267,8 +267,8 @@ const MOCK_CONTEXTS: Record<EventName, CtxShape> = {
     vaultTimeline: [
       { state: 'Pending',  time: 'Apr 9, 2026 · 03:14 UTC', note: 'Vault created' },
       { state: 'Verified', time: 'Apr 9, 2026 · 05:22 UTC', note: '3/5 keepers ACKed' },
-      { state: 'Active',   time: 'Apr 9, 2026 · 05:48 UTC', note: 'Vault activated' },
-      { state: 'Active',   time: 'Apr 20, 2026 · 14:30 UTC', note: '+0.5 BTC added · this tx', current: true },
+      { state: 'Available',   time: 'Apr 9, 2026 · 05:48 UTC', note: 'Vault activated' },
+      { state: 'Available',   time: 'Apr 20, 2026 · 14:30 UTC', note: '+0.5 BTC added · this tx', current: true },
     ] as TimelineStep[],
   },
 
@@ -276,7 +276,7 @@ const MOCK_CONTEXTS: Record<EventName, CtxShape> = {
     ...BASE,
     eventName: 'REMOVE_COLLATERAL',
     txStatus: 'FAILED',            // LTV 초과로 reverted
-    fromState: 'Active', toState: 'Active',
+    fromState: 'Available', toState: 'Available',
     secretRevealed: false,
     amount: { btc: 0.2, usd: 13_000 },
     linkedDapp: { name: 'Aave', loan: '15,000 USDC' },
@@ -302,8 +302,8 @@ const MOCK_CONTEXTS: Record<EventName, CtxShape> = {
     vaultTimeline: [
       { state: 'Pending',  time: 'Apr 9, 2026 · 03:14 UTC', note: 'Vault created' },
       { state: 'Verified', time: 'Apr 9, 2026 · 05:22 UTC', note: '3/5 keepers ACKed' },
-      { state: 'Active',   time: 'Apr 9, 2026 · 05:48 UTC', note: 'Vault activated' },
-      { state: 'Active',   time: 'Apr 28, 2026 · 08:12 UTC', note: '-0.2 BTC withdrawn · this tx', current: true },
+      { state: 'Available',   time: 'Apr 9, 2026 · 05:48 UTC', note: 'Vault activated' },
+      { state: 'Available',   time: 'Apr 28, 2026 · 08:12 UTC', note: '-0.2 BTC withdrawn · this tx', current: true },
     ] as TimelineStep[],
   },
 
@@ -362,7 +362,7 @@ const MOCK_CONTEXTS: Record<EventName, CtxShape> = {
     vaultTimeline: [
       { state: 'Pending',    time: 'Apr 9, 2026 · 03:14 UTC',  note: 'Vault created' },
       { state: 'Verified',   time: 'Apr 9, 2026 · 05:22 UTC',  note: '3/5 keepers ACKed' },
-      { state: 'Active',     time: 'Apr 9, 2026 · 05:48 UTC',  note: 'Vault activated' },
+      { state: 'Available',     time: 'Apr 9, 2026 · 05:48 UTC',  note: 'Vault activated' },
       { state: 'At-Risk',    time: 'May 20, 2026 · 17:44 UTC', note: 'HF dropped below 1.0' },
       { state: 'Liquidated', time: 'May 21, 2026 · 02:09 UTC', note: 'Liquidated by keeper · this tx', current: true },
     ] as TimelineStep[],

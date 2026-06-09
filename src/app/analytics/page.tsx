@@ -29,7 +29,7 @@ export default async function AnalyticsPage() {
 
   // Top 10 active vaults sorted by size descending
   const topActiveVaults = allVaults
-    .filter((v) => v.status === 'Active')
+    .filter((v) => v.status === 'Available')
     .sort((a, b) => b.vaultSize - a.vaultSize)
     .slice(0, 10);
 

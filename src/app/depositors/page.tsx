@@ -14,7 +14,7 @@ import {
   ResponsiveContainer,
 } from 'recharts';
 import { MOCK_DEPOSITORS, MOCK_VAULTS } from '@/lib/mock-data';
-import { truncateAddress, formatDate } from '@/lib/utils';
+import { truncateAddress, formatRelativeTime, toUsd } from '@/lib/utils';
 import DevNote, { DevNoteSection } from '@/components/DevNote';
 
 const PAGE_SIZE = 25;
@@ -51,15 +51,40 @@ export default function DepositorsPage() {
   const total = depositors.length;
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
   const safePage = Math.min(page, totalPages);
-  const pageData = depositors.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE);
 
   // KPI summary
   const totalDepositors = depositors.length;
   const totalBtc = vaults.reduce((s, v) => s + v.vaultSize, 0);
-  const activeVaultCount = vaults.filter((v) => v.status === 'Active').length;
-  const avgBtc = totalDepositors > 0 ? totalBtc / totalDepositors : 0;
+  const activeVaultCount = vaults.filter((v) => v.status === 'Available').length;
+  const avgBtcPerVault = vaults.length > 0 ? totalBtc / vaults.length : 0;
 
-  // ── New Depositors — weekly first-time depositors (last 3 months) ───────
+  const [sortKey, setSortKey] = useState<'totalVaults' | 'activeVaults' | 'totalBtc' | null>(null);
+  const [sortDir, setSortDir] = useState<'asc' | 'desc'>('desc');
+
+  const handleSort = (key: 'totalVaults' | 'activeVaults' | 'totalBtc') => {
+    if (sortKey === key) {
+      setSortDir((d) => (d === 'desc' ? 'asc' : 'desc'));
+    } else {
+      setSortKey(key);
+      setSortDir('desc');
+    }
+    setPage(1);
+  };
+
+  const sortedDepositors = [...depositors].sort((a, b) => {
+    if (!sortKey) return 0;
+    const mul = sortDir === 'desc' ? -1 : 1;
+    return (a[sortKey] - b[sortKey]) * mul;
+  });
+
+  const pageData = sortedDepositors.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE);
+
+  // ── Period toggle ─────────────────────────────────────────────────────
+  type Period = '7D' | '30D' | '180D' | 'YTD' | '1Y' | 'ALL';
+  const PERIODS: Period[] = ['7D', '30D', '180D', 'YTD', '1Y', 'ALL'];
+  const [chartPeriod, setChartPeriod] = useState<Period>('ALL');
+
+  // ── New Depositors — weekly first-time depositors ─────────────────────
   const firstVaultByDepositor = new Map<string, Date>();
   for (const v of vaults) {
     const addr = v.depositorAddress?.toLowerCase();
@@ -72,7 +97,7 @@ export default function DepositorsPage() {
   }
 
   const today = new Date();
-  const WEEK_COUNT = 13;
+  const WEEK_COUNT = 52; // generate 1 year of weekly data
   const weeks = Array.from({ length: WEEK_COUNT }, (_, i) => {
     const weekStart = new Date(today);
     weekStart.setHours(0, 0, 0, 0);
@@ -100,8 +125,9 @@ export default function DepositorsPage() {
   const totalFromData = weeks.reduce((s, w) => s + w.count, 0);
   let cumulativeBase: number;
   if (totalFromData < 10) {
-    const sampleCounts = [2, 5, 3, 7, 4, 8, 6, 11, 7, 12, 9, 14, 16];
-    weeks.forEach((w, i) => { w.count = sampleCounts[i] ?? 0; });
+    // Generate sample data for all 52 weeks
+    const sampleBase = [2, 5, 3, 7, 4, 8, 6, 11, 7, 12, 9, 14, 16];
+    weeks.forEach((w, i) => { w.count = sampleBase[i % sampleBase.length] ?? 0; });
     cumulativeBase = 80;
   } else {
     cumulativeBase = 0;
@@ -116,7 +142,22 @@ export default function DepositorsPage() {
     w.cumulative = running;
   }
 
-  const totalNewDepositors = weeks.reduce((s, w) => s + w.count, 0);
+  // Filter weeks by selected period
+  const filteredWeeks = (() => {
+    if (chartPeriod === 'ALL') return weeks;
+    const now = Date.now();
+    let cutoff: Date;
+    switch (chartPeriod) {
+      case '7D':  cutoff = new Date(now - 7 * 24*60*60*1000); break;
+      case '30D': cutoff = new Date(now - 30 * 24*60*60*1000); break;
+      case '180D': cutoff = new Date(now - 180 * 24*60*60*1000); break;
+      case 'YTD': cutoff = new Date(new Date().getFullYear(), 0, 1); break;
+      case '1Y':  cutoff = new Date(now - 365 * 24*60*60*1000); break;
+    }
+    return weeks.filter(w => w.weekEnd >= cutoff);
+  })();
+
+  const totalNewDepositors = filteredWeeks.reduce((s, w) => s + w.count, 0);
 
   return (
     <div className="relative mx-auto max-w-[1200px] space-y-5 px-4 py-8 sm:px-6">
@@ -125,31 +166,28 @@ export default function DepositorsPage() {
           <p>BTCVault에 BTC를 예치한 개별 사용자 전체를 조회.</p>
           <p>어떤 주소가 얼마나 예치했고, 현재 얼마가 활성 상태인지 파악.</p>
         </DevNoteSection>
-
-        <DevNoteSection heading="표시 대상">
-          <p>실제로 Vault를 만든 주소만 포함.</p>
-          <p>활동 이력이 없는 일반 지갑 주소는 제외.</p>
+        <DevNoteSection heading="KPI 4카드">
+          <p>Total Depositors: 실제 Vault를 생성한 고유 주소 수.</p>
+          <p>Locked BTC (ℹ): 전체 Depositor가 예치 중인 BTC 합계 (sBTC 단위).</p>
+          <p>Avg BTC Per Vault: 전체 BTC를 총 Vault 수로 나눈 평균.</p>
+          <p>Active Vaults: 현재 Active 상태인 Vault 수.</p>
         </DevNoteSection>
-
-        <DevNoteSection heading="컬럼 구성">
-          <p>순위, 주소, 총 Vault 수, 활성 Vault 수, Total BTC, 첫 예치일.</p>
-          <p>활성 수는 현재 사용 중인 예치 규모를 시각적으로 구분하기 위해 녹색으로 표시.</p>
-          <p>첫 예치일은 온보딩 시점을 추적하는 용도.</p>
-        </DevNoteSection>
-
-        <DevNoteSection heading="정렬 / 이동">
-          <p>Total BTC 내림차순으로 규모가 큰 예치자를 상단 배치.</p>
-          <p>주소 클릭 시 통합 Account 상세로 이동.</p>
-        </DevNoteSection>
-
         <DevNoteSection heading="New Depositors 차트">
-          <p>최근 13주(약 3개월)간 신규 Depositor 유입 추이를 주 단위로 풀 너비 노출.</p>
-          <p>해당 주에 처음으로 vault를 생성한 주소만 신규 Depositor로 카운트.</p>
-          <p>막대는 주별 신규 수, 라인은 누적 총 Depositor 수.</p>
-          <p>우측 상단 +N 값은 표시 구간 동안 새로 유입된 총 Depositor 수.</p>
+          <p>최근 13주(약 3개월)간 신규 Depositor 유입 추이를 주 단위로 시각화.</p>
+          <p>해당 주에 처음으로 vault를 생성한 주소만 신규로 카운트.</p>
+          <p>막대(Bar): 주별 신규 수. 라인(Line): 누적 총 Depositor 수.</p>
+          <p>우측 상단에 표시 구간 내 신규 유입 총수를 +N으로 표시.</p>
+        </DevNoteSection>
+        <DevNoteSection heading="테이블 컬럼">
+          <p>#(순위) / Address(복사) / Total Vaults(정렬) / Active Vaults(정렬) / Locked BTC(정렬) / First Deposit (Age).</p>
+          <p>Active Vaults는 녹색으로 강조.</p>
+          <p>First Deposit (Age)는 상대 시간(e.g. &quot;3 days ago&quot;)으로 표시.</p>
+          <p>Address 클릭 시 /accounts/{'{address}'} 상세 이동.</p>
+        </DevNoteSection>
+        <DevNoteSection heading="페이지네이션">
+          <p>25개/페이지. 첫/이전/다음/마지막 버튼 제공.</p>
         </DevNoteSection>
       </DevNote>
-
       {/* Title */}
       <h1 className="text-lg font-semibold text-[#14140f]">Depositors</h1>
 
@@ -160,12 +198,17 @@ export default function DepositorsPage() {
           <p className="mt-0.5 text-2xl font-semibold text-[#14140f]">{totalDepositors.toLocaleString()}</p>
         </div>
         <div className="border border-[#cd6332]/20 bg-[#cd6332]/5 p-3">
-          <p className="text-[11px] font-medium uppercase tracking-wide text-[#387085]/50">Total BTC Deposited</p>
-          <p className="mt-0.5 text-2xl font-semibold text-[#cd6332]">{totalBtc.toFixed(2)} BTC</p>
+          <p className="text-[11px] font-medium uppercase tracking-wide text-[#387085]/50">
+            Locked BTC
+            <span className="ml-1 inline-block cursor-help text-[#387085]/40" title="Total BTC currently locked in active vaults">&#8505;</span>
+          </p>
+          <p className="mt-0.5 text-2xl font-semibold text-[#cd6332]">{totalBtc.toFixed(2)} sBTC</p>
+          <p className="mt-0.5 text-xs text-[#387085]/40">{toUsd(totalBtc)}</p>
         </div>
         <div className="border border-[#387085]/10 bg-[#faf9f5] p-3">
-          <p className="text-[11px] font-medium uppercase tracking-wide text-[#387085]/50">Avg BTC per Depositor</p>
-          <p className="mt-0.5 text-2xl font-semibold text-[#14140f]">{avgBtc.toFixed(2)} BTC</p>
+          <p className="text-[11px] font-medium uppercase tracking-wide text-[#387085]/50">Avg BTC Per Vault</p>
+          <p className="mt-0.5 text-2xl font-semibold text-[#14140f]">{avgBtcPerVault.toFixed(2)} BTC</p>
+          <p className="mt-0.5 text-xs text-[#387085]/40">{toUsd(avgBtcPerVault)}</p>
         </div>
         <div className="border border-[#387085]/10 bg-[#faf9f5] p-3">
           <p className="text-[11px] font-medium uppercase tracking-wide text-[#387085]/50">Active Vaults</p>
@@ -178,16 +221,33 @@ export default function DepositorsPage() {
         <div className="flex items-center justify-between border-b border-[#387085]/10 px-5 py-3">
           <div>
             <h2 className="text-sm font-semibold text-[#14140f]">New Depositors</h2>
-            <p className="mt-0.5 text-[11px] text-[#387085]/50">Weekly · last 3 months</p>
+            <p className="mt-0.5 text-[11px] text-[#387085]/50">Weekly new depositors</p>
           </div>
-          <div className="text-right">
-            <span className="text-lg font-semibold text-[#cd6332]">+{totalNewDepositors}</span>
-            <p className="text-[10px] text-[#387085]/40">last 3 months</p>
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-1">
+              {PERIODS.map((p) => (
+                <button
+                  key={p}
+                  onClick={() => setChartPeriod(p)}
+                  className={`rounded-none px-2.5 py-1 text-[11px] font-medium transition-colors ${
+                    chartPeriod === p
+                      ? 'bg-[#cd6332] text-white'
+                      : 'text-[rgba(56,112,133,0.6)] hover:text-[#cd6332]'
+                  }`}
+                >
+                  {p}
+                </button>
+              ))}
+            </div>
+            <div className="text-right">
+              <span className="text-lg font-semibold text-[#cd6332]">+{totalNewDepositors}</span>
+              <p className="text-[10px] text-[#387085]/40">{chartPeriod === 'ALL' ? 'all time' : chartPeriod.toLowerCase()}</p>
+            </div>
           </div>
         </div>
         <div className="flex-1 px-4 pb-2 pt-4">
           <ResponsiveContainer width="100%" height="100%">
-            <ComposedChart data={weeks} margin={{ top: 8, right: 4, bottom: 0, left: -20 }} barCategoryGap="35%">
+            <ComposedChart data={filteredWeeks} margin={{ top: 8, right: 4, bottom: 0, left: -20 }} barCategoryGap="35%">
               <CartesianGrid strokeDasharray="3 3" stroke="#387085" strokeOpacity={0.08} vertical={false} />
               <XAxis dataKey="label" tick={{ fontSize: 11, fill: '#387085', opacity: 0.5 }} axisLine={false} tickLine={false} />
               <YAxis yAxisId="bar" allowDecimals={false} tick={{ fontSize: 11, fill: '#387085', opacity: 0.5 }} axisLine={false} tickLine={false} width={24} />
@@ -208,8 +268,8 @@ export default function DepositorsPage() {
                 cursor={{ fill: 'rgba(56,112,133,0.04)' }}
               />
               <Bar yAxisId="bar" dataKey="count" radius={[3, 3, 0, 0]} maxBarSize={48} isAnimationActive={false} name="count">
-                {weeks.map((w, i) => (
-                  <Cell key={w.week} fill="#cd6332" fillOpacity={i === 3 ? 0.85 : 0.35 + i * 0.12} />
+                {filteredWeeks.map((w, i) => (
+                  <Cell key={w.week} fill="#cd6332" fillOpacity={0.35 + (i / Math.max(filteredWeeks.length - 1, 1)) * 0.5} />
                 ))}
               </Bar>
               <Line yAxisId="line" type="monotone" dataKey="cumulative" stroke="#387085" strokeWidth={1.5} dot={{ r: 3, fill: '#387085', strokeWidth: 0 }} activeDot={{ r: 4 }} name="cumulative" isAnimationActive={false} />
@@ -249,10 +309,16 @@ export default function DepositorsPage() {
             <tr className="bg-[#cd6332] text-[11px] font-medium uppercase tracking-wider text-white">
               <th className="whitespace-nowrap px-4 py-2.5 font-medium w-12">#</th>
               <th className="whitespace-nowrap px-4 py-2.5 font-medium">Address</th>
-              <th className="whitespace-nowrap px-4 py-2.5 font-medium text-right">Total Vaults</th>
-              <th className="whitespace-nowrap px-4 py-2.5 font-medium text-right">Active Vaults</th>
-              <th className="whitespace-nowrap px-4 py-2.5 font-medium text-right">Total BTC</th>
-              <th className="whitespace-nowrap px-4 py-2.5 font-medium text-right">First Deposit</th>
+              <th className="whitespace-nowrap px-4 py-2.5 font-medium text-right cursor-pointer select-none" onClick={() => handleSort('totalVaults')}>
+                Total Vaults <span className="opacity-60">↕</span>
+              </th>
+              <th className="whitespace-nowrap px-4 py-2.5 font-medium text-right cursor-pointer select-none" onClick={() => handleSort('activeVaults')}>
+                Active Vaults <span className="opacity-60">↕</span>
+              </th>
+              <th className="whitespace-nowrap px-4 py-2.5 font-medium text-right cursor-pointer select-none" onClick={() => handleSort('totalBtc')}>
+                Locked BTC <span className="opacity-60">↕</span>
+              </th>
+              <th className="whitespace-nowrap px-4 py-2.5 font-medium text-right">First Deposit (Age)</th>
             </tr>
           </thead>
           <tbody>
@@ -273,9 +339,10 @@ export default function DepositorsPage() {
                   <td className="whitespace-nowrap px-4 py-2.5 text-right tabular-nums text-[#5a8a3c]">{d.activeVaults}</td>
                   <td className="whitespace-nowrap px-4 py-2.5 text-right tabular-nums text-[#14140f]">
                     {d.totalBtc.toFixed(4)} <span className="text-[rgba(56,112,133,0.5)]">sBTC</span>
+                    <span className="ml-1 text-[10px] text-[#387085]/35">{toUsd(d.totalBtc)}</span>
                   </td>
                   <td className="whitespace-nowrap px-4 py-2.5 text-right text-[rgba(56,112,133,0.5)]">
-                    {formatDate(d.firstDeposit)}
+                    {formatRelativeTime(d.firstDeposit)}
                   </td>
                 </tr>
               );

@@ -2,7 +2,7 @@
 
 import type { VaultStatus } from '@/lib/types';
 
-const STATUS_OPTIONS: (VaultStatus | 'All')[] = ['All', 'Active', 'Expired', 'Pending', 'Liquidated', 'Redeemed'];
+const STATUS_OPTIONS: (VaultStatus | 'All')[] = ['All', 'Available', 'Pending', 'Verified', 'Signature Collected', 'Redeemed', 'Expired', 'Liquidated'];
 const SORT_OPTIONS = [
   { value: 'newest', label: 'Newest' },
   { value: 'oldest', label: 'Oldest' },

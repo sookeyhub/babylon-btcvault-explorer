@@ -155,18 +155,18 @@ function applyStatusTransitions(timeline: TimelineEvent[], vault: VaultData): vo
 
   const activated = timeline.find((e) => e.key === 'ACTIVATED');
   if (activated?.isCompleted) {
-    activated.statusTransition = { from: 'Pending', to: 'Active' };
+    activated.statusTransition = { from: 'Pending', to: 'Available' };
   }
 
   const terminal = timeline.find((e) => e.key.startsWith('terminal-'));
   if (terminal?.isCompleted) {
     if (vault.status === 'Redeemed') {
-      terminal.statusTransition = { from: 'Active', to: 'Redeemed' };
+      terminal.statusTransition = { from: 'Available', to: 'Redeemed' };
     } else if (vault.status === 'Expired') {
       // Expired can come from Pending (most common in mock data)
       terminal.statusTransition = { from: 'Pending', to: 'Expired' };
     } else if (vault.status === 'Liquidated') {
-      terminal.statusTransition = { from: 'Active', to: 'Liquidated' };
+      terminal.statusTransition = { from: 'Available', to: 'Liquidated' };
     }
   }
 }
@@ -302,11 +302,13 @@ function buildTimeline(vault: VaultData, lifecycle: VaultLifecycleEvent[]): Time
 
 // Pill styles per status
 const STATUS_PILL: Record<VaultStatus, string> = {
-  Active:     'bg-green-100 text-green-700',
-  Pending:    'bg-amber-100 text-amber-700',
-  Redeemed:   'bg-blue-100 text-blue-700',
-  Expired:    'bg-zinc-200 text-zinc-600',
-  Liquidated: 'bg-red-100 text-red-700',
+  Available:            'bg-green-100 text-green-700',
+  Pending:              'bg-amber-100 text-amber-700',
+  Verified:             'bg-purple-100 text-purple-700',
+  'Signature Collected':'bg-yellow-100 text-yellow-700',
+  Redeemed:             'bg-blue-100 text-blue-700',
+  Expired:              'bg-zinc-200 text-zinc-600',
+  Liquidated:           'bg-red-100 text-red-700',
 };
 
 function StatusPill({ status }: { status: VaultStatus }) {
@@ -838,6 +840,7 @@ function StatusTransitionRow({
   );
 }
 
+
 // ── Main Component ───────────────────────────────────────────────────────────
 
 type TabKey = 'overview' | 'transaction';
@@ -845,9 +848,6 @@ type TabKey = 'overview' | 'transaction';
 export default function VaultDetailTabs({ vault, lifecycle }: Props) {
   const [activeTab, setActiveTab] = useState<TabKey>('overview');
   const timeline = buildTimeline(vault, lifecycle);
-
-  // Reversed for rendering — current state at top, oldest at bottom
-  const reversedTimeline = [...timeline].reverse();
 
   return (
     <div className="space-y-5">
@@ -986,25 +986,15 @@ export default function VaultDetailTabs({ vault, lifecycle }: Props) {
           </details>
         </div>
       ) : (
-        <div>
-          {/* Transaction Flow timeline — completed events only, newest first */}
-          <div className="rounded border border-[#387085]/10 bg-white px-5 py-4">
-            {(() => {
-              const completedOnly = reversedTimeline.filter((e) => e.isCompleted);
-              return completedOnly.map((event, i) => {
-                const isLast = i === completedOnly.length - 1;
-                const nextCompleted = !isLast && completedOnly[i + 1].isCompleted;
-                return (
-                  <TimelineRow
-                    key={event.key}
-                    event={event}
-                    nextCompleted={nextCompleted}
-                    isLast={isLast}
-                  />
-                );
-              });
-            })()}
-          </div>
+        <div className="border border-[#387085]/10 bg-white px-5 py-5">
+          {timeline.map((event, idx) => (
+            <TimelineRow
+              key={event.key}
+              event={event}
+              nextCompleted={idx + 1 < timeline.length ? timeline[idx + 1].isCompleted : false}
+              isLast={idx === timeline.length - 1}
+            />
+          ))}
         </div>
       )}
     </div>

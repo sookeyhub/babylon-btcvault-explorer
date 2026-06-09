@@ -273,7 +273,7 @@ const TRANSACTIONS: Transaction[] = [
           { key: 'Pool', val: 'WBTC Reserve' },
           { key: 'aToken Burned', val: '0.25 aWBTC' },
           { key: 'Remaining Supply', val: '0.50 WBTC' },
-          { key: 'Collateral Status', val: '', pill: { text: 'Active', type: 'success' } },
+          { key: 'Collateral Status', val: '', pill: { text: 'Available', type: 'success' } },
         ],
       },
       overview: {

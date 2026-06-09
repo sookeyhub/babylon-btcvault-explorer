@@ -1,5 +1,5 @@
 /** Vault status values matching the live explorer */
-export type VaultStatus = 'Active' | 'Expired' | 'Pending' | 'Liquidated' | 'Redeemed';
+export type VaultStatus = 'Available' | 'Pending' | 'Verified' | 'Signature Collected' | 'Redeemed' | 'Expired' | 'Liquidated';
 
 /** Core vault entity — maps to the live BTCVault explorer schema */
 export interface Vault {

@@ -13,7 +13,7 @@ import {
   Legend,
 } from 'recharts';
 import { MOCK_PROVIDERS, MOCK_VAULTS } from '@/lib/mock-data';
-import { truncateAddress } from '@/lib/utils';
+import { toUsd } from '@/lib/utils';
 import DevNote, { DevNoteSection } from '@/components/DevNote';
 
 const PAGE_SIZE = 25;
@@ -43,9 +43,40 @@ function CopyIcon({ text }: { text: string }) {
   );
 }
 
+type SortKey = 'commission' | 'vaultCount' | 'totalBtc';
+type SortDir = 'asc' | 'desc';
+
 export default function ProvidersPage() {
   const [page, setPage] = useState(1);
-  const providers = MOCK_PROVIDERS;
+  const [sortKey, setSortKey] = useState<SortKey>('totalBtc');
+  const [sortDir, setSortDir] = useState<SortDir>('desc');
+  const [dappFilter, setDappFilter] = useState<string>('ALL');
+  const [dappDropdownOpen, setDappDropdownOpen] = useState(false);
+
+  const allProviders = MOCK_PROVIDERS;
+  const uniqueDapps = Array.from(new Set(allProviders.map((p) => p.appName))).sort();
+
+  const toggleSort = (key: SortKey) => {
+    if (sortKey === key) {
+      setSortDir((d) => (d === 'asc' ? 'desc' : 'asc'));
+    } else {
+      setSortKey(key);
+      setSortDir('desc');
+    }
+  };
+
+  const sortIcon = (key: SortKey) => {
+    if (sortKey !== key) return '↕';
+    return sortDir === 'desc' ? '↓' : '↑';
+  };
+
+  const providers = (dappFilter === 'ALL'
+    ? allProviders
+    : allProviders.filter((p) => p.appName === dappFilter)
+  ).sort((a, b) => {
+    const mul = sortDir === 'asc' ? 1 : -1;
+    return mul * (a[sortKey] - b[sortKey]);
+  });
   const vaults = MOCK_VAULTS;
   const total = providers.length;
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
@@ -59,10 +90,25 @@ export default function ProvidersPage() {
     totalProviders > 0
       ? providers.reduce((s, p) => s + p.commission, 0) / totalProviders
       : 0;
-  const activeVaultCount = vaults.filter((v) => v.status === 'Active').length;
+  const activeVaultCount = vaults.filter((v) => v.status === 'Available').length;
 
-  // Provider TVL Trend — last 30 days, top 10 providers + Others
-  const TREND_DAYS = 30;
+  // ── Period toggle state ─────────────────────────────────────────────────
+  type Period = '7D' | '30D' | '180D' | 'YTD' | '1Y' | 'ALL';
+  const PERIODS: Period[] = ['7D', '30D', '180D', 'YTD', '1Y', 'ALL'];
+  const [trendPeriod, setTrendPeriod] = useState<Period>('ALL');
+
+  // Provider TVL Trend — generate all available data, filtered by period
+  const TREND_DAYS = (() => {
+    const now = Date.now();
+    switch (trendPeriod) {
+      case '7D':  return 7;
+      case '30D': return 30;
+      case '180D': return 180;
+      case 'YTD': return Math.ceil((now - new Date(new Date().getFullYear(), 0, 1).getTime()) / (24*60*60*1000)) + 1;
+      case '1Y':  return 365;
+      case 'ALL': return 365;
+    }
+  })();
   const PROVIDER_COLORS = [
     '#cd6332',
     '#387085',
@@ -139,33 +185,31 @@ export default function ProvidersPage() {
     <div className="relative mx-auto max-w-[1200px] space-y-5 px-4 py-8 sm:px-6">
       <DevNote title="Providers 기획 의도">
         <DevNoteSection heading="페이지 목적">
-          <p>Vault를 운영하며 BTC 커스터디와 ZKP 서명을 담당하는 운영자 목록을 조회.</p>
+          <p>Vault를 운영하며 BTC 커스터디와 ZKP 서명을 담당하는 Provider 목록 조회.</p>
           <p>누가 얼마의 자산을 관리하고 어떤 DApp과 연결되어 있는지 파악.</p>
         </DevNoteSection>
-
-        <DevNoteSection heading="표시 대상">
-          <p>프로토콜에 등록된 Provider만 포함.</p>
-          <p>아직 vault를 배정받지 않은 신규 Provider도 포함.</p>
+        <DevNoteSection heading="KPI 4카드">
+          <p>Total Providers: 등록된 Provider 수.</p>
+          <p>Locked BTC (ℹ): 전체 Provider가 관리 중인 BTC 합계 (sBTC 단위).</p>
+          <p>Avg Commission: 전체 Provider 평균 수수료율 (%).</p>
+          <p>Active Vaults: 현재 Active 상태인 Vault 수.</p>
         </DevNoteSection>
-
-        <DevNoteSection heading="컬럼 구성">
-          <p>순위, 이름, 주소, 연결 DApp, 수수료율, 관리 Vault 수, Total BTC.</p>
-          <p>수수료율은 사용자가 바로 이해할 수 있도록 % 단위로 변환해 표시.</p>
-        </DevNoteSection>
-
-        <DevNoteSection heading="정렬 / 이동">
-          <p>Total BTC 내림차순으로 관리 규모가 큰 Provider를 상단 배치.</p>
-          <p>이름 또는 주소 클릭 시 통합 Account 상세로 이동.</p>
-        </DevNoteSection>
-
         <DevNoteSection heading="Provider TVL Trend 차트">
           <p>최근 30일간 Provider별 일간 관리 BTC(TVL)를 누적 영역으로 시각화.</p>
           <p>created ≤ day &amp; closed &gt; day 인 vault의 vaultSize 합으로 산출.</p>
-          <p>Total BTC 기준 상위 10개를 개별 영역, 나머지는 Others 회색으로 통합.</p>
-          <p>우측 상단에 현재 총 TVL과 30일 변화량(±BTC, ±%)을 함께 표시.</p>
+          <p>Total BTC 기준 상위 10개를 개별 영역, 나머지는 Others로 통합.</p>
+          <p>우측 상단에 현재 총 TVL과 30일 변화량(±BTC, ±%)을 표시.</p>
+        </DevNoteSection>
+        <DevNoteSection heading="테이블 컬럼">
+          <p>#(순위) / Provider(이름+복사) / DApp(필터) / Commission(정렬) / Managed Vaults(정렬) / Locked BTC(정렬).</p>
+          <p>Provider 이름 클릭 시 /accounts/{'{address}'} 상세 이동.</p>
+          <p>DApp 컬럼 헤더에 드롭다운 필터 제공.</p>
+          <p>기본 정렬: Locked BTC 내림차순.</p>
+        </DevNoteSection>
+        <DevNoteSection heading="페이지네이션">
+          <p>25개/페이지. 첫/이전/다음/마지막 버튼 제공.</p>
         </DevNoteSection>
       </DevNote>
-
       {/* Title */}
       <h1 className="text-lg font-semibold text-[#14140f]">Providers</h1>
 
@@ -176,8 +220,14 @@ export default function ProvidersPage() {
           <p className="mt-0.5 text-2xl font-semibold text-[#14140f]">{totalProviders.toLocaleString()}</p>
         </div>
         <div className="border border-[#cd6332]/20 bg-[#cd6332]/5 p-3">
-          <p className="text-[11px] font-medium uppercase tracking-wide text-[#387085]/50">Total BTC Managed</p>
-          <p className="mt-0.5 text-2xl font-semibold text-[#cd6332]">{totalBtc.toFixed(2)} BTC</p>
+          <p className="flex items-center gap-1 text-[11px] font-medium uppercase tracking-wide text-[#387085]/50">
+            Locked BTC
+            <span className="inline-flex cursor-help text-[#387085]/40" title="Total BTC locked across all providers">
+              <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor"><circle cx="12" cy="12" r="10" /><path strokeLinecap="round" strokeLinejoin="round" d="M12 16v-4m0-4h.01" /></svg>
+            </span>
+          </p>
+          <p className="mt-0.5 text-2xl font-semibold text-[#cd6332]">{totalBtc.toFixed(2)} sBTC</p>
+          <p className="mt-0.5 text-xs text-[#387085]/40">{toUsd(totalBtc)}</p>
         </div>
         <div className="border border-[#387085]/10 bg-[#faf9f5] p-3">
           <p className="text-[11px] font-medium uppercase tracking-wide text-[#387085]/50">Avg Commission</p>
@@ -195,18 +245,35 @@ export default function ProvidersPage() {
           <div>
             <h2 className="text-sm font-semibold text-[#14140f]">Provider TVL Trend</h2>
             <p className="mt-0.5 text-[11px] text-[#387085]/50">
-              Daily managed BTC per provider · last 30 days · Top 10{hasOthers ? ' + Others' : ''}
+              Daily managed BTC per provider · Top 10{hasOthers ? ' + Others' : ''}
             </p>
           </div>
-          <div className="text-right">
-            <p className="text-sm font-semibold text-[#14140f]">
-              {totalNow.toFixed(2)} BTC
-            </p>
-            <p className={`text-[10px] ${totalDelta >= 0 ? 'text-green-600' : 'text-red-500'}`}>
-              {totalDelta >= 0 ? '+' : ''}
-              {totalDelta.toFixed(2)} ({totalDeltaPct >= 0 ? '+' : ''}
-              {totalDeltaPct.toFixed(1)}%) · 30d
-            </p>
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-1">
+              {PERIODS.map((p) => (
+                <button
+                  key={p}
+                  onClick={() => setTrendPeriod(p)}
+                  className={`rounded-none px-2.5 py-1 text-[11px] font-medium transition-colors ${
+                    trendPeriod === p
+                      ? 'bg-[#cd6332] text-white'
+                      : 'text-[rgba(56,112,133,0.6)] hover:text-[#cd6332]'
+                  }`}
+                >
+                  {p}
+                </button>
+              ))}
+            </div>
+            <div className="text-right">
+              <p className="text-sm font-semibold text-[#14140f]">
+                {totalNow.toFixed(2)} BTC <span className="text-xs font-normal text-[#387085]/40">{toUsd(totalNow)}</span>
+              </p>
+              <p className={`text-[10px] ${totalDelta >= 0 ? 'text-green-600' : 'text-red-500'}`}>
+                {totalDelta >= 0 ? '+' : ''}
+                {totalDelta.toFixed(2)} ({totalDeltaPct >= 0 ? '+' : ''}
+                {totalDeltaPct.toFixed(1)}%) · {trendPeriod.toLowerCase()}
+              </p>
+            </div>
           </div>
         </div>
 
@@ -256,7 +323,7 @@ export default function ProvidersPage() {
                 }}
                 labelStyle={{ color: '#14140f', fontWeight: 500, marginBottom: 4 }}
                 formatter={(value: number | undefined, name: string | undefined) => [
-                  value != null ? `${value.toFixed(2)} BTC` : '—',
+                  value != null ? `${value.toFixed(2)} BTC ${toUsd(value)}` : '—',
                   name ?? '',
                 ]}
                 cursor={{ stroke: '#387085', strokeOpacity: 0.2, strokeWidth: 1 }}
@@ -309,12 +376,39 @@ export default function ProvidersPage() {
           <thead>
             <tr className="bg-[#cd6332] text-[11px] font-medium uppercase tracking-wider text-white">
               <th className="whitespace-nowrap px-4 py-2.5 font-medium w-12">#</th>
-              <th className="whitespace-nowrap px-4 py-2.5 font-medium">Name</th>
-              <th className="whitespace-nowrap px-4 py-2.5 font-medium">Address</th>
-              <th className="whitespace-nowrap px-4 py-2.5 font-medium">DApp</th>
-              <th className="whitespace-nowrap px-4 py-2.5 font-medium text-right">Commission</th>
-              <th className="whitespace-nowrap px-4 py-2.5 font-medium text-right">Managed Vaults</th>
-              <th className="whitespace-nowrap px-4 py-2.5 font-medium text-right">Total BTC</th>
+              <th className="whitespace-nowrap px-4 py-2.5 font-medium">Provider</th>
+              <th className="relative whitespace-nowrap px-4 py-2.5 font-medium">
+                <button onClick={() => setDappDropdownOpen(!dappDropdownOpen)} className="inline-flex items-center gap-1 uppercase">
+                  DApp
+                  <svg className="h-3 w-3 opacity-70" fill="currentColor" viewBox="0 0 20 20"><path d="M3 4h14v2H3V4zm2 4h10v2H5V8zm3 4h4v2H8v-2z" /></svg>
+                  {dappFilter !== 'ALL' && <span className="inline-flex h-1.5 w-1.5 rounded-full bg-white" />}
+                </button>
+                {dappDropdownOpen && (
+                  <div className="absolute left-0 top-full z-50 mt-0.5 w-40 border border-[#387085]/10 bg-white py-1 shadow-lg" onMouseLeave={() => setDappDropdownOpen(false)}>
+                    {[{ value: 'ALL', label: 'All DApps' }, ...uniqueDapps.map((d) => ({ value: d, label: d }))].map((opt) => (
+                      <button key={opt.value} onClick={() => { setDappFilter(opt.value); setDappDropdownOpen(false); setPage(1); }}
+                        className={`block w-full px-3 py-1.5 text-left text-[11px] transition-colors ${dappFilter === opt.value ? 'bg-[#cd6332]/8 font-semibold text-[#cd6332]' : 'text-[#14140f] hover:bg-[#faf9f5]'}`}>
+                        {opt.label}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </th>
+              <th className="whitespace-nowrap px-4 py-2.5 font-medium text-right">
+                <button onClick={() => toggleSort('commission')} className="inline-flex items-center gap-1 uppercase">
+                  Commission <span className="text-[10px]">{sortIcon('commission')}</span>
+                </button>
+              </th>
+              <th className="whitespace-nowrap px-4 py-2.5 font-medium text-right">
+                <button onClick={() => toggleSort('vaultCount')} className="inline-flex items-center gap-1 uppercase">
+                  Managed Vaults <span className="text-[10px]">{sortIcon('vaultCount')}</span>
+                </button>
+              </th>
+              <th className="whitespace-nowrap px-4 py-2.5 font-medium text-right">
+                <button onClick={() => toggleSort('totalBtc')} className="inline-flex items-center gap-1 uppercase">
+                  Locked BTC <span className="text-[10px]">{sortIcon('totalBtc')}</span>
+                </button>
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -323,11 +417,13 @@ export default function ProvidersPage() {
               return (
                 <tr key={p.address} className="h-10 border-b border-[#cd6332]/10 transition-colors hover:bg-[rgba(56,112,133,0.03)]">
                   <td className="whitespace-nowrap px-4 py-2.5 text-[rgba(56,112,133,0.5)]">{rank}</td>
-                  <td className="whitespace-nowrap px-4 py-2.5 font-medium text-[#14140f]">{p.name}</td>
                   <td className="whitespace-nowrap px-4 py-2.5">
-                    <div className="flex items-center">
-                      <Link href={`/accounts/${p.address}`} className="font-mono text-[11px] font-medium text-[#cd6332] hover:text-[#b8562b]">
-                        {truncateAddress(p.address, 6, 4)}
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-[#387085]/40">
+                        <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M15.75 5.25a3 3 0 0 1 3 3m3 0a6 6 0 0 1-7.029 5.912c-.563-.097-1.159.026-1.563.43L10.5 17.25H8.25v2.25H6v2.25H2.25v-2.818c0-.597.237-1.17.659-1.591l6.499-6.499c.404-.404.527-1 .43-1.563A6 6 0 1 1 21.75 8.25Z" /></svg>
+                      </span>
+                      <Link href={`/accounts/${p.address}`} className="font-medium text-[#14140f] hover:text-[#cd6332]">
+                        {p.name}
                       </Link>
                       <CopyIcon text={p.address} />
                     </div>
@@ -345,6 +441,7 @@ export default function ProvidersPage() {
                   </td>
                   <td className="whitespace-nowrap px-4 py-2.5 text-right tabular-nums text-[#14140f]">
                     {p.totalBtc.toFixed(4)} <span className="text-[rgba(56,112,133,0.5)]">sBTC</span>
+                    <span className="ml-1 text-[10px] text-[#387085]/35">{toUsd(p.totalBtc)}</span>
                   </td>
                 </tr>
               );

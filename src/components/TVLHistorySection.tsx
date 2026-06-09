@@ -39,7 +39,7 @@ interface TVLHistorySectionProps {
 }
 
 export default function TVLHistorySection({ data }: TVLHistorySectionProps) {
-  const [activePeriod, setActivePeriod] = useState<Period>('30D');
+  const [activePeriod, setActivePeriod] = useState<Period>('ALL');
   const filtered = filterByPeriod(data, activePeriod);
 
   return (

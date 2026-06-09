@@ -132,7 +132,7 @@ export async function getVaultLifecycle(vaultId: string): Promise<VaultLifecycle
       // Only first 1-2 steps
       flow = FULL_ACTIVE_FLOW.slice(0, 1 + Math.floor(rand() * 2));
       break;
-    case 'Active':
+    case 'Available':
     default:
       flow = FULL_ACTIVE_FLOW;
       break;

@@ -18,7 +18,7 @@ const PROVIDERS = [
   { name: 'ceffu-secure',      address: '0x9e4b2c1a3d5e7f8a0b9c1d2e3f4a5b6c7d8e9f0a', commission: 350,  appAddress: '0x1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b', appName: 'bouncebit'},
 ];
 
-const STATUSES: Vault['status'][] = ['Active', 'Active', 'Expired', 'Expired', 'Expired', 'Pending', 'Liquidated', 'Redeemed'];
+const STATUSES: Vault['status'][] = ['Available', 'Available', 'Expired', 'Expired', 'Expired', 'Pending', 'Liquidated', 'Redeemed', 'Verified', 'Signature Collected'];
 
 const DEPOSITORS = [
   '0x8c5283a3f2995ecf78319bb1ca3bd9a179b3e740',
@@ -125,7 +125,7 @@ export function generateMockVaults(count: number = 240): Vault[] {
 export function generateMockKPIs(vaults: Vault[]): DashboardKPIs {
   return {
     currentTVL: 1.12937239,
-    activeVaultCount: vaults.filter((v) => v.status === 'Active').length,
+    activeVaultCount: vaults.filter((v) => v.status === 'Available').length,
     totalValueProcessed: 4.11339688,
     totalNumberOfVaults: vaults.length,
     lastUpdated: new Date().toISOString(),
@@ -361,13 +361,13 @@ export function generateMockDepositors(vaults: Vault[]): DepositorInfo[] {
     if (!existing) {
       map.set(addr, {
         totalVaults: 1,
-        activeVaults: v.status === 'Active' ? 1 : 0,
+        activeVaults: v.status === 'Available' ? 1 : 0,
         totalBtc: v.vaultSize,
         firstDeposit: v.createdAt,
       });
     } else {
       existing.totalVaults++;
-      if (v.status === 'Active') existing.activeVaults++;
+      if (v.status === 'Available') existing.activeVaults++;
       existing.totalBtc += v.vaultSize;
       if (new Date(v.createdAt).getTime() < new Date(existing.firstDeposit).getTime()) {
         existing.firstDeposit = v.createdAt;
@@ -397,7 +397,7 @@ export function generateMockProviders(vaults: Vault[]): ProviderInfo[] {
       commission: p.commission,
       vaultCount: providerVaults.length,
       totalBtc: parseFloat(providerVaults.reduce((s, v) => s + v.vaultSize, 0).toFixed(8)),
-      activeVaults: providerVaults.filter((v) => v.status === 'Active').length,
+      activeVaults: providerVaults.filter((v) => v.status === 'Available').length,
     };
   }).sort((a, b) => b.totalBtc - a.totalBtc);
 }
@@ -416,7 +416,7 @@ export function generateMockDApps(vaults: Vault[], providers: ProviderInfo[]): D
       providerCount: appProviders.length,
       vaultCount: appVaults.length,
       totalBtc: parseFloat(appVaults.reduce((s, v) => s + v.vaultSize, 0).toFixed(8)),
-      activeVaults: appVaults.filter((v) => v.status === 'Active').length,
+      activeVaults: appVaults.filter((v) => v.status === 'Available').length,
     };
   }).sort((a, b) => b.totalBtc - a.totalBtc);
 }
