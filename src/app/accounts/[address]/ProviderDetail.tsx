@@ -421,11 +421,6 @@ function ActivityTab() {
                         <span className="text-[9px] text-[#387085]/30">{formatRelativeTime(activity.blockTime)}</span>
                       </div>
 
-                      {/* Dot */}
-                      <div className="mt-1.5 flex-shrink-0">
-                        <div className={`h-2 w-2 rounded-full ${s.color}`} style={{ background: 'currentColor' }} />
-                      </div>
-
                       {/* Content */}
                       <div className="min-w-0 flex-1">
                         {/* Row 1: Status chip + amount (for terminal states) */}
