@@ -11,12 +11,12 @@ export const TOKEN_PRICES: Record<string, number> = {
   ETH: 2_510,
 };
 
-/** Convert a token amount to USD string, e.g. "($104,820)" */
+/** Convert a token amount to USD string, e.g. "$104,820" */
 export function toUsd(amount: number, symbol: string = 'sBTC'): string {
   const price = TOKEN_PRICES[symbol] ?? 0;
   const usd = amount * price;
-  if (usd < 0.01 && usd > 0) return '($<0.01)';
-  return `($${usd.toLocaleString('en-US', { maximumFractionDigits: usd >= 100 ? 0 : 2 })})`;
+  if (usd < 0.01 && usd > 0) return '$<0.01';
+  return `$${usd.toLocaleString('en-US', { maximumFractionDigits: usd >= 100 ? 0 : 2 })}`;
 }
 
 /** Format sBTC amount with proper precision */

@@ -416,18 +416,29 @@ function ActivityTab() {
                       className="flex items-start gap-3 border border-[#387085]/10 bg-white px-4 py-3 transition-colors hover:bg-[#faf9f5]"
                     >
                       {/* Time column */}
-                      <div className="flex w-16 shrink-0 flex-col items-end pt-0.5">
-                        <span className="font-mono text-[11px] font-medium text-[#387085]/40">{formatTimeHHMM(activity.blockTime)}</span>
-                        <span className="text-[9px] text-[#387085]/30">{formatRelativeTime(activity.blockTime)}</span>
+                      <div className="flex w-24 shrink-0 flex-col items-end pt-0.5">
+                        <span className="text-[11px] font-medium text-[#387085]/40">{formatRelativeTime(activity.blockTime)}</span>
+                        <span className="font-mono text-[9px] text-[#387085]/30">({formatTimeHHMM(activity.blockTime)} UTC)</span>
                       </div>
 
                       {/* Content */}
                       <div className="min-w-0 flex-1">
-                        {/* Row 1: Status chip + amount (for terminal states) */}
+                        {/* Row 1: Status chip + Vault + amount (for terminal states) */}
                         <div className="flex items-center justify-between gap-2">
-                          <span className={`inline-block rounded-full px-2 py-0.5 text-[10px] font-medium ${STATE_PILL[activity.toState] ?? 'bg-gray-100 text-gray-500'}`}>
-                            {activity.toState}
-                          </span>
+                          <div className="flex items-center gap-2">
+                            <span className={`inline-block rounded-full px-2 py-0.5 text-[10px] font-medium ${STATE_PILL[activity.toState] ?? 'bg-gray-100 text-gray-500'}`}>
+                              {activity.toState}
+                            </span>
+                            <span className="inline-flex items-center gap-1">
+                              <span className="text-[9px] font-medium uppercase tracking-wide text-[#387085]/40">Vault</span>
+                              <svg className="h-3 w-3 text-[#387085]/30" fill="none" viewBox="0 0 24 24" strokeWidth="1.8" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z" />
+                              </svg>
+                              <Link href={`/vaults/${activity.fullVaultId}`} className="font-mono text-[10px] text-[#cd6332]/70 hover:text-[#cd6332] hover:underline">
+                                {activity.vaultId}
+                              </Link>
+                            </span>
+                          </div>
                           {/* 물량 표시 기준: 볼트 라이프사이클이 완료된(terminal) 상태에서만 표시
                               - Available: peg-in 완료, 볼트 활성화 → 확정 물량
                               - Redeemed: 정상 상환 완료 → 상환 물량
@@ -441,18 +452,8 @@ function ActivityTab() {
                           )}
                         </div>
 
-                        {/* Row 2: Vault | Depositor */}
+                        {/* Row 2: Depositor */}
                         <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-0.5">
-                          <span className="inline-flex items-center gap-1">
-                            <span className="text-[9px] font-medium uppercase tracking-wide text-[#387085]/40">Vault</span>
-                            <svg className="h-3 w-3 text-[#387085]/30" fill="none" viewBox="0 0 24 24" strokeWidth="1.8" stroke="currentColor">
-                              <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z" />
-                            </svg>
-                            <Link href={`/vaults/${activity.fullVaultId}`} className="font-mono text-[10px] text-[#cd6332]/70 hover:text-[#cd6332] hover:underline">
-                              {activity.vaultId}
-                            </Link>
-                          </span>
-                          <span className="text-[#387085]/20">·</span>
                           <span className="inline-flex items-center gap-1">
                             <span className="text-[9px] font-medium uppercase tracking-wide text-[#387085]/40">Depositor</span>
                             <svg className="h-3 w-3 text-[#387085]/30" fill="none" viewBox="0 0 24 24" strokeWidth="1.8" stroke="currentColor">

@@ -239,6 +239,11 @@ function formatTokenAmount(t: TokenAmount): string {
   })} ${t.symbol}`;
 }
 
+function formatTimeHHMM(iso: string): string {
+  const d = new Date(iso);
+  return `${String(d.getUTCHours()).padStart(2, '0')}:${String(d.getUTCMinutes()).padStart(2, '0')}`;
+}
+
 function formatFull(iso: string): string {
   return (
     new Date(iso)
@@ -363,12 +368,10 @@ function AaveActivityTable() {
                           : 'border-[#387085]/10 bg-white hover:bg-[#faf9f5]'
                       }`}
                     >
-                      {/* Type dot */}
-                      <div className="mt-1 flex-shrink-0">
-                        <div
-                          className="h-2 w-2 rounded-full"
-                          style={{ background: style.dot }}
-                        />
+                      {/* Time column */}
+                      <div className="w-24 shrink-0 pt-0.5">
+                        <div className="text-[11px] font-medium text-[#387085]/40">{formatRelativeTime(activity.blockTime)}</div>
+                        <div className="font-mono text-[9px] text-[#387085]/30">({formatTimeHHMM(activity.blockTime)} UTC)</div>
                       </div>
 
                       <div className="min-w-0 flex-1">
@@ -817,7 +820,7 @@ function ManagedVaultsPanel({ vaults, address }: { vaults: Vault[]; address: str
                         {vault.vaultSize.toFixed(8)}
                       </div>
                       <div className="text-[10px] text-[#387085]/40">
-                        ≈ ${usdValue.toLocaleString('en-US', { maximumFractionDigits: 0 })}
+                         ${usdValue.toLocaleString('en-US', { maximumFractionDigits: 0 })}
                       </div>
                     </td>
                     <td className="whitespace-nowrap px-4 py-2.5">
@@ -940,7 +943,7 @@ function PositionSummaryCard() {
             {collateralAmount.toFixed(3)} <span className="text-sm font-normal text-[#387085]/50">{p.totalCollateral.symbol ?? 'sBTC'}</span>
           </p>
           {collateralUsd != null && (
-            <p className="mt-0.5 text-xs text-[#387085]/40">≈ ${collateralUsd.toLocaleString('en-US', { maximumFractionDigits: 1 })}</p>
+            <p className="mt-0.5 text-xs text-[#387085]/40"> ${collateralUsd.toLocaleString('en-US', { maximumFractionDigits: 1 })}</p>
           )}
         </div>
 

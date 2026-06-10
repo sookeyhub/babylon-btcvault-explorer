@@ -215,27 +215,29 @@ export default function ProvidersPage() {
 
       {/* KPI summary cards */}
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-        <div className="border border-[#387085]/10 bg-[#faf9f5] p-3">
+        <div className="border border-[#387085]/10 bg-white p-3">
           <p className="text-[11px] font-medium uppercase tracking-wide text-[#387085]/50">Total Providers</p>
           <p className="mt-0.5 text-2xl font-semibold text-[#14140f]">{totalProviders.toLocaleString()}</p>
         </div>
-        <div className="border border-[#cd6332]/20 bg-[#cd6332]/5 p-3">
+        <div className="border border-[#387085]/10 bg-white p-3">
           <p className="flex items-center gap-1 text-[11px] font-medium uppercase tracking-wide text-[#387085]/50">
             Locked BTC
-            <span className="inline-flex cursor-help text-[#387085]/40" title="Total BTC locked across all providers">
-              <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor"><circle cx="12" cy="12" r="10" /><path strokeLinecap="round" strokeLinejoin="round" d="M12 16v-4m0-4h.01" /></svg>
-            </span>
+            <svg className="h-3 w-3 text-[#387085]/30" fill="none" viewBox="0 0 24 24" strokeWidth="1.8" stroke="currentColor">
+              <title>Total BTC locked across all providers</title>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z" />
+            </svg>
           </p>
-          <p className="mt-0.5 text-2xl font-semibold text-[#cd6332]">{totalBtc.toFixed(2)} sBTC</p>
+          <p className="mt-0.5 text-2xl font-semibold text-[#14140f]">{totalBtc.toFixed(2)} <span className="text-sm font-normal text-[#387085]/50">sBTC</span></p>
           <p className="mt-0.5 text-xs text-[#387085]/40">{toUsd(totalBtc)}</p>
         </div>
-        <div className="border border-[#387085]/10 bg-[#faf9f5] p-3">
+        <div className="border border-[#387085]/10 bg-white p-3">
           <p className="text-[11px] font-medium uppercase tracking-wide text-[#387085]/50">Avg Commission</p>
           <p className="mt-0.5 text-2xl font-semibold text-[#14140f]">{(avgCommission / 100).toFixed(2)}%</p>
         </div>
-        <div className="border border-[#387085]/10 bg-[#faf9f5] p-3">
+        <div className="border border-[#387085]/10 bg-white p-3">
           <p className="text-[11px] font-medium uppercase tracking-wide text-[#387085]/50">Active Vaults</p>
-          <p className="mt-0.5 text-2xl font-semibold text-green-600">{activeVaultCount.toLocaleString()}</p>
+          <p className="mt-0.5 text-2xl font-semibold text-[#14140f]">{activeVaultCount.toLocaleString()}</p>
+          <p className="mt-0.5 text-xs text-[#387085]/40">out of {vaults.length} vault{vaults.length !== 1 ? 's' : ''}</p>
         </div>
       </div>
 
@@ -439,9 +441,9 @@ export default function ProvidersPage() {
                   <td className="whitespace-nowrap px-4 py-2.5 text-right tabular-nums text-[#14140f]">
                     {p.vaultCount}
                   </td>
-                  <td className="whitespace-nowrap px-4 py-2.5 text-right tabular-nums text-[#14140f]">
-                    {p.totalBtc.toFixed(4)} <span className="text-[rgba(56,112,133,0.5)]">sBTC</span>
-                    <span className="ml-1 text-[10px] text-[#387085]/35">{toUsd(p.totalBtc)}</span>
+                  <td className="whitespace-nowrap px-4 py-2.5 text-right tabular-nums">
+                    <div className="text-[#14140f]">{p.totalBtc.toFixed(4)} <span className="text-[rgba(56,112,133,0.5)]">sBTC</span></div>
+                    <div className="text-[10px] text-[#387085]/40">{toUsd(p.totalBtc)}</div>
                   </td>
                 </tr>
               );

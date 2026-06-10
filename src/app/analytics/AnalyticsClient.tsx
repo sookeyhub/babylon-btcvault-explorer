@@ -338,7 +338,7 @@ export function VaultsTabContent({
 }: AnalyticsClientProps) {
   const kpiCards = [
     { label: 'Total Value Locked (TVL)', value: `${kpis.currentTVL.toFixed(2)} sBTC`, subValue: toUsd(kpis.currentTVL), hasInfo: true },
-    { label: 'Active Vaults', value: String(kpis.activeVaultCount), subValue: '', hasInfo: false },
+    { label: 'Active Vaults', value: String(kpis.activeVaultCount), subValue: `out of ${kpis.totalNumberOfVaults} vaults`, hasInfo: false },
     { label: 'Total Value Processed (TVP)', value: `${kpis.totalValueProcessed.toFixed(2)} sBTC`, subValue: toUsd(kpis.totalValueProcessed), hasInfo: true },
     { label: 'Total Vaults', value: String(kpis.totalNumberOfVaults), subValue: '', hasInfo: false },
   ];
@@ -362,9 +362,11 @@ export function VaultsTabContent({
                 </svg>
               )}
             </p>
-            <p className="mt-1.5 text-xl font-bold tabular-nums text-[#14140f]">{card.value}</p>
+            <div className="mt-1.5 flex items-baseline gap-2">
+              <p className="text-xl font-bold tabular-nums text-[#14140f]">{card.value}</p>
+              <span className="text-xs text-green-600">+0% (24h)</span>
+            </div>
             {card.subValue && <p className="mt-0.5 text-xs text-[#387085]/40">{card.subValue}</p>}
-            <p className="mt-1 text-xs text-green-600">+0% (24h)</p>
           </div>
         ))}
       </div>
@@ -434,8 +436,9 @@ export function VaultsTabContent({
                       <CopyButton text={vault.id} />
                     </div>
                   </td>
-                  <td className="whitespace-nowrap px-4 py-2.5 font-medium tabular-nums text-[#14140f]">
-                    {vault.vaultSize} sBTC <span className="text-[10px] font-normal text-[#387085]/40">{toUsd(vault.vaultSize)}</span>
+                  <td className="whitespace-nowrap px-4 py-2.5 tabular-nums">
+                    <div className="font-medium text-[#14140f]">{vault.vaultSize} sBTC</div>
+                    <div className="text-[10px] text-[#387085]/40">{toUsd(vault.vaultSize)}</div>
                   </td>
                   <td className="whitespace-nowrap px-4 py-2.5">
                     <div className="flex items-center">

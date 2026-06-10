@@ -100,11 +100,22 @@ const STATUS_COLORS: Record<string, string> = {
 function formatTokenAmount(t: TokenAmount): string {
   const raw = parseFloat(t.amount);
   const value = raw / Math.pow(10, t.decimals);
+  if (t.symbol === 'sBTC') return `${value.toFixed(6)} sBTC`;
+  return `${value.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ${t.symbol}`;
+}
+
+function formatTokenUsd(t: TokenAmount): string {
+  const raw = parseFloat(t.amount);
+  const value = raw / Math.pow(10, t.decimals);
   const price = TOKEN_PRICES[t.symbol] ?? 0;
   const usd = value * price;
-  const usdStr = usd < 0.01 && usd > 0 ? '$<0.01' : `$${usd.toLocaleString('en-US', { maximumFractionDigits: usd >= 100 ? 0 : 2 })}`;
-  if (t.symbol === 'sBTC') return `${value.toFixed(6)} sBTC (${usdStr})`;
-  return `${value.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ${t.symbol} (${usdStr})`;
+  if (usd < 0.01 && usd > 0) return '$<0.01';
+  return `$${usd.toLocaleString('en-US', { maximumFractionDigits: usd >= 100 ? 0 : 2 })}`;
+}
+
+function formatTimeHHMM(iso: string): string {
+  const d = new Date(iso);
+  return `${String(d.getUTCHours()).padStart(2, '0')}:${String(d.getUTCMinutes()).padStart(2, '0')}`;
 }
 
 function formatFull(iso: string): string {
@@ -210,8 +221,10 @@ function AaveActivityTable() {
                           : 'border-[#387085]/10 bg-white hover:bg-[#faf9f5]'
                       }`}
                     >
-                      <div className="mt-1 flex-shrink-0">
-                        <div className="h-2 w-2 rounded-full" style={{ background: style.dot }} />
+                      {/* Time column */}
+                      <div className="w-24 shrink-0 pt-0.5">
+                        <div className="text-[11px] font-medium text-[#387085]/40">{formatRelativeTime(activity.blockTime)}</div>
+                        <div className="font-mono text-[9px] text-[#387085]/30">({formatTimeHHMM(activity.blockTime)} UTC)</div>
                       </div>
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center justify-between gap-2">
@@ -232,9 +245,14 @@ function AaveActivityTable() {
                               </span>
                             )}
                           </div>
-                          <span className={`flex-shrink-0 font-mono text-sm font-semibold ${style.amountColor}`}>
-                            {style.amountPrefix}{formattedAmount}
-                          </span>
+                          <div className="flex-shrink-0 text-right">
+                            <div className={`font-mono text-sm font-semibold ${style.amountColor}`}>
+                              {style.amountPrefix}{formattedAmount}
+                            </div>
+                            <div className="text-[10px] text-[#387085]/40">
+                              {formatTokenUsd(activity.tokenAmount)}
+                            </div>
+                          </div>
                         </div>
                         <div className="mt-1.5 flex flex-wrap items-center gap-3">
                           <span className="inline-flex items-center gap-1">
@@ -300,9 +318,9 @@ function DepositedVaultsTable({ vaults, address }: { vaults: Vault[]; address: s
                     <span className="text-xs font-medium" style={{ color: STATUS_COLORS[vault.status] }}>{vault.status}</span>
                   </span>
                 </td>
-                <td className="whitespace-nowrap px-4 py-2.5 tabular-nums text-[#14140f]">
-                  {vault.vaultSize.toFixed(8)} <span className="text-[rgba(56,112,133,0.5)]">sBTC</span>
-                  <span className="ml-1 text-[10px] text-[#387085]/35">{toUsd(vault.vaultSize)}</span>
+                <td className="whitespace-nowrap px-4 py-2.5 tabular-nums">
+                  <div className="text-[#14140f]">{vault.vaultSize.toFixed(8)} <span className="text-[rgba(56,112,133,0.5)]">sBTC</span></div>
+                  <div className="text-[10px] text-[#387085]/40">{toUsd(vault.vaultSize)}</div>
                 </td>
                 <td className="whitespace-nowrap px-4 py-2.5 text-[#14140f]">{vault.dappName}</td>
                 <td className="whitespace-nowrap px-4 py-2.5 text-[#14140f]">{vault.providerName}</td>
@@ -362,7 +380,7 @@ function PositionSummaryCard() {
             {collateralAmount.toFixed(3)} <span className="text-sm font-normal text-[#387085]/50">{p.totalCollateral.symbol ?? 'sBTC'}</span>
           </p>
           {collateralUsd != null && (
-            <p className="mt-0.5 text-xs text-[#387085]/40">≈ ${collateralUsd.toLocaleString('en-US', { maximumFractionDigits: 1 })}</p>
+            <p className="mt-0.5 text-xs text-[#387085]/40"> ${collateralUsd.toLocaleString('en-US', { maximumFractionDigits: 1 })}</p>
           )}
         </div>
         <div className="border border-[#387085]/10 bg-white px-5 py-4">
@@ -586,7 +604,7 @@ function PositionsByDApp() {
                 <p className="mt-1 text-xl font-bold text-[#14140f]">
                   {pos.collateral.toFixed(4)} <span className="text-xs font-normal text-[#387085]/50">{pos.collateralSymbol}</span>
                 </p>
-                <p className="mt-0.5 text-[11px] text-[#387085]/40">≈ ${pos.collateralUsd.toLocaleString('en-US', { maximumFractionDigits: 2 })}</p>
+                <p className="mt-0.5 text-[11px] text-[#387085]/40"> ${pos.collateralUsd.toLocaleString('en-US', { maximumFractionDigits: 2 })}</p>
               </div>
 
               {/* Debt — in USD */}
@@ -717,22 +735,14 @@ function DAppPositionSection({ position, isFirst }: { position: DAppPosition; is
   ];
 
   return (
-    <section className={isFirst ? '' : 'mt-6'}>
+    <section className={`border border-[#387085]/10 bg-white ${isFirst ? '' : 'mt-4'}`}>
       {/* dApp name header */}
-      {!isFirst && (
-        <div className="mb-3 flex items-center gap-3">
-          <span className="whitespace-nowrap text-sm font-semibold text-[#14140f]">{p.dappName}</span>
-          <div className="h-px flex-1 bg-[#387085]/10" />
-        </div>
-      )}
-      {isFirst && (
-        <div className="mb-3">
-          <span className="text-sm font-semibold text-[#14140f]">{p.dappName}</span>
-        </div>
-      )}
+      <div className="border-b border-[#387085]/10 px-5 py-3">
+        <span className="text-sm font-semibold text-[#14140f]">{p.dappName}</span>
+      </div>
 
       {/* 2×2 summary grid */}
-      <div className="grid grid-cols-2 gap-0 border border-[#387085]/10 bg-white">
+      <div className="grid grid-cols-2 gap-0">
         {/* Collateral */}
         <div className="border-b border-r border-[#387085]/10 px-5 py-4">
           <p className="text-[11px] font-medium uppercase tracking-wide text-[#387085]/50">Collateral</p>
@@ -740,7 +750,7 @@ function DAppPositionSection({ position, isFirst }: { position: DAppPosition; is
             {collateral.toFixed(3)} <span className="text-sm font-normal text-[#387085]/50">{p.totalCollateral.symbol}</span>
           </p>
           {collateralUsdVal != null && (
-            <p className="mt-0.5 text-xs text-[#387085]/40">≈ $ {collateralUsdVal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
+            <p className="mt-0.5 text-xs text-[#387085]/40"> $ {collateralUsdVal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
           )}
         </div>
 
@@ -793,17 +803,17 @@ function DAppPositionSection({ position, isFirst }: { position: DAppPosition; is
       </div>
 
       {/* Borrowed assets table */}
-      <div className="mt-3 overflow-x-auto border border-[#cd6332]/20 bg-white">
+      <div className="overflow-x-auto border-t border-[#387085]/10">
         <table className="w-full text-left text-xs">
           <thead>
-            <tr className="bg-[#cd6332] text-[11px] font-medium uppercase tracking-wider text-white">
+            <tr className="border-b border-[#387085]/8 bg-[#faf9f5] text-[11px] font-medium uppercase tracking-wider text-[#387085]/50">
               <th className="whitespace-nowrap px-4 py-2.5 font-medium">Assets</th>
               <th className="whitespace-nowrap px-4 py-2.5 font-medium">Amount Borrowed</th>
               <th className="whitespace-nowrap px-4 py-2.5 font-medium">Interest</th>
               <th className="whitespace-nowrap px-4 py-2.5 font-medium">
                 <span className="inline-flex items-center gap-1">
                   Amount to Repay
-                  <svg className="h-3 w-3 text-white/60" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor">
+                  <svg className="h-3 w-3 text-[#387085]/30" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z" />
                   </svg>
                 </span>
@@ -945,7 +955,7 @@ export default function DepositorDetail({ address, vaults }: DepositorDetailProp
             {totalBtc.toFixed(3)} <span className="text-sm font-normal text-[#387085]/50">sBTC</span>
           </p>
           <p className="mt-0.5 text-[11px] text-[#387085]/40">
-            ≈ ${(totalBtc * BTC_USD_RATE).toLocaleString('en-US', { maximumFractionDigits: 0 })}
+             ${(totalBtc * BTC_USD_RATE).toLocaleString('en-US', { maximumFractionDigits: 0 })}
           </p>
         </div>
 
@@ -956,7 +966,7 @@ export default function DepositorDetail({ address, vaults }: DepositorDetailProp
             {collateralAmount.toFixed(3)} <span className="text-sm font-normal text-[#387085]/50">vaultBTC</span>
           </p>
           <p className="mt-0.5 text-[11px] text-[#387085]/40">
-            {collateralUsd != null ? `≈ $${collateralUsd.toLocaleString('en-US', { maximumFractionDigits: 0 })}` : '—'}
+            {collateralUsd != null ? ` $${collateralUsd.toLocaleString('en-US', { maximumFractionDigits: 0 })}` : '—'}
           </p>
         </div>
 
@@ -1004,22 +1014,24 @@ export default function DepositorDetail({ address, vaults }: DepositorDetailProp
         const fullTimestamp = `${bt.getUTCFullYear()}/${pad(bt.getUTCMonth() + 1)}/${pad(bt.getUTCDate())} ${pad(bt.getUTCHours())}:${pad(bt.getUTCMinutes())}:${pad(bt.getUTCSeconds())} +UTC`;
         return (
           <div className="border border-[#387085]/12 bg-white px-4 py-2.5">
-            <div className="flex items-center justify-between text-sm">
+            {/* Row 1: title + timestamp inline */}
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-[#387085]/50">Latest Activity</span>
+              <span className="text-[11px] text-[#387085]/35">{formatRelativeTime(latestActivity.blockTime)}</span>
+              <span className="text-[11px] text-[#387085]/25">{fullTimestamp}</span>
+            </div>
+            {/* Row 2: status + amount + view all */}
+            <div className="mt-1.5 flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <span className="text-[#387085]/50">Latest Activity</span>
-                <div className="flex flex-col">
-                  <div className="flex items-center gap-2">
-                    <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-medium ${style.bg} ${style.text}`}>
-                      {style.label}
-                    </span>
-                    <span className="font-medium text-[#14140f]">
-                      {style.amountPrefix}{formattedAmount}
-                    </span>
-                  </div>
-                  <p className="mt-0.5 text-[11px] text-[#387085]/45">
-                    {formatRelativeTime(latestActivity.blockTime)} ({fullTimestamp})
-                  </p>
-                </div>
+                <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-medium ${style.bg} ${style.text}`}>
+                  {style.label}
+                </span>
+                <span className="text-sm font-medium text-[#14140f]">
+                  {style.amountPrefix}{formattedAmount}
+                </span>
+                <span className="text-[11px] text-[#387085]/40">
+                  {formatTokenUsd(latestActivity.tokenAmount)}
+                </span>
               </div>
               <button
                 onClick={() => setActiveTab('aave_activity')}

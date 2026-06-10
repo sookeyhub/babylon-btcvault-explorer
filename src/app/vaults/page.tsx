@@ -178,18 +178,29 @@ function VaultsActivityTab() {
                       className="flex items-start gap-3 border border-[#387085]/10 bg-white px-4 py-3 transition-colors hover:bg-[#faf9f5]"
                     >
                       {/* Time column */}
-                      <div className="flex w-16 shrink-0 flex-col items-end pt-0.5">
-                        <span className="font-mono text-[11px] font-medium text-[#387085]/40">{formatHHMM(event.blockTime)}</span>
-                        <span className="text-[9px] text-[#387085]/30">{formatRelativeTime(event.blockTime)}</span>
+                      <div className="flex w-24 shrink-0 flex-col items-end pt-0.5">
+                        <span className="text-[11px] font-medium text-[#387085]/40">{formatRelativeTime(event.blockTime)}</span>
+                        <span className="font-mono text-[9px] text-[#387085]/30">({formatHHMM(event.blockTime)} UTC)</span>
                       </div>
 
                       {/* Content */}
                       <div className="min-w-0 flex-1">
-                        {/* Row 1: Status chip + amount (for terminal states) */}
+                        {/* Row 1: Status chip + Vault + amount (for terminal states) */}
                         <div className="flex items-center justify-between gap-2">
-                          <span className={`inline-block rounded-full px-2 py-0.5 text-[10px] font-medium ${style.pillClass}`}>
-                            {style.status}
-                          </span>
+                          <div className="flex items-center gap-2">
+                            <span className={`inline-block rounded-full px-2 py-0.5 text-[10px] font-medium ${style.pillClass}`}>
+                              {style.status}
+                            </span>
+                            <span className="inline-flex items-center gap-1">
+                              <span className="text-[9px] font-medium uppercase tracking-wide text-[#387085]/40">Vault</span>
+                              <svg className="h-3 w-3 text-[#387085]/30" fill="none" viewBox="0 0 24 24" strokeWidth="1.8" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z" />
+                              </svg>
+                              <Link href={`/vaults/${event.vaultId}`} className="font-mono text-[10px] text-[#cd6332]/70 hover:text-[#cd6332] hover:underline">
+                                {truncateAddress(event.vaultId, 6, 4)}
+                              </Link>
+                            </span>
+                          </div>
                           {/* 물량 표시 기준: 볼트 라이프사이클이 완료된(terminal) 상태에서만 표시
                               - Available: peg-in 완료, 볼트 활성화 → 확정 물량
                               - Redeemed: 정상 상환 완료 → 상환 물량
@@ -197,24 +208,17 @@ function VaultsActivityTab() {
                               - Liquidated: 청산 처리 완료 → 청산 물량
                               * Pending/Verified/Signature Collected: 아직 진행 중이라 물량 미확정 → 미표시 */}
                           {['Available', 'Redeemed', 'Expired', 'Liquidated'].includes(style.status) && (
-                            <span className="flex-shrink-0 font-mono text-sm font-semibold text-[#14140f]">
-                              {parseFloat(event.amount).toFixed(6)} <span className="text-xs font-normal text-[#387085]/50">sBTC</span>
-                            </span>
+                            <div className="flex-shrink-0 text-right">
+                              <div className="font-mono text-sm font-semibold text-[#14140f]">
+                                {parseFloat(event.amount).toFixed(6)} <span className="text-xs font-normal text-[#387085]/50">sBTC</span>
+                              </div>
+                              <div className="text-[10px] text-[#387085]/40">{toUsd(parseFloat(event.amount))}</div>
+                            </div>
                           )}
                         </div>
 
-                        {/* Row 2: Vault | Provider | Depositor */}
+                        {/* Row 2: Provider | Depositor */}
                         <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-0.5">
-                          <span className="inline-flex items-center gap-1">
-                            <span className="text-[9px] font-medium uppercase tracking-wide text-[#387085]/40">Vault</span>
-                            <svg className="h-3 w-3 text-[#387085]/30" fill="none" viewBox="0 0 24 24" strokeWidth="1.8" stroke="currentColor">
-                              <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z" />
-                            </svg>
-                            <Link href={`/vaults/${event.vaultId}`} className="font-mono text-[10px] text-[#cd6332]/70 hover:text-[#cd6332] hover:underline">
-                              {truncateAddress(event.vaultId, 6, 4)}
-                            </Link>
-                          </span>
-                          <span className="text-[#387085]/20">·</span>
                           <span className="inline-flex items-center gap-1">
                             <span className="text-[9px] font-medium uppercase tracking-wide text-[#387085]/40">Provider</span>
                             <svg className="h-3 w-3 text-[#387085]/30" fill="none" viewBox="0 0 24 24" strokeWidth="1.8" stroke="currentColor">
@@ -504,10 +508,9 @@ export default function VaultsPage() {
                 </td>
 
                 {/* Amount */}
-                <td className="whitespace-nowrap px-4 py-2.5 tabular-nums text-[#14140f]">
-                  {vault.vaultSize.toFixed(8)}{' '}
-                  <span className="text-[rgba(56,112,133,0.5)]">sBTC</span>
-                  <span className="ml-1 text-[10px] text-[#387085]/35">{toUsd(vault.vaultSize)}</span>
+                <td className="whitespace-nowrap px-4 py-2.5 tabular-nums">
+                  <div className="text-[#14140f]">{vault.vaultSize.toFixed(8)} <span className="text-[rgba(56,112,133,0.5)]">sBTC</span></div>
+                  <div className="text-[10px] text-[#387085]/40">{toUsd(vault.vaultSize)}</div>
                 </td>
 
                 {/* Status */}

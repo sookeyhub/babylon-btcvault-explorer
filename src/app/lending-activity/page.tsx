@@ -8,7 +8,7 @@ import {
   type AaveV4ActivityType,
   type TokenAmount,
 } from '@/lib/mock-aave-activity';
-import { truncateAddress, toUsd, TOKEN_PRICES } from '@/lib/utils';
+import { truncateAddress, toUsd, TOKEN_PRICES, formatRelativeTime } from '@/lib/utils';
 import DevNote, { DevNoteSection } from '@/components/DevNote';
 
 const PAGE_SIZE = 25;
@@ -73,11 +73,17 @@ const FILTER_OPTIONS: { value: AaveV4ActivityType | 'ALL'; label: string }[] = [
 function formatTokenAmount(t: TokenAmount): string {
   const raw = parseFloat(t.amount);
   const value = raw / Math.pow(10, t.decimals);
+  if (t.symbol === 'sBTC') return `${value.toFixed(6)} sBTC`;
+  return `${value.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ${t.symbol}`;
+}
+
+function formatTokenUsd(t: TokenAmount): string {
+  const raw = parseFloat(t.amount);
+  const value = raw / Math.pow(10, t.decimals);
   const price = TOKEN_PRICES[t.symbol] ?? 0;
   const usd = value * price;
-  const usdStr = usd < 0.01 && usd > 0 ? '$<0.01' : `$${usd.toLocaleString('en-US', { maximumFractionDigits: usd >= 100 ? 0 : 2 })}`;
-  if (t.symbol === 'sBTC') return `${value.toFixed(6)} sBTC (${usdStr})`;
-  return `${value.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ${t.symbol} (${usdStr})`;
+  if (usd < 0.01 && usd > 0) return '$<0.01';
+  return `$${usd.toLocaleString('en-US', { maximumFractionDigits: usd >= 100 ? 0 : 2 })}`;
 }
 
 function formatTimeHHMM(iso: string): string {
@@ -219,8 +225,9 @@ export default function LendingActivityPage() {
                       className="flex items-start border-b border-[#387085]/8 py-3"
                     >
                       {/* Time */}
-                      <div className="w-14 shrink-0 pt-0.5 text-xs text-[#387085]/50">
-                        {formatTimeHHMM(activity.blockTime)}
+                      <div className="w-24 shrink-0 pt-0.5">
+                        <div className="text-[11px] font-medium text-[#387085]/40">{formatRelativeTime(activity.blockTime)}</div>
+                        <div className="font-mono text-[9px] text-[#387085]/30">({formatTimeHHMM(activity.blockTime)} UTC)</div>
                       </div>
 
                       {/* Content */}
@@ -244,9 +251,12 @@ export default function LendingActivityPage() {
                               </span>
                             )}
                           </div>
-                          <span className={`shrink-0 font-mono text-sm font-semibold ${style.amountColor}`}>
-                            {style.amountPrefix}{formattedAmount}
-                          </span>
+                          <div className="shrink-0 text-right">
+                            <div className={`font-mono text-sm font-semibold ${style.amountColor}`}>
+                              {style.amountPrefix}{formattedAmount}
+                            </div>
+                            <div className="text-[10px] text-[#387085]/40">{formatTokenUsd(activity.tokenAmount)}</div>
+                          </div>
                         </div>
 
                         {/* Row 2: Depositor + Tx + Block */}
