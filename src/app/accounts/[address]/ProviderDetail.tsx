@@ -769,28 +769,22 @@ export default function ProviderDetail({
       <p className="text-[11px] font-medium uppercase tracking-widest text-[#387085]/35">Provider</p>
 
       {/* ── Row A: Identity strip ────────────────────────────────────────── */}
-      <div className="flex items-center justify-between gap-4">
-        <div className="space-y-1">
-          <h1 className="text-2xl font-bold text-[#14140f]">{displayName}</h1>
-          <div className="flex flex-wrap items-center gap-1.5 text-xs text-[#387085]/55">
-            <svg className="h-3.5 w-3.5 text-[#387085]/40" fill="none" viewBox="0 0 24 24" strokeWidth="1.8" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 5.25a3 3 0 0 1 3 3m3 0a6 6 0 0 1-7.029 5.912c-.563-.097-1.159.026-1.563.43L10.5 17.25H8.25v2.25H6v2.25H2.25v-2.818c0-.597.237-1.17.659-1.591l6.499-6.499c.404-.404.527-1 .43-1.563A6 6 0 1 1 21.75 8.25Z" />
-            </svg>
-            <span className="font-mono break-all">{addrDisplay}</span>
-            <CopyIcon text={address} />
+      <div className="space-y-1">
+        <h1 className="text-2xl font-bold text-[#14140f]">{displayName}</h1>
+        <div className="flex flex-wrap items-center gap-1.5 text-xs text-[#387085]/55">
+          <svg className="h-3.5 w-3.5 text-[#387085]/40" fill="none" viewBox="0 0 24 24" strokeWidth="1.8" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 5.25a3 3 0 0 1 3 3m3 0a6 6 0 0 1-7.029 5.912c-.563-.097-1.159.026-1.563.43L10.5 17.25H8.25v2.25H6v2.25H2.25v-2.818c0-.597.237-1.17.659-1.591l6.499-6.499c.404-.404.527-1 .43-1.563A6 6 0 1 1 21.75 8.25Z" />
+          </svg>
+          <span className="font-mono break-all">{addrDisplay}</span>
+          <CopyIcon text={address} />
+        </div>
+        {vaults[0]?.btcAddress && (
+          <div className="flex items-center gap-1.5 text-xs text-[#387085]/55">
+            <span className="flex h-3.5 w-3.5 shrink-0 items-center justify-center rounded-full bg-orange-100 text-[8px] font-bold text-orange-600">₿</span>
+            <span className="font-mono break-all">{vaults[0].btcAddress}</span>
+            <CopyIcon text={vaults[0].btcAddress} />
           </div>
-          {vaults[0]?.btcAddress && (
-            <div className="flex items-center gap-1.5 text-xs text-[#387085]/55">
-              <span className="flex h-3.5 w-3.5 shrink-0 items-center justify-center rounded-full bg-orange-100 text-[8px] font-bold text-orange-600">₿</span>
-              <span className="font-mono break-all">{vaults[0].btcAddress}</span>
-              <CopyIcon text={vaults[0].btcAddress} />
-            </div>
-          )}
-        </div>
-        <div className="flex flex-shrink-0 flex-col items-end gap-1 text-xs text-[#387085]/55">
-          <span>commission <span className="font-medium text-[#14140f]">{commissionPct}%</span></span>
-          <span>joined <span className="font-medium text-[#14140f]">{joinedFormatted}</span></span>
-        </div>
+        )}
       </div>
 
       {/* ── Row B: Status bar ────────────────────────────────────────────── */}
@@ -808,58 +802,41 @@ export default function ProviderDetail({
 
       {/* ── Row C: 4 stat cards ──────────────────────────────────────────── */}
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-        {/* Card 1 — Vaults */}
-        <button
-          onClick={() => setActiveTab('vaults')}
-          className="group relative border border-[#387085]/10 bg-white p-4 text-left transition-colors hover:border-[#cd6332]/20 hover:bg-[#faf9f5]"
-        >
-          <p className="text-[11px] font-semibold uppercase tracking-wide text-[#387085]/45">Vaults</p>
-          <p className="mt-1.5 text-2xl font-bold text-[#14140f]">{totalVaults}</p>
-          <span className="absolute bottom-2 right-2 text-[10px] text-[#cd6332] opacity-0 transition-opacity group-hover:opacity-100">View details ›</span>
-        </button>
+        {/* Card 1 — Commission */}
+        <div className="border border-[#387085]/10 bg-white p-4">
+          <p className="text-[11px] font-semibold uppercase tracking-wide text-[#387085]/45">Commission</p>
+          <p className="mt-1.5 text-2xl font-bold text-[#14140f]">{commissionPct}%</p>
+          <p className="mt-0.5 text-[11px] text-[#387085]/40">
+            {(totalBtc * commission / 10000).toFixed(4)} sBTC earned
+          </p>
+        </div>
 
-        {/* Card 2 — BTC Locked */}
-        <button
-          onClick={() => setActiveTab('vaults')}
-          className="group relative border border-[#387085]/10 bg-white p-4 text-left transition-colors hover:border-[#cd6332]/20 hover:bg-[#faf9f5]"
-        >
-          <p className="text-[11px] font-semibold uppercase tracking-wide text-[#387085]/45">BTC Locked</p>
+        {/* Card 2 — Locked BTC */}
+        <div className="border border-[#387085]/10 bg-white p-4">
+          <p className="text-[11px] font-semibold uppercase tracking-wide text-[#387085]/45">Locked BTC</p>
           <p className="mt-1.5 text-2xl font-bold text-[#14140f]">{totalBtc.toFixed(2)} sBTC</p>
           <p className="mt-0.5 text-[11px] text-[#387085]/40">{toUsd(totalBtc)}</p>
-          <span className="absolute bottom-2 right-2 text-[10px] text-[#cd6332] opacity-0 transition-opacity group-hover:opacity-100">View details ›</span>
-        </button>
+        </div>
 
         {/* Card 3 — Success Rate */}
-        <button
-          onClick={() => setActiveTab('activity')}
-          className="group relative border border-[#387085]/10 bg-white p-4 text-left transition-colors hover:border-[#cd6332]/20 hover:bg-[#faf9f5]"
-        >
+        <div className="border border-[#387085]/10 bg-white p-4">
           <p className="text-[11px] font-semibold uppercase tracking-wide text-[#387085]/45">Success Rate</p>
           <p className="mt-1.5 text-2xl font-bold text-[#14140f]">{MOCK_PERF.successRate}%</p>
-          {/* Success / Fail bar */}
-          <div className="mt-2 flex h-1 w-full overflow-hidden rounded-full bg-red-200">
-            <div
-              className="h-full rounded-full bg-[#16a34a]"
-              style={{ width: `${MOCK_PERF.successRate}%` }}
-            />
-          </div>
-          <div className="mt-1.5 flex items-center gap-2 text-[10px]">
-            <span className="text-[#16a34a]">✓ {MOCK_PERF.successCount}</span>
-            <span className="text-[#387085]/25">·</span>
-            <span className="text-red-500">✗ {MOCK_PERF.totalCount - MOCK_PERF.successCount}</span>
-          </div>
-          <span className="absolute bottom-2 right-2 text-[10px] text-[#cd6332] opacity-0 transition-opacity group-hover:opacity-100">View details ›</span>
-        </button>
+          <p className="mt-0.5 text-[11px] text-[#387085]/40">
+            <span className="text-[#16a34a]">{MOCK_PERF.successCount} success</span>
+            <span className="mx-1 text-[#387085]/25">·</span>
+            <span className="text-red-500">{MOCK_PERF.totalCount - MOCK_PERF.successCount} failed</span>
+          </p>
+        </div>
 
         {/* Card 4 — Avg Activation */}
-        <button
-          onClick={() => setActiveTab('vaults')}
-          className="group relative border border-[#387085]/10 bg-white p-4 text-left transition-colors hover:border-[#cd6332]/20 hover:bg-[#faf9f5]"
-        >
+        <div className="border border-[#387085]/10 bg-white p-4">
           <p className="text-[11px] font-semibold uppercase tracking-wide text-[#387085]/45">Avg Activation</p>
           <p className="mt-1.5 text-2xl font-bold text-[#14140f]">{MOCK_PERF.avgActivation}</p>
-          <span className="absolute bottom-2 right-2 text-[10px] text-[#cd6332] opacity-0 transition-opacity group-hover:opacity-100">View details ›</span>
-        </button>
+          <p className="mt-0.5 text-[11px] text-[#387085]/40">
+            last active {MOCK_STATUS.lastActivity}
+          </p>
+        </div>
       </div>
 
       {/* ── Row D: Tab bar ───────────────────────────────────────────────── */}

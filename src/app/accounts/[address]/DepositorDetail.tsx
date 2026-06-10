@@ -924,12 +924,9 @@ export default function DepositorDetail({ address, vaults }: DepositorDetailProp
       <p className="text-[11px] font-medium uppercase tracking-widest text-[#387085]/35">Depositor</p>
 
       {/* ── Identity strip ──────────────────────────────────────────── */}
-      <div className="flex items-center justify-between gap-4">
-        <div className="flex items-center gap-2">
-          <h1 className="text-2xl font-bold text-[#14140f] break-all">{addrDisplay}</h1>
-          <CopyIcon text={address} />
-        </div>
-        <span className="text-xs text-[#387085]/55">joined {joinedFormatted}</span>
+      <div className="flex items-center gap-2">
+        <h1 className="text-2xl font-bold text-[#14140f] break-all">{addrDisplay}</h1>
+        <CopyIcon text={address} />
       </div>
 
       {/* ── 4 stat cards: 2 left + 2 right ─────────────────────────── */}
