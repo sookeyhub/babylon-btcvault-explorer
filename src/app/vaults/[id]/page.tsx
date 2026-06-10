@@ -12,61 +12,85 @@ interface Props {
   params: Promise<{ id: string }>;
 }
 
-// ── Status icon (varies by status) ───────────────────────────────────────────
+// ── Status icon (circle with status-specific symbol) ────────────────────────
 
-function StatusIcon({ status }: { status: VaultStatus }) {
-  switch (status) {
-    case 'Available':
-      return (
-        <svg className="h-4 w-4 text-emerald-500" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor">
-          <circle cx="12" cy="12" r="10" />
+function StatusIcon({ status, size = 'md' }: { status: VaultStatus; size?: 'md' | 'lg' }) {
+  const sizeClasses = size === 'lg' ? 'h-8 w-8' : 'h-5 w-5';
+  const iconSize = size === 'lg' ? 'h-4 w-4' : 'h-3 w-3';
+
+  const configs: Record<VaultStatus, { bg: string; iconColor: string; icon: React.ReactNode }> = {
+    Available: {
+      bg: 'bg-emerald-100',
+      iconColor: 'text-emerald-600',
+      icon: (
+        <svg className={iconSize} fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
         </svg>
-      );
-    case 'Verified':
-      return (
-        <svg className="h-4 w-4 text-purple-500" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor">
-          <circle cx="12" cy="12" r="10" />
-          <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
-        </svg>
-      );
-    case 'Signature Collected':
-      return (
-        <svg className="h-4 w-4 text-yellow-500" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor">
-          <circle cx="12" cy="12" r="10" />
+      ),
+    },
+    Pending: {
+      bg: 'bg-amber-100',
+      iconColor: 'text-amber-600',
+      icon: (
+        <svg className={iconSize} fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6l4 2" />
         </svg>
-      );
-    case 'Redeemed':
-      return (
-        <svg className="h-4 w-4 text-blue-500" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor">
-          <circle cx="12" cy="12" r="10" />
+      ),
+    },
+    Verified: {
+      bg: 'bg-purple-100',
+      iconColor: 'text-purple-600',
+      icon: (
+        <svg className={iconSize} fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
         </svg>
-      );
-    case 'Pending':
-      return (
-        <svg className="h-4 w-4 text-amber-500" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor">
-          <circle cx="12" cy="12" r="10" />
+      ),
+    },
+    'Signature Collected': {
+      bg: 'bg-yellow-100',
+      iconColor: 'text-yellow-600',
+      icon: (
+        <svg className={iconSize} fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6l4 2" />
         </svg>
-      );
-    case 'Expired':
-      return (
-        <svg className="h-4 w-4 text-zinc-400" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor">
-          <circle cx="12" cy="12" r="10" />
-          <path strokeLinecap="round" strokeLinejoin="round" d="M15 9l-6 6M9 9l6 6" />
+      ),
+    },
+    Redeemed: {
+      bg: 'bg-blue-100',
+      iconColor: 'text-blue-600',
+      icon: (
+        <svg className={iconSize} fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v12m-3-2.818.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
         </svg>
-      );
-    case 'Liquidated':
-      return (
-        <svg className="h-4 w-4 text-red-500" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor">
+      ),
+    },
+    Expired: {
+      bg: 'bg-zinc-100',
+      iconColor: 'text-zinc-500',
+      icon: (
+        <svg className={iconSize} fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
+        </svg>
+      ),
+    },
+    Liquidated: {
+      bg: 'bg-red-100',
+      iconColor: 'text-red-600',
+      icon: (
+        <svg className={iconSize} fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" />
         </svg>
-      );
-    default:
-      return null;
-  }
+      ),
+    },
+  };
+
+  const cfg = configs[status] ?? configs.Pending;
+
+  return (
+    <div className={`flex ${sizeClasses} items-center justify-center rounded-full ${cfg.bg} ${cfg.iconColor}`}>
+      {cfg.icon}
+    </div>
+  );
 }
 
 // ── Status banner ────────────────────────────────────────────────────────────
@@ -87,13 +111,10 @@ function formatRelativeTime(iso: string): string {
 
 interface BannerConfig {
   bg: string;
-  border: string;
-  dot: string;
   label: string;
   desc: string;
   labelText: string;
   subText: string;
-  pulse?: boolean;
 }
 
 function getBannerConfig(status: VaultStatus, lifecycle: VaultLifecycleEvent[]): BannerConfig {
@@ -101,58 +122,45 @@ function getBannerConfig(status: VaultStatus, lifecycle: VaultLifecycleEvent[]):
     case 'Available':
       return {
         bg: 'bg-green-50',
-        border: 'border-green-500',
-        dot: 'bg-green-500',
         label: 'Available',
-        desc: 'Vault is live — BTC locked and usable as collateral',
+        desc: 'Vault is live. BTC locked and usable as collateral.',
         labelText: 'text-green-700',
         subText: 'text-green-600/70',
-        pulse: true,
       };
     case 'Pending':
       return {
         bg: 'bg-amber-50',
-        border: 'border-amber-500',
-        dot: 'bg-amber-500',
         label: 'Pending',
-        desc: 'Waiting for BTC confirmation and ZKP verification',
+        desc: 'Waiting for BTC confirmation and ZKP verification.',
         labelText: 'text-amber-700',
         subText: 'text-amber-600/70',
-        pulse: true,
       };
     case 'Verified':
       return {
         bg: 'bg-purple-50',
-        border: 'border-purple-500',
-        dot: 'bg-purple-500',
         label: 'Verified',
-        desc: 'Vault verification completed by committee',
+        desc: 'Vault verification completed by committee.',
         labelText: 'text-purple-700',
         subText: 'text-purple-600/70',
       };
     case 'Signature Collected':
       return {
         bg: 'bg-yellow-50',
-        border: 'border-yellow-500',
-        dot: 'bg-yellow-500',
         label: 'Signature Collected',
-        desc: 'BTC signatures have been collected and posted',
+        desc: 'BTC signatures have been collected and posted.',
         labelText: 'text-yellow-700',
         subText: 'text-yellow-600/70',
-        pulse: true,
       };
     case 'Expired': {
       const expiredEvent = lifecycle.find((e) => e.event_type === 'EXPIRED');
       const reason =
         expiredEvent?.expired_reason === 0
-          ? 'ACK not submitted within timeout'
+          ? 'ACK not submitted within timeout.'
           : expiredEvent?.expired_reason === 1
-            ? 'Activation not completed within timeout'
-            : 'Timeout exceeded';
+            ? 'Activation not completed within timeout.'
+            : 'Timeout exceeded.';
       return {
         bg: 'bg-zinc-50',
-        border: 'border-zinc-400',
-        dot: 'bg-zinc-400',
         label: 'Expired',
         desc: reason,
         labelText: 'text-zinc-600',
@@ -162,34 +170,38 @@ function getBannerConfig(status: VaultStatus, lifecycle: VaultLifecycleEvent[]):
     case 'Liquidated':
       return {
         bg: 'bg-red-50',
-        border: 'border-red-500',
-        dot: 'bg-red-500',
         label: 'Liquidated',
-        desc: 'Vault was undercollateralized and liquidated',
+        desc: 'Vault was undercollateralized and liquidated.',
         labelText: 'text-red-700',
         subText: 'text-red-600/70',
       };
     case 'Redeemed':
       return {
         bg: 'bg-blue-50',
-        border: 'border-blue-500',
-        dot: 'bg-blue-500',
         label: 'Redeemed',
-        desc: 'BTC has been successfully withdrawn',
+        desc: 'BTC ready to claim.',
         labelText: 'text-blue-700',
         subText: 'text-blue-600/70',
       };
     default:
       return {
         bg: 'bg-[#387085]/5',
-        border: 'border-[#387085]',
-        dot: 'bg-[#387085]',
         label: status,
         desc: '',
         labelText: 'text-[#387085]',
         subText: 'text-[#387085]/60',
       };
   }
+}
+
+function formatUtcDate(iso: string): string {
+  const d = new Date(iso);
+  if (isNaN(d.getTime())) return iso;
+  const pad = (n: number) => String(n).padStart(2, '0');
+  return (
+    `${d.getUTCFullYear()}/${pad(d.getUTCMonth() + 1)}/${pad(d.getUTCDate())} ` +
+    `${pad(d.getUTCHours())}:${pad(d.getUTCMinutes())}:${pad(d.getUTCSeconds())} +UTC`
+  );
 }
 
 function StatusBanner({
@@ -204,29 +216,27 @@ function StatusBanner({
   lifecycle: VaultLifecycleEvent[];
 }) {
   const cfg = getBannerConfig(status, lifecycle);
-  const timeText =
-    status === 'Available' || status === 'Pending' || status === 'Verified' || status === 'Signature Collected'
-      ? `${formatRelativeTime(createdAt)} · created`
-      : closedAt
-        ? `${formatRelativeTime(closedAt)} · closed`
-        : formatRelativeTime(createdAt);
+  const isTerminal = ['Redeemed', 'Expired', 'Liquidated'].includes(status);
+  const timeLabel = isTerminal ? 'Closed' : 'Created';
+  const timeIso = isTerminal && closedAt ? closedAt : createdAt;
 
   return (
-    <div className={`flex items-center justify-between border-l-4 px-4 py-2.5 ${cfg.bg} ${cfg.border}`}>
-      <div className="flex min-w-0 items-center gap-2.5">
-        <span
-          className={`inline-block h-2 w-2 shrink-0 rounded-full ${cfg.dot} ${
-            cfg.pulse ? 'animate-pulse' : ''
-          }`}
-        />
-        <span className={`text-sm font-semibold ${cfg.labelText}`}>{cfg.label}</span>
-        {cfg.desc && (
-          <span className={`hidden truncate text-xs sm:inline ${cfg.subText}`}>
-            — {cfg.desc}
-          </span>
-        )}
+    <div className={`flex items-center justify-between rounded-lg px-5 py-3 ${cfg.bg}`}>
+      <div className="flex min-w-0 items-center gap-3">
+        <StatusIcon status={status} size="lg" />
+        <div className="min-w-0">
+          <span className={`text-sm font-semibold ${cfg.labelText}`}>{cfg.label}</span>
+          {cfg.desc && (
+            <p className={`text-xs ${cfg.subText}`}>{cfg.desc}</p>
+          )}
+        </div>
       </div>
-      <span className={`shrink-0 text-xs ${cfg.subText}`}>{timeText}</span>
+      <div className="shrink-0 text-right">
+        <p className="text-sm font-medium text-[#14140f]">
+          {timeLabel} {formatRelativeTime(timeIso)}
+        </p>
+        <p className="text-xs text-[#387085]/50">{formatUtcDate(timeIso)}</p>
+      </div>
     </div>
   );
 }
@@ -303,7 +313,6 @@ export default async function VaultDetailPage({ params }: Props) {
 
         {/* ID row */}
         <div className="flex items-center gap-2">
-          <StatusIcon status={vault.status} />
           <span className="break-all font-mono text-base font-semibold text-[#14140f]">
             {vault.id}
           </span>
@@ -321,19 +330,25 @@ export default async function VaultDetailPage({ params }: Props) {
 
       {/* ── 3 summary cards ───────────────────────────────────────────────── */}
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-        {[
-          { label: 'Amount',   value: `${vault.vaultSize.toFixed(2)} sBTC ${toUsd(vault.vaultSize)}` },
-          { label: 'DApp',     value: vault.dappName },
-          { label: 'Provider', value: vault.providerName },
-        ].map(({ label, value }) => (
-          <div
-            key={label}
-            className="border border-[#387085]/10 bg-[#faf9f5] p-3"
-          >
-            <p className="text-[11px] font-medium uppercase tracking-wide text-[#387085]/50">{label}</p>
-            <p className="mt-0.5 text-lg font-semibold text-[#14140f]">{value}</p>
-          </div>
-        ))}
+        <div className="border border-[#387085]/10 bg-[#faf9f5] p-3">
+          <p className="text-[11px] font-medium uppercase tracking-wide text-[#387085]/50">Amount</p>
+          <p className="mt-0.5 text-lg font-semibold text-[#14140f]">
+            {vault.vaultSize.toFixed(2)} <span className="text-sm font-normal text-[#387085]/60">sBTC</span>
+          </p>
+        </div>
+        <div className="border border-[#387085]/10 bg-[#faf9f5] p-3">
+          <p className="text-[11px] font-medium uppercase tracking-wide text-[#387085]/50">DApp</p>
+          <p className="mt-0.5 text-lg font-semibold text-[#14140f]">{vault.dappName}</p>
+        </div>
+        <div className="border border-[#387085]/10 bg-[#faf9f5] p-3">
+          <p className="text-[11px] font-medium uppercase tracking-wide text-[#387085]/50">Provider</p>
+          <p className="mt-0.5 flex items-center gap-1.5 text-lg font-semibold text-[#14140f]">
+            <svg className="h-4 w-4 text-[#387085]/40" fill="none" viewBox="0 0 24 24" strokeWidth="1.8" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 5.25a3 3 0 0 1 3 3m3 0a6 6 0 0 1-7.029 5.912c-.563-.097-1.159.026-1.563.43L10.5 17.25H8.25v2.25H6v2.25H2.25v-2.818c0-.597.237-1.17.659-1.591l6.499-6.499c.404-.404.527-1 .43-1.563A6 6 0 1 1 21.75 8.25Z" />
+            </svg>
+            {vault.providerName}
+          </p>
+        </div>
       </div>
 
       {/* ── Vault details + Transaction Flow + Raw Txs ────────────────────── */}

@@ -69,9 +69,9 @@ function truncateTx(hash: string): string {
 
 // ── Detail row ───────────────────────────────────────────────────────────────
 
-function DetailRow({ label, children }: { label: string; children: React.ReactNode }) {
+function DetailRow({ label, children, noBorder }: { label: string; children: React.ReactNode; noBorder?: boolean }) {
   return (
-    <div className="flex flex-col gap-1 border-b border-[#387085]/10 py-3 sm:flex-row sm:items-start sm:gap-4 last:border-b-0">
+    <div className={`flex flex-col gap-1 py-3 sm:flex-row sm:items-start sm:gap-4 ${noBorder ? '' : 'border-b border-[#387085]/10 last:border-b-0'}`}>
       <span className="w-36 shrink-0 text-xs text-[rgba(56,112,133,0.55)]">{label}</span>
       <div className="flex min-w-0 flex-1 items-center gap-1 text-sm text-[#14140f]">
         {children}
@@ -888,11 +888,10 @@ export default function VaultDetailTabs({ vault, lifecycle }: Props) {
       {activeTab === 'overview' ? (
         <div className="space-y-5">
           <div className="border border-[#387085]/10 bg-white px-5 py-2">
-            <DetailRow label="Vault ID">
-              <span className="break-all font-mono text-xs text-[#14140f]">{vault.id}</span>
-            </DetailRow>
-
-            <DetailRow label="Provider Address">
+            <DetailRow label="Provider" noBorder>
+              <svg className="h-3.5 w-3.5 shrink-0 text-[#387085]/40" fill="none" viewBox="0 0 24 24" strokeWidth="1.8" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 5.25a3 3 0 0 1 3 3m3 0a6 6 0 0 1-7.029 5.912c-.563-.097-1.159.026-1.563.43L10.5 17.25H8.25v2.25H6v2.25H2.25v-2.818c0-.597.237-1.17.659-1.591l6.499-6.499c.404-.404.527-1 .43-1.563A6 6 0 1 1 21.75 8.25Z" />
+              </svg>
               <Link
                 href={`/accounts/${vault.providerAddress}`}
                 className="break-all font-mono text-xs text-[#387085] hover:underline"
@@ -902,7 +901,18 @@ export default function VaultDetailTabs({ vault, lifecycle }: Props) {
               <CopyButton text={vault.providerAddress} />
             </DetailRow>
 
-            <DetailRow label="Depositor">
+            {vault.btcAddress && (
+              <DetailRow label="">
+                <span className="flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-orange-100 text-[9px] font-bold text-orange-600">₿</span>
+                <span className="break-all font-mono text-xs text-[#387085]">{vault.btcAddress}</span>
+                <CopyButton text={vault.btcAddress} />
+              </DetailRow>
+            )}
+
+            <DetailRow label="Depositor" noBorder>
+              <svg className="h-3.5 w-3.5 shrink-0 text-[#387085]/40" fill="none" viewBox="0 0 24 24" strokeWidth="1.8" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0" />
+              </svg>
               <Link
                 href={`/accounts/${vault.depositorAddress}`}
                 className="break-all font-mono text-xs text-[#387085] hover:underline"
@@ -912,13 +922,16 @@ export default function VaultDetailTabs({ vault, lifecycle }: Props) {
               <CopyButton text={vault.depositorAddress} />
             </DetailRow>
 
-            <DetailRow label="BTC Address">
-              <span className="break-all font-mono text-xs text-[#387085]">{vault.btcAddress}</span>
-              <CopyButton text={vault.btcAddress} />
-            </DetailRow>
+            {vault.btcAddress && (
+              <DetailRow label="">
+                <span className="flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-orange-100 text-[9px] font-bold text-orange-600">₿</span>
+                <span className="break-all font-mono text-xs text-[#387085]">{vault.btcAddress}</span>
+                <CopyButton text={vault.btcAddress} />
+              </DetailRow>
+            )}
 
             <DetailRow label="Block Height">
-              <span>{vault.blockNumber}</span>
+              <span>{vault.blockNumber.toLocaleString()}</span>
             </DetailRow>
 
             <DetailRow label="Created">
@@ -941,26 +954,27 @@ export default function VaultDetailTabs({ vault, lifecycle }: Props) {
           </div>
 
           {/* Raw Transactions — collapsible */}
-          <details className="group rounded border border-[#387085]/10 bg-white">
-            <summary className="flex cursor-pointer list-none items-center justify-between px-5 py-3 text-sm font-medium text-[#387085]/60 transition-colors hover:text-[#14140f]">
-              <span>Raw Transactions</span>
+          <details className="group border border-[#387085]/10 bg-white" open>
+            <summary className="flex cursor-pointer list-none items-center gap-2 px-5 py-3 text-sm font-medium text-[#387085]/60 transition-colors hover:text-[#14140f]">
               <svg
-                className="h-4 w-4 transition-transform duration-200 group-open:rotate-180"
+                className="h-3.5 w-3.5 transition-transform duration-200 group-open:rotate-90"
                 fill="none"
                 viewBox="0 0 24 24"
-                strokeWidth="2"
+                strokeWidth="2.5"
                 stroke="currentColor"
               >
-                <path strokeLinecap="round" strokeLinejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
+                <path strokeLinecap="round" strokeLinejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
               </svg>
+              <span>Raw Transactions</span>
             </summary>
             <div className="border-t border-[#387085]/10 px-5 py-2">
-              <DetailRow label="BTC Peg-In Tx">
-                <span className="break-all font-mono text-xs text-[#387085]">{vault.btcPegInTxHash}</span>
-                <CopyButton text={vault.btcPegInTxHash} />
+              <DetailRow label="BTC Pre Peg-in Txn" noBorder>
+                <span className="flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-orange-100 text-[9px] font-bold text-orange-600">₿</span>
+                <span className="break-all font-mono text-xs text-[#387085]">{vault.createdTxHash}</span>
+                <CopyButton text={vault.createdTxHash} />
               </DetailRow>
 
-              <DetailRow label="Created Tx">
+              <DetailRow label="Created Txn">
                 <Link
                   href={`/tx/${vault.createdTxHash}`}
                   className="break-all font-mono text-xs text-[#387085] hover:underline"
@@ -970,17 +984,36 @@ export default function VaultDetailTabs({ vault, lifecycle }: Props) {
                 <CopyButton text={vault.createdTxHash} />
               </DetailRow>
 
-              <DetailRow label="HTLC Hashlock">
+              <DetailRow label="BTC Peg-in Txn" noBorder>
+                <span className="flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-orange-100 text-[9px] font-bold text-orange-600">₿</span>
+                <span className="break-all font-mono text-xs text-[#387085]">{vault.btcPegInTxHash}</span>
+                <CopyButton text={vault.btcPegInTxHash} />
+              </DetailRow>
+
+              <DetailRow label="HTLC Hashlock" noBorder>
+                <svg className="h-3.5 w-3.5 shrink-0 text-[#387085]/30" fill="none" viewBox="0 0 24 24" strokeWidth="1.8" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z" />
+                </svg>
                 <span className="break-all font-mono text-xs text-[#387085]">{vault.hashlock}</span>
                 <CopyButton text={vault.hashlock} />
               </DetailRow>
 
-              <DetailRow label="HTLC Vout">
+              <DetailRow label="HTLC Output Index">
+                <svg className="h-3.5 w-3.5 shrink-0 text-[#387085]/30" fill="none" viewBox="0 0 24 24" strokeWidth="1.8" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z" />
+                </svg>
                 <span>0</span>
               </DetailRow>
 
-              <DetailRow label="Closed Tx">
-                <span className="text-[rgba(20,20,15,0.35)]">—</span>
+              <DetailRow label="Closed Txn">
+                {vault.closedAt ? (
+                  <>
+                    <span className="break-all font-mono text-xs text-[#387085]">{vault.createdTxHash}</span>
+                    <CopyButton text={vault.createdTxHash} />
+                  </>
+                ) : (
+                  <span className="text-[rgba(20,20,15,0.35)]">—</span>
+                )}
               </DetailRow>
             </div>
           </details>
