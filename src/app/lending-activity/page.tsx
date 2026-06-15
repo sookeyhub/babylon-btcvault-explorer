@@ -8,7 +8,7 @@ import {
   type AaveV4ActivityType,
   type TokenAmount,
 } from '@/lib/mock-aave-activity';
-import { truncateAddress, toUsd, TOKEN_PRICES, formatRelativeTime } from '@/lib/utils';
+import { truncateAddress, toUsd, TOKEN_PRICES, formatRelativeTime, formatTimeUTC } from '@/lib/utils';
 import DevNote, { DevNoteSection } from '@/components/DevNote';
 
 const PAGE_SIZE = 25;
@@ -86,12 +86,6 @@ function formatTokenUsd(t: TokenAmount): string {
   return `$${usd.toLocaleString('en-US', { maximumFractionDigits: usd >= 100 ? 0 : 2 })}`;
 }
 
-function formatTimeHHMM(iso: string): string {
-  const d = new Date(iso);
-  const hh = String(d.getUTCHours()).padStart(2, '0');
-  const mm = String(d.getUTCMinutes()).padStart(2, '0');
-  return `${hh}:${mm}`;
-}
 
 function formatDateGroupHeader(dateKey: string): string {
   const day = new Date(dateKey);
@@ -225,9 +219,9 @@ export default function LendingActivityPage() {
                       className="flex items-start border-b border-[#387085]/8 py-3"
                     >
                       {/* Time */}
-                      <div className="w-24 shrink-0 pt-0.5">
+                      <div className="w-28 shrink-0 pt-0.5">
                         <div className="text-[11px] font-medium text-[#387085]/40">{formatRelativeTime(activity.blockTime)}</div>
-                        <div className="font-mono text-[9px] text-[#387085]/30">({formatTimeHHMM(activity.blockTime)} UTC)</div>
+                        <div className="font-mono text-[9px] text-[#387085]/30">({formatTimeUTC(activity.blockTime)})</div>
                       </div>
 
                       {/* Content */}

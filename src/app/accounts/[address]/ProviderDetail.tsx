@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import type { Vault } from '@/lib/types';
-import { truncateAddress, formatRelativeTime, toUsd } from '@/lib/utils';
+import { truncateAddress, formatRelativeTime, formatTimeUTC, toUsd } from '@/lib/utils';
 
 /* ── Mock data ──────────────────────────────────────────────────────────── */
 
@@ -296,10 +296,6 @@ const PROVIDER_FILTER_OPTIONS: { value: ProviderFilterKey; label: string }[] = [
 
 const ACTIVITY_PAGE_SIZE = 25;
 
-function formatTimeHHMM(iso: string): string {
-  const d = new Date(iso);
-  return `${String(d.getUTCHours()).padStart(2, '0')}:${String(d.getUTCMinutes()).padStart(2, '0')}`;
-}
 
 function formatDateGroupHeader(dateKey: string): string {
   const day = new Date(dateKey);
@@ -418,7 +414,7 @@ function ActivityTab() {
                       {/* Time column */}
                       <div className="flex w-24 shrink-0 flex-col items-end pt-0.5">
                         <span className="text-[11px] font-medium text-[#387085]/40">{formatRelativeTime(activity.blockTime)}</span>
-                        <span className="font-mono text-[9px] text-[#387085]/30">({formatTimeHHMM(activity.blockTime)} UTC)</span>
+                        <span className="font-mono text-[9px] text-[#387085]/30">({formatTimeUTC(activity.blockTime)})</span>
                       </div>
 
                       {/* Content */}
@@ -699,7 +695,7 @@ function VaultsTab({ vaults }: { vaults: Vault[] }) {
                         </div>
                       </td>
                       <td className="whitespace-nowrap px-4 py-2.5 text-[rgba(56,112,133,0.5)]">
-                        {new Date(vault.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                        {formatRelativeTime(vault.createdAt)}
                       </td>
                     </tr>
                   );
@@ -760,7 +756,7 @@ export default function ProviderDetail({
 
   const tabs: { key: TabKey; label: string }[] = [
     { key: 'vaults',   label: 'Vaults' },
-    { key: 'activity', label: 'Vaults History' },
+    { key: 'activity', label: 'Vault Activity' },
   ];
 
   return (
@@ -798,23 +794,35 @@ export default function ProviderDetail({
           <span className="text-sm font-medium text-[#14140f]">{MOCK_STATUS.status}</span>
           <span className="text-xs text-[#387085]/50">last activity {MOCK_STATUS.lastActivity}</span>
         </div>
-        <span className="text-[#387085]/40">›</span>
+        <span className="text-xs font-medium text-[#cd6332]">View all Activities ›</span>
       </button>
 
       {/* ── Row C: 4 stat cards ──────────────────────────────────────────── */}
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         {/* Card 1 — Commission */}
         <div className="border border-[#387085]/10 bg-white p-4">
-          <p className="text-[11px] font-semibold uppercase tracking-wide text-[#387085]/45">Commission</p>
+          <p className="flex items-center gap-1 text-[11px] font-semibold uppercase tracking-wide text-[#387085]/45">
+            Commission
+            <svg className="h-3 w-3 text-[#387085]/30" fill="none" viewBox="0 0 24 24" strokeWidth="1.8" stroke="currentColor">
+              <title>Commission rate applied to vault earnings</title>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z" />
+            </svg>
+          </p>
           <p className="mt-1.5 text-2xl font-bold text-[#14140f]">{commissionPct}%</p>
           <p className="mt-0.5 text-[11px] text-[#387085]/40">
-            {(totalBtc * commission / 10000).toFixed(4)} sBTC earned
+            Avg Commission 6.36%
           </p>
         </div>
 
         {/* Card 2 — Locked BTC */}
         <div className="border border-[#387085]/10 bg-white p-4">
-          <p className="text-[11px] font-semibold uppercase tracking-wide text-[#387085]/45">Locked BTC</p>
+          <p className="flex items-center gap-1 text-[11px] font-semibold uppercase tracking-wide text-[#387085]/45">
+            Locked BTC
+            <svg className="h-3 w-3 text-[#387085]/30" fill="none" viewBox="0 0 24 24" strokeWidth="1.8" stroke="currentColor">
+              <title>Total BTC currently locked as collateral in active vaults</title>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z" />
+            </svg>
+          </p>
           <p className="mt-1.5 text-2xl font-bold text-[#14140f]">{totalBtc.toFixed(2)} sBTC</p>
           <p className="mt-0.5 text-[11px] text-[#387085]/40">{toUsd(totalBtc)}</p>
         </div>
@@ -825,7 +833,7 @@ export default function ProviderDetail({
           <p className="mt-1.5 text-2xl font-bold text-[#14140f]">{MOCK_PERF.successRate}%</p>
           <p className="mt-0.5 text-[11px] text-[#387085]/40">
             <span className="text-[#16a34a]">{MOCK_PERF.successCount} success</span>
-            <span className="mx-1 text-[#387085]/25">·</span>
+            <span className="mx-1 text-[#387085]/25">|</span>
             <span className="text-red-500">{MOCK_PERF.totalCount - MOCK_PERF.successCount} failed</span>
           </p>
         </div>
@@ -835,7 +843,7 @@ export default function ProviderDetail({
           <p className="text-[11px] font-semibold uppercase tracking-wide text-[#387085]/45">Avg Activation</p>
           <p className="mt-1.5 text-2xl font-bold text-[#14140f]">{MOCK_PERF.avgActivation}</p>
           <p className="mt-0.5 text-[11px] text-[#387085]/40">
-            last active {MOCK_STATUS.lastActivity}
+            last active 8 min ago
           </p>
         </div>
       </div>

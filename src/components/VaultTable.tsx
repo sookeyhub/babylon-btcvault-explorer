@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import type { Vault } from '@/lib/types';
-import { truncateAddress, formatBTC, formatDate } from '@/lib/utils';
+import { truncateAddress, formatBTC, formatRelativeTime } from '@/lib/utils';
 import StatusBadge from './StatusBadge';
 
 interface VaultTableProps {
@@ -104,10 +104,10 @@ export default function VaultTable({ vaults, compact, title, headerLink }: Vault
                     </td>
                   </>
                 )}
-                <td className="px-5 py-3 text-[rgba(56,112,133,0.5)]">{formatDate(vault.createdAt)}</td>
+                <td className="px-5 py-3 text-[rgba(56,112,133,0.5)]">{formatRelativeTime(vault.createdAt)}</td>
                 {!compact && (
                   <td className="hidden px-5 py-3 text-[rgba(56,112,133,0.5)] md:table-cell">
-                    {vault.closedAt ? formatDate(vault.closedAt) : '—'}
+                    {vault.closedAt ? formatRelativeTime(vault.closedAt) : '—'}
                   </td>
                 )}
               </tr>

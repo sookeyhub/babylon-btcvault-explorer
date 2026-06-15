@@ -57,6 +57,9 @@ export default function DepositorsPage() {
   const totalBtc = vaults.reduce((s, v) => s + v.vaultSize, 0);
   const activeVaultCount = vaults.filter((v) => v.status === 'Available').length;
   const avgBtcPerVault = vaults.length > 0 ? totalBtc / vaults.length : 0;
+  const borrowingCount = 12; // mock
+  const totalBorrowedUsd = 431323.12; // mock
+  const utilizationRate = 42.3; // mock
 
   const [sortKey, setSortKey] = useState<'totalVaults' | 'activeVaults' | 'totalBtc' | null>(null);
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>('desc');
@@ -196,12 +199,24 @@ export default function DepositorsPage() {
         <div className="border border-[#387085]/10 bg-white p-3">
           <p className="text-[11px] font-medium uppercase tracking-wide text-[#387085]/50">Total Depositors</p>
           <p className="mt-0.5 text-2xl font-semibold text-[#14140f]">{totalDepositors.toLocaleString()}</p>
+          <p className="mt-0.5 text-xs text-[#387085]/40">{borrowingCount} borrowing</p>
+        </div>
+        <div className="border border-[#387085]/10 bg-white p-3">
+          <p className="flex items-center gap-1 text-[11px] font-medium uppercase tracking-wide text-[#387085]/50">
+            Total Borrowed
+            <svg className="h-3 w-3 text-[#387085]/30" fill="none" viewBox="0 0 24 24" strokeWidth="1.8" stroke="currentColor">
+              <title>Total debt borrowed against deposited collateral</title>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z" />
+            </svg>
+          </p>
+          <p className="mt-0.5 text-2xl font-semibold text-[#14140f]">${totalBorrowedUsd.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</p>
+          <p className="mt-0.5 text-xs text-[#387085]/40">Utilization {utilizationRate}%</p>
         </div>
         <div className="border border-[#387085]/10 bg-white p-3">
           <p className="flex items-center gap-1 text-[11px] font-medium uppercase tracking-wide text-[#387085]/50">
             Locked BTC
             <svg className="h-3 w-3 text-[#387085]/30" fill="none" viewBox="0 0 24 24" strokeWidth="1.8" stroke="currentColor">
-              <title>Total BTC currently locked in active vaults</title>
+              <title>Total BTC currently locked as collateral in active vaults</title>
               <path strokeLinecap="round" strokeLinejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z" />
             </svg>
           </p>
@@ -209,44 +224,39 @@ export default function DepositorsPage() {
           <p className="mt-0.5 text-xs text-[#387085]/40">{toUsd(totalBtc)}</p>
         </div>
         <div className="border border-[#387085]/10 bg-white p-3">
-          <p className="text-[11px] font-medium uppercase tracking-wide text-[#387085]/50">Avg BTC Per Vault</p>
-          <p className="mt-0.5 text-2xl font-semibold text-[#14140f]">{avgBtcPerVault.toFixed(2)} <span className="text-sm font-normal text-[#387085]/50">BTC</span></p>
-          <p className="mt-0.5 text-xs text-[#387085]/40">{toUsd(avgBtcPerVault)}</p>
-        </div>
-        <div className="border border-[#387085]/10 bg-white p-3">
           <p className="text-[11px] font-medium uppercase tracking-wide text-[#387085]/50">Active Vaults</p>
           <p className="mt-0.5 text-2xl font-semibold text-[#14140f]">{activeVaultCount.toLocaleString()}</p>
-          <p className="mt-0.5 text-xs text-[#387085]/40">out of {vaults.length} vault{vaults.length !== 1 ? 's' : ''}</p>
+          <p className="mt-0.5 text-xs text-[#387085]/40">of {vaults.length}</p>
         </div>
       </div>
 
       {/* New Depositors chart */}
       <section className="flex h-[360px] flex-col border border-[#387085]/10 bg-white">
-        <div className="flex items-center justify-between border-b border-[#387085]/10 px-5 py-3">
-          <div>
-            <h2 className="text-sm font-semibold text-[#14140f]">New Depositors</h2>
-            <p className="mt-0.5 text-[11px] text-[#387085]/50">Weekly new depositors</p>
-          </div>
-          <div className="flex items-center gap-4">
-            <div className="flex items-center gap-1">
-              {PERIODS.map((p) => (
-                <button
-                  key={p}
-                  onClick={() => setChartPeriod(p)}
-                  className={`rounded-none px-2.5 py-1 text-[11px] font-medium transition-colors ${
-                    chartPeriod === p
-                      ? 'bg-[#cd6332] text-white'
-                      : 'text-[rgba(56,112,133,0.6)] hover:text-[#cd6332]'
-                  }`}
-                >
-                  {p}
-                </button>
-              ))}
+        <div className="border-b border-[#387085]/10 px-5 py-3">
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-sm font-semibold text-[#14140f]">New Depositors</h2>
+              <p className="mt-0.5 text-[11px] text-[#387085]/50">Weekly new depositors</p>
             </div>
             <div className="text-right">
               <span className="text-lg font-semibold text-[#cd6332]">+{totalNewDepositors}</span>
               <p className="text-[10px] text-[#387085]/40">{chartPeriod === 'ALL' ? 'all time' : chartPeriod.toLowerCase()}</p>
             </div>
+          </div>
+          <div className="mt-2 flex items-center justify-end gap-1">
+            {PERIODS.map((p) => (
+              <button
+                key={p}
+                onClick={() => setChartPeriod(p)}
+                className={`rounded-none px-2.5 py-1 text-[11px] font-medium transition-colors ${
+                  chartPeriod === p
+                    ? 'bg-[#cd6332] text-white'
+                    : 'text-[rgba(56,112,133,0.6)] hover:text-[#cd6332]'
+                }`}
+              >
+                {p}
+              </button>
+            ))}
           </div>
         </div>
         <div className="flex-1 px-4 pb-2 pt-4">

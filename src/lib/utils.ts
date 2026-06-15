@@ -35,35 +35,90 @@ export function truncateAddress(addr: string, start = 6, end = 4): string {
   return `${addr.slice(0, start)}...${addr.slice(-end)}`;
 }
 
-/** Format ISO timestamp to readable date */
-export function formatDate(iso: string | null): string {
-  if (!iso) return '—';
-  const d = new Date(iso);
-  if (isNaN(d.getTime())) return iso;
-  return d.toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-  });
-}
-
-/** Format ISO timestamp to relative time */
+/**
+ * Age format — relative time
+ * just now → secs → mins → hrs+mins → days+hrs → months → years
+ */
 export function formatRelativeTime(iso: string): string {
   const now = Date.now();
   const then = new Date(iso).getTime();
-  const diff = now - then;
+  const diff = Math.max(0, now - then);
 
-  const minutes = Math.floor(diff / 60000);
-  if (minutes < 1) return 'just now';
-  if (minutes < 60) return `${minutes} min${minutes === 1 ? '' : 's'} ago`;
-  const hours = Math.floor(minutes / 60);
-  if (hours < 24) return `${hours} ${hours === 1 ? 'hr' : 'hrs'} ago`;
-  const days = Math.floor(hours / 24);
-  if (days < 30) return `${days} ${days === 1 ? 'day' : 'days'} ago`;
-  const months = Math.floor(days / 30);
-  if (months < 12) return `${months} ${months === 1 ? 'month' : 'months'} ago`;
-  const years = Math.floor(days / 365);
-  return `${years} ${years === 1 ? 'year' : 'years'} ago`;
+  const totalSecs = Math.floor(diff / 1000);
+  if (totalSecs < 5) return 'just now';
+  if (totalSecs < 60) return `${totalSecs} ${totalSecs === 1 ? 'sec' : 'secs'} ago`;
+
+  const totalMins = Math.floor(totalSecs / 60);
+  if (totalMins < 60) return `${totalMins} ${totalMins === 1 ? 'min' : 'mins'} ago`;
+
+  const totalHours = Math.floor(totalMins / 60);
+  if (totalHours < 24) {
+    const remMins = totalMins % 60;
+    if (remMins === 0) return `${totalHours} ${totalHours === 1 ? 'hr' : 'hrs'} ago`;
+    return `${totalHours} ${totalHours === 1 ? 'hr' : 'hrs'} ${remMins} ${remMins === 1 ? 'min' : 'mins'} ago`;
+  }
+
+  const totalDays = Math.floor(totalHours / 24);
+  if (totalDays < 30) {
+    const remHours = totalHours % 24;
+    if (remHours === 0) return `${totalDays} ${totalDays === 1 ? 'day' : 'days'} ago`;
+    return `${totalDays} ${totalDays === 1 ? 'day' : 'days'} ${remHours} ${remHours === 1 ? 'hr' : 'hrs'} ago`;
+  }
+
+  const totalMonths = Math.floor(totalDays / 30);
+  if (totalMonths < 12) return `${totalMonths} ${totalMonths === 1 ? 'month' : 'months'} ago`;
+
+  const totalYears = Math.floor(totalDays / 365);
+  return `${totalYears} ${totalYears === 1 ? 'year' : 'years'} ago`;
+}
+
+/**
+ * DateTime format — absolute time
+ * "YYYY/MM/DD HH:MM:SS UTC"
+ */
+export function formatDateTime(iso: string): string {
+  const d = new Date(iso);
+  if (isNaN(d.getTime())) return iso;
+  const pad = (n: number) => String(n).padStart(2, '0');
+  return (
+    `${d.getUTCFullYear()}/${pad(d.getUTCMonth() + 1)}/${pad(d.getUTCDate())} ` +
+    `${pad(d.getUTCHours())}:${pad(d.getUTCMinutes())}:${pad(d.getUTCSeconds())} UTC`
+  );
+}
+
+/**
+ * Time-only format for activity lists — "HH:MM UTC"
+ */
+export function formatTimeUTC(iso: string): string {
+  const d = new Date(iso);
+  if (isNaN(d.getTime())) return iso;
+  const pad = (n: number) => String(n).padStart(2, '0');
+  return `${pad(d.getUTCHours())}:${pad(d.getUTCMinutes())} UTC`;
+}
+
+/**
+ * Date-only format — "YYYY/MM/DD"
+ */
+export function formatDateOnly(iso: string | null): string {
+  if (!iso) return '—';
+  const d = new Date(iso);
+  if (isNaN(d.getTime())) return iso;
+  const pad = (n: number) => String(n).padStart(2, '0');
+  return `${d.getUTCFullYear()}/${pad(d.getUTCMonth() + 1)}/${pad(d.getUTCDate())}`;
+}
+
+/**
+ * Combined format for detail pages / card type
+ * "{age} ({datetime})"
+ * e.g. "2 hrs 15 mins ago (2026/06/09 04:09:36 UTC)"
+ */
+export function formatAgeDateTime(iso: string): string {
+  return `${formatRelativeTime(iso)} (${formatDateTime(iso)})`;
+}
+
+/** @deprecated Use formatDateOnly instead */
+export function formatDate(iso: string | null): string {
+  return formatDateOnly(iso);
 }
 
 /** Filter, sort, and paginate vaults */

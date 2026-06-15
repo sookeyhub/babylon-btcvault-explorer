@@ -11,7 +11,7 @@ import {
   type AaveV4ActivityType,
   type TokenAmount,
 } from '@/lib/mock-aave-activity';
-import { truncateAddress, formatRelativeTime, toUsd, TOKEN_PRICES } from '@/lib/utils';
+import { truncateAddress, formatRelativeTime, formatTimeUTC, toUsd, TOKEN_PRICES } from '@/lib/utils';
 
 /* ── Shared helpers ──────────────────────────────────────────────────────── */
 
@@ -33,17 +33,12 @@ function CopyIcon({ text }: { text: string }) {
   );
 }
 
-function formatHHMM(iso: string): string {
-  const d = new Date(iso);
-  return `${String(d.getUTCHours()).padStart(2, '0')}:${String(d.getUTCMinutes()).padStart(2, '0')}`;
-}
-
-/* ── Vault History styles (same as /vaults page) ─────────────────────────── */
+/* ── Vault Activity styles (same as /vaults page) ─────────────────────────── */
 
 const VAULT_EVENT_STYLES: Record<VaultEventType, {
   label: string; status: string; pillClass: string;
 }> = {
-  VAULT_CREATED:    { label: 'Created',    status: 'Pending',    pillClass: 'bg-amber-50 text-amber-600' },
+  VAULT_CREATED:    { label: 'Pending',    status: 'Pending',    pillClass: 'bg-amber-50 text-amber-600' },
   VAULT_ACTIVATED:  { label: 'Activated',  status: 'Available',  pillClass: 'bg-green-50 text-green-700' },
   VAULT_EXPIRED:    { label: 'Expired',    status: 'Expired',    pillClass: 'bg-gray-100 text-gray-500' },
   VAULT_REDEEMED:   { label: 'Redeemed',   status: 'Redeemed',   pillClass: 'bg-blue-50 text-blue-700' },
@@ -78,15 +73,16 @@ function formatTokenUsd(t: TokenAmount): string {
   return `$${usd.toLocaleString('en-US', { maximumFractionDigits: usd >= 100 ? 0 : 2 })}`;
 }
 
-/* ── Vault History Row (same format as /vaults Vault History tab) ─────────── */
+/* ── Vault Activity Row (same format as /vaults Vault Activity tab) ─────────── */
 
 function VaultHistoryRow({ event }: { event: VaultActivityEvent }) {
   const style = VAULT_EVENT_STYLES[event.type];
   return (
     <div className="flex items-start gap-3 border border-[#387085]/10 bg-white px-4 py-3 transition-colors hover:bg-[#faf9f5]">
       {/* Time column */}
-      <div className="w-20 shrink-0 pt-0.5">
-        <span className="text-[11px] font-medium text-[#387085]/40">{formatRelativeTime(event.blockTime)}</span>
+      <div className="w-28 shrink-0 pt-0.5">
+        <div className="text-[11px] font-medium text-[#387085]/40">{formatRelativeTime(event.blockTime)}</div>
+        <div className="font-mono text-[9px] text-[#387085]/30">({formatTimeUTC(event.blockTime)})</div>
       </div>
 
       {/* Content */}
@@ -161,8 +157,9 @@ function LendingActivityRow({ activity }: { activity: AaveV4Activity }) {
   return (
     <div className="flex items-start border-b border-[#387085]/8 py-3">
       {/* Time */}
-      <div className="w-20 shrink-0 pt-0.5">
-        <span className="text-[11px] font-medium text-[#387085]/40">{formatRelativeTime(activity.blockTime)}</span>
+      <div className="w-28 shrink-0 pt-0.5">
+        <div className="text-[11px] font-medium text-[#387085]/40">{formatRelativeTime(activity.blockTime)}</div>
+        <div className="font-mono text-[9px] text-[#387085]/30">({formatTimeUTC(activity.blockTime)})</div>
       </div>
 
       {/* Content */}
@@ -237,18 +234,29 @@ export default function HomeActivitySections() {
 
   return (
     <div className="grid grid-cols-2 items-stretch gap-5">
-      {/* ── Vault History ──────────────────────────────────────────── */}
+      {/* ── Vault Activity ──────────────────────────────────────────── */}
       <div className="flex flex-col border border-[#387085]/10 bg-white">
         <div className="flex items-center justify-between border-b border-[#387085]/10 px-5 py-3">
-          <h2 className="text-sm font-semibold text-[#14140f]">Vault History</h2>
-          <Link href="/vaults" className="text-[11px] font-medium text-[#cd6332] hover:underline">
-            View All Vault History ›
+          <h2 className="text-sm font-semibold text-[#14140f]">Vault Activity</h2>
+          <Link href="/vaults?tab=history" className="text-[11px] font-medium text-[#cd6332] hover:underline">
+            View all Vault Activity ›
           </Link>
         </div>
         <div className="flex-1 space-y-2 overflow-auto p-4">
           {recentVaultHistory.map((event) => (
             <VaultHistoryRow key={`${event.txHash}-${event.logIndex}`} event={event} />
           ))}
+        </div>
+        <div className="border-t border-[#387085]/10 px-5 py-3">
+          <Link
+            href="/vaults?tab=history"
+            className="flex w-full items-center justify-center gap-1 rounded-sm border border-[#387085]/15 py-2 text-xs font-medium text-[#387085]/60 transition-colors hover:border-[#cd6332]/30 hover:text-[#cd6332]"
+          >
+            View all Vault Activity
+            <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
+            </svg>
+          </Link>
         </div>
       </div>
 
@@ -257,13 +265,24 @@ export default function HomeActivitySections() {
         <div className="flex items-center justify-between border-b border-[#387085]/10 px-5 py-3">
           <h2 className="text-sm font-semibold text-[#14140f]">Lending Activity</h2>
           <Link href="/lending-activity" className="text-[11px] font-medium text-[#cd6332] hover:underline">
-            View All Lending Activity ›
+            View all Lending Activity ›
           </Link>
         </div>
         <div className="flex-1 overflow-auto px-5 py-2">
           {recentLendingActivity.map((activity) => (
             <LendingActivityRow key={`${activity.txHash}-${activity.logIndex}`} activity={activity} />
           ))}
+        </div>
+        <div className="border-t border-[#387085]/10 px-5 py-3">
+          <Link
+            href="/lending-activity"
+            className="flex w-full items-center justify-center gap-1 rounded-sm border border-[#387085]/15 py-2 text-xs font-medium text-[#387085]/60 transition-colors hover:border-[#cd6332]/30 hover:text-[#cd6332]"
+          >
+            View all Lending Activity
+            <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
+            </svg>
+          </Link>
         </div>
       </div>
     </div>

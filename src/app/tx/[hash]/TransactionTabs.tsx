@@ -4,7 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import type { Transaction } from '@/lib/types';
 import CopyButton from './CopyButton';
-import { formatRelativeTime } from '@/lib/utils';
+import { formatRelativeTime, formatDateTime } from '@/lib/utils';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 type EventName = 'PeginActivated' | 'BORROW' | 'REPAY' | 'ADD_COLLATERAL' | 'REMOVE_COLLATERAL' | 'LIQUIDATION';
@@ -474,12 +474,7 @@ export default function TransactionTabs({ tx }: { tx: Transaction }) {
   const copy = EVENT_COPY[eventType];
   const relTime = formatRelativeTime(tx.timestamp);
 
-  const d = new Date(tx.timestamp);
-  const pad = (n: number) => String(n).padStart(2, '0');
-  // "27 days ago (2026/05/04 23:45:00 +UTC)" format
-  const absoluteUTC =
-    `${d.getUTCFullYear()}/${pad(d.getUTCMonth() + 1)}/${pad(d.getUTCDate())} ` +
-    `${pad(d.getUTCHours())}:${pad(d.getUTCMinutes())}:${pad(d.getUTCSeconds())} +UTC`;
+  const absoluteUTC = formatDateTime(tx.timestamp);
 
   const fmt = (s: string) => `${s.slice(0, 6)}...${s.slice(-4)}`;
   const hashDisplay = `${tx.hash.slice(0, 6)}...${tx.hash.slice(-4)}`;

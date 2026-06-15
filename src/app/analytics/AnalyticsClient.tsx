@@ -179,9 +179,11 @@ function LineChartCard({ title, data, color, valueSuffix = '', yTickFormatter }:
   return (
     <div className="relative border border-[#387085]/20 bg-white">
       <CornerBrackets />
-      <div className="flex items-center justify-between px-4 py-3">
+      <div className="px-4 py-3">
         <h3 className="text-xs font-semibold text-[#14140f]">{title}</h3>
-        <PeriodToggles active={period} onChange={setPeriod} />
+        <div className="mt-2 flex justify-end">
+          <PeriodToggles active={period} onChange={setPeriod} />
+        </div>
       </div>
       <div className="px-4 pb-4">
         <ResponsiveContainer width="100%" height={160}>
@@ -247,9 +249,11 @@ function VaultCreationChart({ data }: { data: VaultCreationPoint[] }) {
   return (
     <div className="relative border border-[#387085]/20 bg-white">
       <CornerBrackets />
-      <div className="flex items-center justify-between px-4 py-3">
+      <div className="px-4 py-3">
         <h3 className="text-xs font-semibold text-[#14140f]">Vault Creation</h3>
-        <PeriodToggles active={period} onChange={setPeriod} />
+        <div className="mt-2 flex justify-end">
+          <PeriodToggles active={period} onChange={setPeriod} />
+        </div>
       </div>
       <div className="px-4 pb-4">
         <ResponsiveContainer width="100%" height={200}>
@@ -336,40 +340,8 @@ export function VaultsTabContent({
   topActiveVaults,
   vaultCreationData,
 }: AnalyticsClientProps) {
-  const kpiCards = [
-    { label: 'Total Value Locked (TVL)', value: `${kpis.currentTVL.toFixed(2)} sBTC`, subValue: toUsd(kpis.currentTVL), hasInfo: true },
-    { label: 'Active Vaults', value: String(kpis.activeVaultCount), subValue: `out of ${kpis.totalNumberOfVaults} vaults`, hasInfo: false },
-    { label: 'Total Value Processed (TVP)', value: `${kpis.totalValueProcessed.toFixed(2)} sBTC`, subValue: toUsd(kpis.totalValueProcessed), hasInfo: true },
-    { label: 'Total Vaults', value: String(kpis.totalNumberOfVaults), subValue: '', hasInfo: false },
-  ];
-
   return (
     <div className="space-y-5">
-
-      {/* 4 KPI cards */}
-      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-        {kpiCards.map((card) => (
-          <div
-            key={card.label}
-            className="relative rounded-none border border-[#387085]/20 bg-white px-5 py-4"
-          >
-            <CornerBrackets />
-            <p className="flex items-center gap-1 text-xs text-[rgba(56,112,133,0.55)]">
-              {card.label}
-              {card.hasInfo && (
-                <svg className="h-3.5 w-3.5 text-[rgba(56,112,133,0.3)]" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z" />
-                </svg>
-              )}
-            </p>
-            <div className="mt-1.5 flex items-baseline gap-2">
-              <p className="text-xl font-bold tabular-nums text-[#14140f]">{card.value}</p>
-              <span className="text-xs text-green-600">+0% (24h)</span>
-            </div>
-            {card.subValue && <p className="mt-0.5 text-xs text-[#387085]/40">{card.subValue}</p>}
-          </div>
-        ))}
-      </div>
 
       {/* 2x2 chart grid */}
       <div className="grid gap-4 md:grid-cols-2">

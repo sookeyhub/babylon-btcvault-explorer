@@ -15,7 +15,7 @@ import {
   type TokenAmount,
   type DAppPosition,
 } from '@/lib/mock-aave-activity';
-import { truncateAddress, formatDate, formatRelativeTime } from '@/lib/utils';
+import { truncateAddress, formatDateTime, formatRelativeTime, formatTimeUTC } from '@/lib/utils';
 import type { Vault } from '@/lib/types';
 
 const BTC_USD_RATE = TOKEN_PRICES['sBTC'];
@@ -113,22 +113,6 @@ function formatTokenUsd(t: TokenAmount): string {
   return `$${usd.toLocaleString('en-US', { maximumFractionDigits: usd >= 100 ? 0 : 2 })}`;
 }
 
-function formatTimeHHMM(iso: string): string {
-  const d = new Date(iso);
-  return `${String(d.getUTCHours()).padStart(2, '0')}:${String(d.getUTCMinutes()).padStart(2, '0')}`;
-}
-
-function formatFull(iso: string): string {
-  return (
-    new Date(iso)
-      .toLocaleString('en-US', {
-        year: 'numeric', month: '2-digit', day: '2-digit',
-        hour: '2-digit', minute: '2-digit', second: '2-digit',
-        timeZone: 'UTC', hour12: false,
-      })
-      .replace(',', '') + ' UTC'
-  );
-}
 
 function formatDateGroupHeader(dateKey: string): string {
   const day = new Date(dateKey);
@@ -224,7 +208,7 @@ function AaveActivityTable() {
                       {/* Time column */}
                       <div className="w-24 shrink-0 pt-0.5">
                         <div className="text-[11px] font-medium text-[#387085]/40">{formatRelativeTime(activity.blockTime)}</div>
-                        <div className="font-mono text-[9px] text-[#387085]/30">({formatTimeHHMM(activity.blockTime)} UTC)</div>
+                        <div className="font-mono text-[9px] text-[#387085]/30">({formatTimeUTC(activity.blockTime)})</div>
                       </div>
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center justify-between gap-2">
@@ -264,7 +248,7 @@ function AaveActivityTable() {
                           <span className="text-[10px] text-[#387085]/20">·</span>
                           <span className="inline-flex items-center gap-1">
                             <span className="text-[9px] font-medium uppercase tracking-wide text-[#387085]/40">Block</span>
-                            <span title={formatFull(activity.blockTime)} className="font-mono text-[10px] text-[#387085]/40">
+                            <span title={formatDateTime(activity.blockTime)} className="font-mono text-[10px] text-[#387085]/40">
                               #{activity.blockNumber.toLocaleString()}
                             </span>
                           </span>
@@ -893,7 +877,7 @@ export default function DepositorDetail({ address, vaults }: DepositorDetailProp
   const activeVaults = vaults.filter((v) => v.status === 'Available').length;
   const totalBtc = vaults.reduce((s, v) => s + v.vaultSize, 0);
 
-  const joinedFormatted = depositor ? formatDate(depositor.firstDeposit) : '—';
+  const joinedFormatted = depositor ? formatDateTime(depositor.firstDeposit) : '—';
   const addrDisplay = address;
 
   // Position data for stat cards
@@ -978,7 +962,7 @@ export default function DepositorDetail({ address, vaults }: DepositorDetailProp
               onClick={() => setActiveTab('collateral')}
               className="text-[10px] font-medium text-[#cd6332] hover:underline"
             >
-              View All Assets ›
+              View all Assets ›
             </button>
           </div>
           <p className="mt-1.5 text-2xl font-bold text-[#14140f]">
@@ -995,7 +979,7 @@ export default function DepositorDetail({ address, vaults }: DepositorDetailProp
               onClick={() => setActiveTab('deposited')}
               className="text-[10px] font-medium text-[#cd6332] hover:underline"
             >
-              View All Vaults ›
+              View all Vaults ›
             </button>
           </div>
           <p className="mt-1.5 text-2xl font-bold text-[#14140f]">
@@ -1013,16 +997,17 @@ export default function DepositorDetail({ address, vaults }: DepositorDetailProp
         const pad = (n: number) => n.toString().padStart(2, '0');
         const fullTimestamp = `${bt.getUTCFullYear()}/${pad(bt.getUTCMonth() + 1)}/${pad(bt.getUTCDate())} ${pad(bt.getUTCHours())}:${pad(bt.getUTCMinutes())}:${pad(bt.getUTCSeconds())} +UTC`;
         return (
-          <div className="border border-[#387085]/12 bg-white px-4 py-2.5">
-            {/* Row 1: title + timestamp inline */}
-            <div className="flex items-center gap-2">
-              <span className="text-sm text-[#387085]/50">Latest Activity</span>
-              <span className="text-[11px] text-[#387085]/35">{formatRelativeTime(latestActivity.blockTime)}</span>
-              <span className="text-[11px] text-[#387085]/25">{fullTimestamp}</span>
-            </div>
-            {/* Row 2: status + amount + view all */}
-            <div className="mt-1.5 flex items-center justify-between">
+          <div className="flex items-center border border-[#387085]/12 bg-white px-4 py-2.5">
+            {/* Left: activity info */}
+            <div className="min-w-0 flex-1">
+              {/* Row 1: title + timestamp inline */}
               <div className="flex items-center gap-2">
+                <span className="text-sm text-[#387085]/50">Latest Activity</span>
+                <span className="text-[11px] text-[#387085]/35">{formatRelativeTime(latestActivity.blockTime)}</span>
+                <span className="text-[11px] text-[#387085]/25">{fullTimestamp}</span>
+              </div>
+              {/* Row 2: status + amount */}
+              <div className="mt-1.5 flex items-center gap-2">
                 <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-medium ${style.bg} ${style.text}`}>
                   {style.label}
                 </span>
@@ -1033,13 +1018,14 @@ export default function DepositorDetail({ address, vaults }: DepositorDetailProp
                   {formatTokenUsd(latestActivity.tokenAmount)}
                 </span>
               </div>
-              <button
-                onClick={() => setActiveTab('aave_activity')}
-                className="text-[10px] font-medium text-[#cd6332] hover:underline"
-              >
-                View All Activities ›
-              </button>
             </div>
+            {/* Right: View all button — vertically centered */}
+            <button
+              onClick={() => setActiveTab('aave_activity')}
+              className="shrink-0 text-[10px] font-medium text-[#cd6332] hover:underline"
+            >
+              View all Activities ›
+            </button>
           </div>
         );
       })()}

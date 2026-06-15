@@ -1,6 +1,8 @@
 import { notFound } from 'next/navigation';
+import Link from 'next/link';
 import { getVaultById, getVaultLifecycle } from '@/lib/data';
-import { truncateAddress, toUsd } from '@/lib/utils';
+import { truncateAddress, toUsd, formatRelativeTime, formatDateTime } from '@/lib/utils';
+import { MOCK_VAULTS } from '@/lib/mock-data';
 import CopyButton from '@/components/CopyButton';
 import type { VaultStatus, VaultLifecycleEvent } from '@/lib/types';
 import VaultDetailTabs from './VaultDetailTabs';
@@ -93,149 +95,86 @@ function StatusIcon({ status, size = 'md' }: { status: VaultStatus; size?: 'md' 
   );
 }
 
-// ── Status banner ────────────────────────────────────────────────────────────
+// ── Collateral / Loan status banner ─────────────────────────────────────────
 
-function formatRelativeTime(iso: string): string {
-  const now = Date.now();
-  const then = new Date(iso).getTime();
-  const diffMs = now - then;
-  const seconds = Math.floor(diffMs / 1000);
-  if (seconds < 60) return `${seconds} secs ago`;
-  const minutes = Math.floor(seconds / 60);
-  if (minutes < 60) return `${minutes} ${minutes === 1 ? 'min' : 'mins'} ago`;
-  const hours = Math.floor(minutes / 60);
-  if (hours < 24) return `${hours} ${hours === 1 ? 'hour' : 'hours'} ago`;
-  const days = Math.floor(hours / 24);
-  return `${days} ${days === 1 ? 'day' : 'days'} ago`;
-}
+type LendingStatus = 'Borrowing' | 'Collateral only' | 'Not supplied';
 
-interface BannerConfig {
+interface LendingBannerConfig {
+  status: LendingStatus;
   bg: string;
-  label: string;
-  desc: string;
+  iconBg: string;
+  iconColor: string;
   labelText: string;
   subText: string;
+  desc: string;
+  icon: React.ReactNode;
 }
 
-function getBannerConfig(status: VaultStatus, lifecycle: VaultLifecycleEvent[]): BannerConfig {
-  switch (status) {
-    case 'Available':
-      return {
-        bg: 'bg-green-50',
-        label: 'Available',
-        desc: 'Vault is live. BTC locked and usable as collateral.',
-        labelText: 'text-green-700',
-        subText: 'text-green-600/70',
-      };
-    case 'Pending':
-      return {
-        bg: 'bg-amber-50',
-        label: 'Pending',
-        desc: 'Waiting for BTC confirmation and ZKP verification.',
-        labelText: 'text-amber-700',
-        subText: 'text-amber-600/70',
-      };
-    case 'Verified':
-      return {
-        bg: 'bg-purple-50',
-        label: 'Verified',
-        desc: 'Vault verification completed by committee.',
-        labelText: 'text-purple-700',
-        subText: 'text-purple-600/70',
-      };
-    case 'Signature Collected':
-      return {
-        bg: 'bg-yellow-50',
-        label: 'Signature Collected',
-        desc: 'BTC signatures have been collected and posted.',
-        labelText: 'text-yellow-700',
-        subText: 'text-yellow-600/70',
-      };
-    case 'Expired': {
-      const expiredEvent = lifecycle.find((e) => e.event_type === 'EXPIRED');
-      const reason =
-        expiredEvent?.expired_reason === 0
-          ? 'ACK not submitted within timeout.'
-          : expiredEvent?.expired_reason === 1
-            ? 'Activation not completed within timeout.'
-            : 'Timeout exceeded.';
-      return {
-        bg: 'bg-zinc-50',
-        label: 'Expired',
-        desc: reason,
-        labelText: 'text-zinc-600',
-        subText: 'text-zinc-500/60',
-      };
-    }
-    case 'Liquidated':
-      return {
-        bg: 'bg-red-50',
-        label: 'Liquidated',
-        desc: 'Vault was undercollateralized and liquidated.',
-        labelText: 'text-red-700',
-        subText: 'text-red-600/70',
-      };
-    case 'Redeemed':
-      return {
-        bg: 'bg-blue-50',
-        label: 'Redeemed',
-        desc: 'BTC ready to claim.',
-        labelText: 'text-blue-700',
-        subText: 'text-blue-600/70',
-      };
-    default:
-      return {
-        bg: 'bg-[#387085]/5',
-        label: status,
-        desc: '',
-        labelText: 'text-[#387085]',
-        subText: 'text-[#387085]/60',
-      };
+function getLendingStatus(vaultStatus: VaultStatus): LendingBannerConfig {
+  // A. 활성 + 대출중: open & debt > 0 → Borrowing
+  if (vaultStatus === 'Available' || vaultStatus === 'Liquidated') {
+    return {
+      status: 'Borrowing',
+      bg: vaultStatus === 'Liquidated' ? 'bg-red-50' : 'bg-[#cd6332]/5',
+      iconBg: vaultStatus === 'Liquidated' ? 'bg-red-100' : 'bg-[#cd6332]/10',
+      iconColor: vaultStatus === 'Liquidated' ? 'text-red-600' : 'text-[#cd6332]',
+      labelText: vaultStatus === 'Liquidated' ? 'text-red-700' : 'text-[#cd6332]',
+      subText: vaultStatus === 'Liquidated' ? 'text-red-600/60' : 'text-[#cd6332]/60',
+      desc: 'Supplied as collateral and currently securing an active loan.',
+      icon: (
+        <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 18.75a60.07 60.07 0 0 1 15.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 0 1 3 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 0 0-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 0 1-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 0 0 3 15h-.75M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm3 0h.008v.008H18V10.5Zm-12 0h.008v.008H6V10.5Z" />
+        </svg>
+      ),
+    };
   }
+
+  // B. 활성 + 무대출: open & debt = 0 → Collateral only
+  if (vaultStatus === 'Redeemed') {
+    return {
+      status: 'Collateral only',
+      bg: 'bg-blue-50',
+      iconBg: 'bg-blue-100',
+      iconColor: 'text-blue-600',
+      labelText: 'text-blue-700',
+      subText: 'text-blue-600/60',
+      desc: 'Supplied as collateral, with no loan drawn against it.',
+      icon: (
+        <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+        </svg>
+      ),
+    };
+  }
+
+  // C. 미활성: peg-in 확정 전 → Not Supplied
+  return {
+    status: 'Not supplied',
+    bg: 'bg-[#387085]/5',
+    iconBg: 'bg-[#387085]/10',
+    iconColor: 'text-[#387085]/60',
+    labelText: 'text-[#387085]',
+    subText: 'text-[#387085]/50',
+    desc: 'Not supplied as collateral, and currently holds no loan.',
+    icon: (
+      <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6l4 2" />
+      </svg>
+    ),
+  };
 }
 
-function formatUtcDate(iso: string): string {
-  const d = new Date(iso);
-  if (isNaN(d.getTime())) return iso;
-  const pad = (n: number) => String(n).padStart(2, '0');
-  return (
-    `${d.getUTCFullYear()}/${pad(d.getUTCMonth() + 1)}/${pad(d.getUTCDate())} ` +
-    `${pad(d.getUTCHours())}:${pad(d.getUTCMinutes())}:${pad(d.getUTCSeconds())} +UTC`
-  );
-}
-
-function StatusBanner({
-  status,
-  createdAt,
-  closedAt,
-  lifecycle,
-}: {
-  status: VaultStatus;
-  createdAt: string;
-  closedAt: string | null;
-  lifecycle: VaultLifecycleEvent[];
-}) {
-  const cfg = getBannerConfig(status, lifecycle);
-  const isTerminal = ['Redeemed', 'Expired', 'Liquidated'].includes(status);
-  const timeLabel = isTerminal ? 'Closed' : 'Created';
-  const timeIso = isTerminal && closedAt ? closedAt : createdAt;
+function StatusBanner({ status }: { status: VaultStatus }) {
+  const cfg = getLendingStatus(status);
 
   return (
-    <div className={`flex items-center justify-between rounded-lg px-5 py-3 ${cfg.bg}`}>
-      <div className="flex min-w-0 items-center gap-3">
-        <StatusIcon status={status} size="lg" />
-        <div className="min-w-0">
-          <span className={`text-sm font-semibold ${cfg.labelText}`}>{cfg.label}</span>
-          {cfg.desc && (
-            <p className={`text-xs ${cfg.subText}`}>{cfg.desc}</p>
-          )}
-        </div>
+    <div className={`flex items-center gap-3 rounded-lg px-5 py-3 ${cfg.bg}`}>
+      <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full ${cfg.iconBg} ${cfg.iconColor}`}>
+        {cfg.icon}
       </div>
-      <div className="shrink-0 text-right">
-        <p className="text-sm font-medium text-[#14140f]">
-          {timeLabel} {formatRelativeTime(timeIso)}
-        </p>
-        <p className="text-xs text-[#387085]/50">{formatUtcDate(timeIso)}</p>
+      <div className="min-w-0">
+        <span className={`text-sm font-semibold ${cfg.labelText}`}>{cfg.status}</span>
+        <p className={`text-xs ${cfg.subText}`}>{cfg.desc}</p>
       </div>
     </div>
   );
@@ -271,7 +210,7 @@ export default async function VaultDetailPage({ params }: Props) {
           <p>Vault 자체의 자산 규모와 연결 컨텍스트를 한눈에 파악.</p>
         </DevNoteSection>
 
-        <DevNoteSection heading="Vault History 목적">
+        <DevNoteSection heading="Vault Activity 목적">
           <p>개별 Vault가 어떤 단계를 거쳐 현재 상태에 도달했는지 한눈에 추적.</p>
           <p>Bitcoin 레이어에서 Ethereum 레이어로 넘어가는 2단계 프로토콜 흐름을 하나의 타임라인으로 통합.</p>
         </DevNoteSection>
@@ -321,34 +260,70 @@ export default async function VaultDetailPage({ params }: Props) {
       </div>
 
       {/* ── Status banner ─────────────────────────────────────────────────── */}
-      <StatusBanner
-        status={vault.status}
-        createdAt={vault.createdAt}
-        closedAt={vault.closedAt}
-        lifecycle={lifecycle}
-      />
+      <StatusBanner status={vault.status} />
 
-      {/* ── 3 summary cards ───────────────────────────────────────────────── */}
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+      {/* ── 4 summary cards ───────────────────────────────────────────────── */}
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+        {/* Card 1: Amount */}
         <div className="border border-[#387085]/10 bg-[#faf9f5] p-3">
           <p className="text-[11px] font-medium uppercase tracking-wide text-[#387085]/50">Amount</p>
-          <p className="mt-0.5 text-lg font-semibold text-[#14140f]">
+          <p className="mt-0.5 text-2xl font-semibold text-[#14140f]">
             {vault.vaultSize.toFixed(2)} <span className="text-sm font-normal text-[#387085]/60">sBTC</span>
           </p>
+          <p className="mt-0.5 text-xs text-[#387085]/40">{toUsd(vault.vaultSize)}</p>
         </div>
-        <div className="border border-[#387085]/10 bg-[#faf9f5] p-3">
-          <p className="text-[11px] font-medium uppercase tracking-wide text-[#387085]/50">DApp</p>
-          <p className="mt-0.5 text-lg font-semibold text-[#14140f]">{vault.dappName}</p>
-        </div>
+
+        {/* Card 2: Current Status */}
+        {(() => {
+          const isTerminal = ['Redeemed', 'Expired', 'Liquidated'].includes(vault.status);
+          const timeIso = isTerminal && vault.closedAt ? vault.closedAt : vault.createdAt;
+          return (
+            <div className="border border-[#387085]/10 bg-[#faf9f5] p-3">
+              <div className="flex items-center justify-between">
+                <p className="text-[11px] font-medium uppercase tracking-wide text-[#387085]/50">Current Status</p>
+                <button className="text-[10px] font-medium text-[#cd6332] hover:underline">View all Vault Activity ›</button>
+              </div>
+              <div className="mt-1 flex items-center gap-2">
+                <StatusIcon status={vault.status} />
+                <span className="text-lg font-semibold text-[#14140f]">{vault.status}</span>
+              </div>
+              <p className="mt-0.5 text-xs text-[#387085]/40">
+                {formatRelativeTime(timeIso)}
+                <span className="ml-1 text-[10px] text-[#387085]/30">({formatDateTime(timeIso)})</span>
+              </p>
+            </div>
+          );
+        })()}
+
+        {/* Card 3: Provider */}
         <div className="border border-[#387085]/10 bg-[#faf9f5] p-3">
           <p className="text-[11px] font-medium uppercase tracking-wide text-[#387085]/50">Provider</p>
-          <p className="mt-0.5 flex items-center gap-1.5 text-lg font-semibold text-[#14140f]">
+          <p className="mt-0.5 flex items-center gap-1.5 text-lg font-semibold">
             <svg className="h-4 w-4 text-[#387085]/40" fill="none" viewBox="0 0 24 24" strokeWidth="1.8" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 5.25a3 3 0 0 1 3 3m3 0a6 6 0 0 1-7.029 5.912c-.563-.097-1.159.026-1.563.43L10.5 17.25H8.25v2.25H6v2.25H2.25v-2.818c0-.597.237-1.17.659-1.591l6.499-6.499c.404-.404.527-1 .43-1.563A6 6 0 1 1 21.75 8.25Z" />
             </svg>
-            {vault.providerName}
+            <Link href={`/accounts/${vault.providerAddress}`} className="text-[#cd6332] hover:underline">
+              {vault.providerName}
+            </Link>
           </p>
+          <p className="mt-0.5 text-xs text-[#387085]/40">Success rate 94.7%</p>
         </div>
+
+        {/* Card 4: Depositor */}
+        {(() => {
+          const depositorVaultCount = MOCK_VAULTS.filter((v) => v.depositorAddress === vault.depositorAddress).length;
+          return (
+            <div className="border border-[#387085]/10 bg-[#faf9f5] p-3">
+              <p className="text-[11px] font-medium uppercase tracking-wide text-[#387085]/50">Depositor</p>
+              <p className="mt-0.5 text-lg font-semibold text-[#14140f]">
+                <Link href={`/accounts/${vault.depositorAddress}`} className="font-mono text-sm text-[#cd6332] hover:underline">
+                  {truncateAddress(vault.depositorAddress, 6, 4)}
+                </Link>
+              </p>
+              <p className="mt-0.5 text-xs text-[#387085]/40">{depositorVaultCount} vaults</p>
+            </div>
+          );
+        })()}
       </div>
 
       {/* ── Vault details + Transaction Flow + Raw Txs ────────────────────── */}

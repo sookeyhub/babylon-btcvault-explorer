@@ -91,6 +91,10 @@ export default function ProvidersPage() {
       ? providers.reduce((s, p) => s + p.commission, 0) / totalProviders
       : 0;
   const activeVaultCount = vaults.filter((v) => v.status === 'Available').length;
+  const commissions = providers.map((p) => p.commission);
+  const minCommission = commissions.length > 0 ? Math.min(...commissions) / 100 : 0;
+  const maxCommission = commissions.length > 0 ? Math.max(...commissions) / 100 : 0;
+  const activeProviders = providers.filter((p) => p.activeVaults > 0).length;
 
   // ── Period toggle state ─────────────────────────────────────────────────
   type Period = '7D' | '30D' | '180D' | 'YTD' | '1Y' | 'ALL';
@@ -216,14 +220,20 @@ export default function ProvidersPage() {
       {/* KPI summary cards */}
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         <div className="border border-[#387085]/10 bg-white p-3">
-          <p className="text-[11px] font-medium uppercase tracking-wide text-[#387085]/50">Total Providers</p>
-          <p className="mt-0.5 text-2xl font-semibold text-[#14140f]">{totalProviders.toLocaleString()}</p>
+          <p className="text-[11px] font-medium uppercase tracking-wide text-[#387085]/50">Active Providers</p>
+          <p className="mt-0.5 text-2xl font-semibold text-[#14140f]">{activeProviders}</p>
+          <p className="mt-0.5 text-xs text-[#387085]/40">of {totalProviders}</p>
+        </div>
+        <div className="border border-[#387085]/10 bg-white p-3">
+          <p className="text-[11px] font-medium uppercase tracking-wide text-[#387085]/50">Avg Commission</p>
+          <p className="mt-0.5 text-2xl font-semibold text-[#14140f]">{(avgCommission / 100).toFixed(2)}%</p>
+          <p className="mt-0.5 text-xs text-[#387085]/40">Range {minCommission.toFixed(1)}–{maxCommission.toFixed(1)}%</p>
         </div>
         <div className="border border-[#387085]/10 bg-white p-3">
           <p className="flex items-center gap-1 text-[11px] font-medium uppercase tracking-wide text-[#387085]/50">
             Locked BTC
             <svg className="h-3 w-3 text-[#387085]/30" fill="none" viewBox="0 0 24 24" strokeWidth="1.8" stroke="currentColor">
-              <title>Total BTC locked across all providers</title>
+              <title>Total BTC currently locked as collateral in active vaults</title>
               <path strokeLinecap="round" strokeLinejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z" />
             </svg>
           </p>
@@ -231,40 +241,21 @@ export default function ProvidersPage() {
           <p className="mt-0.5 text-xs text-[#387085]/40">{toUsd(totalBtc)}</p>
         </div>
         <div className="border border-[#387085]/10 bg-white p-3">
-          <p className="text-[11px] font-medium uppercase tracking-wide text-[#387085]/50">Avg Commission</p>
-          <p className="mt-0.5 text-2xl font-semibold text-[#14140f]">{(avgCommission / 100).toFixed(2)}%</p>
-        </div>
-        <div className="border border-[#387085]/10 bg-white p-3">
           <p className="text-[11px] font-medium uppercase tracking-wide text-[#387085]/50">Active Vaults</p>
           <p className="mt-0.5 text-2xl font-semibold text-[#14140f]">{activeVaultCount.toLocaleString()}</p>
-          <p className="mt-0.5 text-xs text-[#387085]/40">out of {vaults.length} vault{vaults.length !== 1 ? 's' : ''}</p>
+          <p className="mt-0.5 text-xs text-[#387085]/40">of {vaults.length}</p>
         </div>
       </div>
 
       {/* Provider TVL Trend */}
       <section className="flex h-[380px] flex-col border border-[#387085]/10 bg-white">
-        <div className="flex items-center justify-between border-b border-[#387085]/10 px-5 py-3">
-          <div>
-            <h2 className="text-sm font-semibold text-[#14140f]">Provider TVL Trend</h2>
-            <p className="mt-0.5 text-[11px] text-[#387085]/50">
-              Daily managed BTC per provider · Top 10{hasOthers ? ' + Others' : ''}
-            </p>
-          </div>
-          <div className="flex items-center gap-4">
-            <div className="flex items-center gap-1">
-              {PERIODS.map((p) => (
-                <button
-                  key={p}
-                  onClick={() => setTrendPeriod(p)}
-                  className={`rounded-none px-2.5 py-1 text-[11px] font-medium transition-colors ${
-                    trendPeriod === p
-                      ? 'bg-[#cd6332] text-white'
-                      : 'text-[rgba(56,112,133,0.6)] hover:text-[#cd6332]'
-                  }`}
-                >
-                  {p}
-                </button>
-              ))}
+        <div className="border-b border-[#387085]/10 px-5 py-3">
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-sm font-semibold text-[#14140f]">Provider TVL Trend</h2>
+              <p className="mt-0.5 text-[11px] text-[#387085]/50">
+                Daily managed BTC per provider · Top 10{hasOthers ? ' + Others' : ''}
+              </p>
             </div>
             <div className="text-right">
               <p className="text-sm font-semibold text-[#14140f]">
@@ -276,6 +267,21 @@ export default function ProvidersPage() {
                 {totalDeltaPct.toFixed(1)}%) · {trendPeriod.toLowerCase()}
               </p>
             </div>
+          </div>
+          <div className="mt-2 flex items-center justify-end gap-1">
+            {PERIODS.map((p) => (
+              <button
+                key={p}
+                onClick={() => setTrendPeriod(p)}
+                className={`rounded-none px-2.5 py-1 text-[11px] font-medium transition-colors ${
+                  trendPeriod === p
+                    ? 'bg-[#cd6332] text-white'
+                    : 'text-[rgba(56,112,133,0.6)] hover:text-[#cd6332]'
+                }`}
+              >
+                {p}
+              </button>
+            ))}
           </div>
         </div>
 

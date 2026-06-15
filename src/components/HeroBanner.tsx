@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, useCallback } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 
 interface Ripple {
   x: number;
@@ -229,83 +230,83 @@ export default function HeroBanner() {
         </div>
 
         {/* ═══════ CONTENT (centered) ═══════ */}
-        <div className="relative z-10 flex min-h-[550px] flex-col items-center justify-center px-4 py-6 text-center sm:min-h-[520px] sm:px-6 sm:py-10 lg:min-h-[560px] lg:py-12 lg:px-10">
-          {/* Logo + Title */}
-          <div
-            className={`hero-slide-up hero-delay-1 max-w-[280px] sm:max-w-none ${mounted ? '' : 'opacity-0'}`}
+        <div className="relative z-10 flex min-h-[380px] flex-col items-center justify-center px-8 py-10 text-center sm:min-h-[420px] sm:px-12 sm:py-14 lg:min-h-[460px]">
+          <h1
+            className={`hero-slide-up hero-delay-1 text-3xl font-bold leading-tight text-[#387085] sm:text-4xl lg:text-5xl ${mounted ? '' : 'opacity-0'}`}
           >
-            <Image
-              src="/babylon-lockup-darkblue.svg"
-              alt="Babylon"
-              width={200}
-              height={60}
-              className="mx-auto mb-3 h-[30px] w-auto sm:h-[48px]"
-            />
-            <h1 className="text-2xl font-bold leading-tight text-[#387085] sm:text-5xl">
-              BTCVault Explorer
-            </h1>
-          </div>
+            Babylon Trustless<br />Bitcoin Vaults
+          </h1>
 
-          {/* Subtitle */}
           <p
-            className={`hero-slide-up hero-delay-2 mx-auto mt-2 max-w-[280px] text-xs leading-relaxed text-[#1a1a2e]/60 sm:mt-3 sm:max-w-md sm:text-base ${mounted ? '' : 'opacity-0'}`}
+            className={`hero-slide-up hero-delay-2 mx-auto mt-3 whitespace-nowrap text-sm text-[#387085]/60 sm:text-base ${mounted ? '' : 'opacity-0'}`}
           >
-            A Bitcoin-Charged Crypto Economy with Trustless Vaults
+            Native Bitcoin-backed borrowing is live on Public Testnet with Aave v4.
           </p>
 
-          {/* Search */}
-          <div
-            className={`hero-slide-up hero-delay-3 mt-4 w-full max-w-[280px] sm:mt-6 sm:max-w-lg ${mounted ? '' : 'opacity-0'}`}
-          >
-            <div className="search-glow relative">
-              <svg
-                className="pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-[#1a1a2e]/40 sm:left-4 sm:h-4 sm:w-4"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth="2"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"
-                />
+          <div className={`hero-slide-up hero-delay-3 mt-6 ${mounted ? '' : 'opacity-0'}`}>
+            <Link
+              href="https://app.babylon.example"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 rounded-sm bg-[#14140f] px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[#14140f]/80"
+            >
+              Deposit &amp; Borrow
+              <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 6H5.25A2.25 2.25 0 0 0 3 8.25v10.5A2.25 2.25 0 0 0 5.25 21h10.5A2.25 2.25 0 0 0 18 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
               </svg>
-              <input
-                type="text"
-                placeholder="Search by address, Vault ID, or Tx Hash"
-                className="w-full rounded-none border border-[#1a1a2e]/15 bg-white/60 py-2.5 pl-9 pr-12 text-xs text-[#1a1a2e] placeholder-[#1a1a2e]/40 outline-none backdrop-blur-md transition-all duration-300 focus:border-[#cd6332]/40 focus:bg-white/80 sm:py-3 sm:pl-11 sm:pr-16 sm:text-sm"
-              />
-              <kbd className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 rounded border border-[#1a1a2e]/15 bg-white/50 px-2 py-0.5 text-[10px] font-medium text-[#1a1a2e]/40 backdrop-blur-sm">
-                ⌘K
-              </kbd>
-            </div>
+            </Link>
           </div>
+        </div>
+      </div>
 
-          {/* ═══════ STATS (below search) ═══════ */}
-          <div className="mt-5 w-full max-w-2xl sm:mt-8">
-            {/* Mobile: 2×2 grid / Desktop: single row with dividers */}
-            <div className="grid grid-cols-2 gap-y-4 sm:flex sm:items-center sm:justify-center sm:divide-x sm:divide-[#cd6332]/25">
-              {[
-                { label: 'Total BTC Locked', value: '24,847' },
-                { label: 'Active Vaults', value: '3,847' },
-                { label: 'Total Value (USD)', value: '$1.04B' },
-                { label: 'Block Height', value: '#2,856,532' },
-              ].map((stat, i) => (
-                <div
-                  key={i}
-                  className={`hero-slide-up hero-delay-${i + 2} px-5 py-2 text-center ${mounted ? '' : 'opacity-0'}`}
-                >
-                  <p className="text-sm font-bold tabular-nums leading-tight text-[#cd6332] sm:text-lg">
-                    {stat.value}
-                  </p>
-                  <p className="text-[10px] font-medium tracking-wide text-[#cd6332]/60">
-                    {stat.label}
-                  </p>
-                </div>
-              ))}
-            </div>
+      {/* ═══════ KPI CARDS (matching other pages) ═══════ */}
+      <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-4">
+        {/* Card 1: Total Value Locked (TVL) */}
+        <div className="border border-[#387085]/10 bg-white p-3">
+          <p className="flex items-center gap-1 text-[11px] font-medium uppercase tracking-wide text-[#387085]/50">
+            Total Value Locked (TVL)
+            <svg className="h-3 w-3 text-[#387085]/30" fill="none" viewBox="0 0 24 24" strokeWidth="1.8" stroke="currentColor">
+              <title>Total number of BTC that are locked in currently active vaults</title>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z" />
+            </svg>
+          </p>
+          <div className="mt-1.5 flex items-baseline gap-2">
+            <p className="text-2xl font-semibold tabular-nums text-[#14140f]">1.75 <span className="text-sm font-normal text-[#387085]/50">sBTC</span></p>
+            <span className="text-xs text-green-600">+3.42% (24h)</span>
           </div>
+          <p className="mt-0.5 text-xs text-[#387085]/40">$121,147</p>
+        </div>
+        {/* Card 2: Utilization */}
+        <div className="border border-[#387085]/10 bg-white p-3">
+          <p className="flex items-center gap-1 text-[11px] font-medium uppercase tracking-wide text-[#387085]/50">
+            Utilization
+            <svg className="h-3 w-3 text-[#387085]/30" fill="none" viewBox="0 0 24 24" strokeWidth="1.8" stroke="currentColor">
+              <title>Utilization = Total Borrowed / TVL * 100</title>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z" />
+            </svg>
+          </p>
+          <div className="mt-1.5 flex items-baseline gap-2">
+            <p className="text-2xl font-semibold tabular-nums text-[#14140f]">42.3%</p>
+          </div>
+          <p className="mt-0.5 text-xs text-[#387085]/40">$5,342.33 borrowed</p>
+        </div>
+        {/* Card 3: Active Borrowers */}
+        <div className="border border-[#387085]/10 bg-white p-3">
+          <p className="text-[11px] font-medium uppercase tracking-wide text-[#387085]/50">Active Borrowers</p>
+          <div className="mt-1.5 flex items-baseline gap-2">
+            <p className="text-2xl font-semibold tabular-nums text-[#14140f]">10</p>
+            <span className="text-xs text-green-600">+0.45% (24h)</span>
+          </div>
+          <p className="mt-0.5 text-xs text-[#387085]/40">of 63</p>
+        </div>
+        {/* Card 4: Active Vaults */}
+        <div className="border border-[#387085]/10 bg-white p-3">
+          <p className="text-[11px] font-medium uppercase tracking-wide text-[#387085]/50">Active Vaults</p>
+          <div className="mt-1.5 flex items-baseline gap-2">
+            <p className="text-2xl font-semibold tabular-nums text-[#14140f]">100</p>
+            <span className="text-xs text-green-600">+0.45% (24h)</span>
+          </div>
+          <p className="mt-0.5 text-xs text-[#387085]/40">of 344</p>
         </div>
       </div>
     </div>

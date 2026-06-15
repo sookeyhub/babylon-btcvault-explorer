@@ -44,9 +44,9 @@ export default function TVLHistorySection({ data }: TVLHistorySectionProps) {
 
   return (
     <div className="border border-[#387085]/20 bg-white">
-      <div className="flex items-center justify-between px-5 py-4">
+      <div className="px-5 py-4">
         <h2 className="text-sm font-semibold text-[#14140f]">TVL History</h2>
-        <div className="flex items-center gap-1">
+        <div className="mt-2 flex items-center justify-end gap-1">
           {PERIODS.map((p) => (
             <button
               key={p}

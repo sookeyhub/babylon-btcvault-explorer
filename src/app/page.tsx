@@ -20,7 +20,7 @@ export default async function HomePage() {
         <DevNote title="Home 기획 의도">
           <DevNoteSection heading="페이지 목적">
             <p>프로토콜 전체 상태를 한눈에 파악하는 대시보드.</p>
-            <p>Hero Banner → TVL 추이 차트 → Vault History + Lending Activity 순서로 정보를 점층적으로 제공.</p>
+            <p>Hero Banner → TVL 추이 차트 → Vault Activity + Lending Activity 순서로 정보를 점층적으로 제공.</p>
           </DevNoteSection>
           <DevNoteSection heading="Hero Banner">
             <p>프로토콜 핵심 KPI(Total BTC Locked, Active Vaults, Total Value USD, Block Height)를 시각적으로 요약.</p>
@@ -30,7 +30,7 @@ export default async function HomePage() {
             <p>기간별 토글(7D / 30D / 180D / YTD / 1Y / ALL) 제공.</p>
             <p>Active Vault의 BTC 일별 합산을 라인 차트로 시각화.</p>
           </DevNoteSection>
-          <DevNoteSection heading="Vault History & Lending Activity">
+          <DevNoteSection heading="Vault Activity & Lending Activity">
             <p>각각 최근 10건을 타임라인 형태로 표시.</p>
             <p>View All 링크로 각각 /vaults, /lending-activity 전체 목록 이동.</p>
           </DevNoteSection>
@@ -39,7 +39,7 @@ export default async function HomePage() {
         {/* TVL History Chart */}
         <TVLHistorySection data={analytics.tvlHistory} />
 
-        {/* Vault History + Lending Activity */}
+        {/* Vault Activity + Lending Activity */}
         <HomeActivitySections />
       </div>
     </div>

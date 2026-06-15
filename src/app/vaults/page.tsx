@@ -1,10 +1,11 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import type { Vault, VaultStatus } from '@/lib/types';
 import { MOCK_VAULTS } from '@/lib/mock-data';
-import { truncateAddress, formatRelativeTime, toUsd } from '@/lib/utils';
+import { truncateAddress, formatRelativeTime, formatTimeUTC, toUsd } from '@/lib/utils';
 import {
   MOCK_VAULT_ACTIVITIES,
   type VaultEventType,
@@ -20,14 +21,16 @@ const ALL_STATUSES: VaultStatus[] = ['Available', 'Pending', 'Verified', 'Signat
 const ALL_DAPPS: string[] = [...new Set(MOCK_VAULTS.map((v) => v.dappName))].sort();
 
 const STATUS_COLORS: Record<Vault['status'], string> = {
-  Available:            '#5a8a3c',
-  Pending:              '#cd6332',
+  Available:            '#16a34a',
+  Pending:              '#d97706',
   Verified:             '#7c3aed',
   'Signature Collected':'#ca8a04',
   Redeemed:             '#2563eb',
-  Expired:              '#6b7280',
-  Liquidated:           '#c83232',
+  Expired:              '#9ca3af',
+  Liquidated:           '#dc2626',
 };
+
+const VAULT_STATUS_ORDER: VaultStatus[] = ['Available', 'Pending', 'Verified', 'Signature Collected', 'Redeemed', 'Expired', 'Liquidated'];
 
 
 function CopyIcon({ text }: { text: string }) {
@@ -62,7 +65,7 @@ type PageTab = 'all' | 'activity';
 const VAULT_EVENT_STYLES: Record<VaultEventType, {
   label: string; dot: string; color: string; status: string; pillClass: string;
 }> = {
-  VAULT_CREATED:    { label: 'Created',    dot: '#cd6332', color: '#cd6332', status: 'Pending',    pillClass: 'bg-amber-50 text-amber-600' },
+  VAULT_CREATED:    { label: 'Pending',    dot: '#cd6332', color: '#cd6332', status: 'Pending',    pillClass: 'bg-amber-50 text-amber-600' },
   VAULT_ACTIVATED:  { label: 'Activated',  dot: '#16a34a', color: '#16a34a', status: 'Available',  pillClass: 'bg-green-50 text-green-700' },
   VAULT_EXPIRED:    { label: 'Expired',    dot: '#6b7280', color: '#6b7280', status: 'Expired',    pillClass: 'bg-gray-100 text-gray-500' },
   VAULT_REDEEMED:   { label: 'Redeemed',   dot: '#2563eb', color: '#2563eb', status: 'Redeemed',   pillClass: 'bg-blue-50 text-blue-700' },
@@ -71,25 +74,15 @@ const VAULT_EVENT_STYLES: Record<VaultEventType, {
 
 const VAULT_FILTER_OPTIONS: { value: VaultEventType | 'ALL'; label: string }[] = [
   { value: 'ALL', label: 'All' },
-  { value: 'VAULT_CREATED', label: 'Created' },
+  { value: 'VAULT_CREATED', label: 'Pending' },
   { value: 'VAULT_ACTIVATED', label: 'Activated' },
   { value: 'VAULT_EXPIRED', label: 'Expired' },
   { value: 'VAULT_REDEEMED', label: 'Redeemed' },
   { value: 'VAULT_LIQUIDATED', label: 'Liquidated' },
 ];
 
-/* ── Vault History helpers ─────────────────────────────────────────────── */
+/* ── Vault Activity helpers ─────────────────────────────────────────────── */
 
-function formatHHMM(iso: string): string {
-  const d = new Date(iso);
-  return `${String(d.getUTCHours()).padStart(2, '0')}:${String(d.getUTCMinutes()).padStart(2, '0')}`;
-}
-
-function formatFullTimestamp(iso: string): string {
-  const d = new Date(iso);
-  const pad = (n: number) => n.toString().padStart(2, '0');
-  return `${d.getUTCFullYear()}/${pad(d.getUTCMonth() + 1)}/${pad(d.getUTCDate())} ${pad(d.getUTCHours())}:${pad(d.getUTCMinutes())}:${pad(d.getUTCSeconds())} +UTC`;
-}
 
 function vaultGroupByDate(activities: import('@/lib/mock-aave-activity').VaultActivityEvent[]): [string, import('@/lib/mock-aave-activity').VaultActivityEvent[]][] {
   const groups: Record<string, import('@/lib/mock-aave-activity').VaultActivityEvent[]> = {};
@@ -114,6 +107,100 @@ function vaultDateGroupHeader(dateKey: string): string {
   const monthNames = ['JANUARY', 'FEBRUARY', 'MARCH', 'APRIL', 'MAY', 'JUNE', 'JULY', 'AUGUST', 'SEPTEMBER', 'OCTOBER', 'NOVEMBER', 'DECEMBER'];
   const dateStr = `${monthNames[day.getUTCMonth()]} ${day.getUTCDate()}, ${day.getUTCFullYear()}`;
   return `${rel.toUpperCase()} (${dateStr})`;
+}
+
+/* ── Vault Status Bar Chart ────────────────────────────────────────────── */
+
+function VaultStatusChart({ vaults }: { vaults: Vault[] }) {
+  const [hovered, setHovered] = useState<string | null>(null);
+  const totalVaults = vaults.length;
+  const totalBtc = vaults.reduce((s, v) => s + v.vaultSize, 0);
+
+  const statusDist = VAULT_STATUS_ORDER
+    .map((status) => ({
+      status,
+      count: vaults.filter((v) => v.status === status).length,
+      btc:   vaults.filter((v) => v.status === status).reduce((s, v) => s + v.vaultSize, 0),
+    }))
+    .filter((s) => s.count > 0);
+
+  if (totalVaults === 0) return null;
+
+  return (
+    <section className="border border-[#387085]/10 bg-white">
+      <div className="flex items-center justify-between px-5 py-3">
+        <h2 className="text-sm font-semibold text-[#14140f]">Vault Status Distribution</h2>
+        <span className="text-[11px] text-[#387085]/50">
+          {totalVaults.toLocaleString()} vaults · {totalBtc.toFixed(2)} sBTC
+        </span>
+      </div>
+      <div className="px-5 pb-4">
+        {/* Stacked bar with hover tooltips */}
+        <div className="relative">
+          {/* The visible bar (clipped for rounded corners) */}
+          <div className="flex h-6 w-full overflow-hidden rounded-sm">
+            {statusDist.map((s) => {
+              const pct = ((s.count / totalVaults) * 100);
+              const isHovered = hovered === s.status;
+              return (
+                <div
+                  key={s.status}
+                  className="h-full cursor-default transition-opacity"
+                  style={{
+                    width: `${pct}%`,
+                    background: STATUS_COLORS[s.status],
+                    opacity: hovered && !isHovered ? 0.35 : 1,
+                  }}
+                  onMouseEnter={() => setHovered(s.status)}
+                  onMouseLeave={() => setHovered(null)}
+                />
+              );
+            })}
+          </div>
+          {/* Tooltip layer (outside overflow-hidden) */}
+          {hovered && (() => {
+            const idx = statusDist.findIndex((s) => s.status === hovered);
+            if (idx < 0) return null;
+            const s = statusDist[idx];
+            const pct = ((s.count / totalVaults) * 100);
+            // Calculate left offset: sum of widths before this segment + half of this segment
+            const leftPct = statusDist.slice(0, idx).reduce((acc, d) => acc + (d.count / totalVaults) * 100, 0) + pct / 2;
+            return (
+              <div
+                className="pointer-events-none absolute z-50"
+                style={{ left: `${leftPct}%`, bottom: '100%', transform: 'translateX(-50%)', marginBottom: '8px' }}
+              >
+                <div className="whitespace-nowrap rounded bg-[#14140f] px-3 py-2 text-center shadow-lg">
+                  <p className="text-[11px] font-semibold text-white">{s.status}</p>
+                  <div className="mt-1 flex items-center justify-center gap-2">
+                    <span className="text-xs tabular-nums text-white/90">{s.count.toLocaleString()} vaults</span>
+                    <span className="text-[10px] text-white/50">({pct.toFixed(1)}%)</span>
+                  </div>
+                  <p className="mt-0.5 text-[10px] tabular-nums text-white/60">{s.btc.toFixed(2)} sBTC · {toUsd(s.btc)}</p>
+                </div>
+                <div className="mx-auto h-0 w-0 border-x-[5px] border-t-[5px] border-x-transparent border-t-[#14140f]" />
+              </div>
+            );
+          })()}
+        </div>
+        {/* Inline legend */}
+        <div className="mt-2.5 flex flex-wrap items-center justify-center gap-x-4 gap-y-1">
+          {statusDist.map((s) => (
+            <button
+              key={s.status}
+              className={`flex items-center gap-1 transition-opacity ${hovered && hovered !== s.status ? 'opacity-35' : 'opacity-100'}`}
+              onMouseEnter={() => setHovered(s.status)}
+              onMouseLeave={() => setHovered(null)}
+            >
+              <span className="h-2 w-2 shrink-0 rounded-sm" style={{ background: STATUS_COLORS[s.status] }} />
+              <span className="text-[11px] text-[#14140f]/70">{s.status}</span>
+              <span className="text-[10px] tabular-nums text-[#387085]/40">{s.count}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
 }
 
 /* ── Vaults Activity Tab ───────────────────────────────────────────────── */
@@ -178,9 +265,9 @@ function VaultsActivityTab() {
                       className="flex items-start gap-3 border border-[#387085]/10 bg-white px-4 py-3 transition-colors hover:bg-[#faf9f5]"
                     >
                       {/* Time column */}
-                      <div className="flex w-24 shrink-0 flex-col items-end pt-0.5">
+                      <div className="flex w-28 shrink-0 flex-col items-end pt-0.5">
                         <span className="text-[11px] font-medium text-[#387085]/40">{formatRelativeTime(event.blockTime)}</span>
-                        <span className="font-mono text-[9px] text-[#387085]/30">({formatHHMM(event.blockTime)} UTC)</span>
+                        <span className="font-mono text-[9px] text-[#387085]/30">({formatTimeUTC(event.blockTime)})</span>
                       </div>
 
                       {/* Content */}
@@ -271,7 +358,17 @@ function VaultsActivityTab() {
 /* ── Main ──────────────────────────────────────────────────────────────── */
 
 export default function VaultsPage() {
-  const [activeTab, setActiveTab] = useState<PageTab>('all');
+  return (
+    <Suspense fallback={null}>
+      <VaultsPageInner />
+    </Suspense>
+  );
+}
+
+function VaultsPageInner() {
+  const searchParams = useSearchParams();
+  const initialTab = searchParams.get('tab') === 'history' ? 'activity' : 'all';
+  const [activeTab, setActiveTab] = useState<PageTab>(initialTab);
   const [page, setPage]           = useState(1);
   const [sortKey, setSortKey]     = useState<SortKey>('createdAt');
   const [sortDir, setSortDir]     = useState<SortDir>('desc');
@@ -281,6 +378,7 @@ export default function VaultsPage() {
   const [statusDropdownOpen, setStatusDropdownOpen] = useState(false);
   const [dappFilter, setDappFilter] = useState<string>('ALL');
   const [dappDropdownOpen, setDappDropdownOpen] = useState(false);
+
 
   function handleSort(key: SortKey) {
     if (sortKey === key) {
@@ -329,7 +427,7 @@ export default function VaultsPage() {
       <DevNote title="Vaults 기획 의도">
         <DevNoteSection heading="페이지 목적">
           <p>프로토콜에 존재하는 모든 Vault를 탐색하는 전체 목록 페이지.</p>
-          <p>두 개의 탭: All Vaults (현재 상태) / Vault History (이벤트 로그).</p>
+          <p>두 개의 탭: All Vaults (현재 상태) / Vault Activity (이벤트 로그).</p>
         </DevNoteSection>
         <DevNoteSection heading="All Vaults 탭">
           <p>컬럼: Vault ID / Amount(정렬) / Status(필터) / Depositor / Provider / DApp(필터) / Created (Age)(정렬) / Closed (Age).</p>
@@ -338,7 +436,7 @@ export default function VaultsPage() {
           <p>기본 정렬: Created 내림차순 (최신순).</p>
           <p>Created/Closed는 상대 시간(e.g. &quot;2 hours ago&quot;)으로 표시.</p>
         </DevNoteSection>
-        <DevNoteSection heading="Vault History 탭">
+        <DevNoteSection heading="Vault Activity 탭">
           <p>Vault 상태 변경 이벤트(Created, Activated, Expired, Redeemed, Liquidated)를 시간순으로 나열.</p>
           <p>레이아웃: 날짜별 그룹 → 각 카드에 왼쪽 시간(HH:MM + ago), 상태 chip, 엔티티 정보, Tx/Block.</p>
           <p>엔티티 표시 순서: 라벨 → 아이콘 → 주소 (예: VAULT 🔒 0x1234...abcd).</p>
@@ -358,11 +456,14 @@ export default function VaultsPage() {
       </DevNote>
       <h1 className="text-lg font-semibold text-[#14140f]">Vaults</h1>
 
+      {/* Vault Status bar chart */}
+      <VaultStatusChart vaults={MOCK_VAULTS} />
+
       {/* Tab bar */}
       <div className="flex border-b border-[#387085]/15">
         {([
           { key: 'all' as PageTab, label: 'All Vaults', count: total },
-          { key: 'activity' as PageTab, label: 'Vault History', count: MOCK_VAULT_ACTIVITIES.length },
+          { key: 'activity' as PageTab, label: 'Vault Activity', count: MOCK_VAULT_ACTIVITIES.length },
         ]).map((tab) => (
           <button
             key={tab.key}
