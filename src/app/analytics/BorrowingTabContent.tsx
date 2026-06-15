@@ -192,9 +192,10 @@ export default function BorrowingTabContent() {
               <Tooltip
                 contentStyle={{ backgroundColor: '#fff', border: '1px solid rgba(56,112,133,0.2)', borderRadius: 0, fontSize: 11 }}
                 labelFormatter={(label) => formatDateLabel(String(label))}
-                formatter={(value: number, name: string) => {
-                  if (name === 'count') return [`${value}`, 'Liquidation Count'];
-                  return [`${value.toFixed(4)} sBTC`, 'Liquidated BTC'];
+                formatter={(value, name) => {
+                  const v = Number(value ?? 0);
+                  if (name === 'count') return [`${v}`, 'Liquidation Count'];
+                  return [`${v.toFixed(4)} sBTC`, 'Liquidated BTC'];
                 }}
               />
               <Legend
@@ -259,9 +260,10 @@ export default function BorrowingTabContent() {
               <Tooltip
                 contentStyle={{ backgroundColor: '#fff', border: '1px solid rgba(56,112,133,0.2)', borderRadius: 0, fontSize: 11 }}
                 labelFormatter={(label) => formatDateLabel(String(label))}
-                formatter={(value: number, name: string) => {
-                  if (name === 'count') return [`${value}`, 'Borrow Count'];
-                  return [`${value}`, 'Total Borrows'];
+                formatter={(value, name) => {
+                  const v = Number(value ?? 0);
+                  if (name === 'count') return [`${v}`, 'Borrow Count'];
+                  return [`${v}`, 'Total Borrows'];
                 }}
               />
               <Legend
