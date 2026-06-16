@@ -165,6 +165,67 @@ export async function getVaultLifecycle(vaultId: string): Promise<VaultLifecycle
       event.expired_reason = rand() > 0.5 ? 0 : 1;
     }
 
+    // BTC L1 counterpart — only for stages with BTC activity
+    const btcBlockBase = 200000 + Math.floor(elapsed / 600000);
+    if (eventType === 'SUBMITTED') {
+      event.btc = {
+        tx_hash: randHex(64),
+        label: 'Pre Peg-in TX',
+        description: 'BTC deposited into an HTLC output on Bitcoin, awaiting peg-in.',
+        block_height: btcBlockBase,
+        confirmations: 6 + Math.floor(rand() * 20),
+        status: 'confirmed',
+        utxo_type: 'htlc',
+        utxo_address: vault.btcAddress,
+        utxo_vout: 0,
+        utxo_value: vault.vaultSize,
+      };
+    }
+    if (eventType === 'ACTIVATED') {
+      event.btc = {
+        tx_hash: vault.btcPegInTxHash,
+        label: 'Peg-in TX',
+        description: 'HTLC output spent into the vault UTXO, locking BTC as collateral.',
+        block_height: btcBlockBase + 1,
+        confirmations: 3 + Math.floor(rand() * 10),
+        status: 'confirmed',
+        utxo_type: 'vault',
+        utxo_address: vault.btcAddress,
+        utxo_vout: 0,
+        utxo_value: vault.vaultSize,
+      };
+    }
+    if (eventType === 'CLAIMABLE_BY') {
+      event.btc = {
+        tx_hash: randHex(64),
+        label: 'PegOut / Claim TX',
+        description: 'Vault UTXO consumed — BTC released to claimer.',
+        block_height: btcBlockBase + 2,
+        confirmations: 1 + Math.floor(rand() * 6),
+        status: rand() > 0.3 ? 'confirmed' : 'mempool',
+      };
+    }
+    if (eventType === 'LIQUIDATED') {
+      event.btc = {
+        tx_hash: randHex(64),
+        label: 'Sweep TX',
+        description: 'Vault UTXO swept by liquidator.',
+        block_height: btcBlockBase + 2,
+        confirmations: 2 + Math.floor(rand() * 8),
+        status: 'confirmed',
+      };
+    }
+    if (eventType === 'EXPIRED') {
+      event.btc = {
+        tx_hash: randHex(64),
+        label: 'Timeout Refund TX',
+        description: 'HTLC timelock expired — depositor reclaims BTC.',
+        block_height: btcBlockBase + 3,
+        confirmations: 4 + Math.floor(rand() * 10),
+        status: 'confirmed',
+      };
+    }
+
     events.push(event);
   }
 

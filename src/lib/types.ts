@@ -53,6 +53,20 @@ export interface VaultLifecycleEvent {
   acker?: string;
   /** EXPIRED 시 사유 (0=ack_timeout, 1=activation_timeout) */
   expired_reason?: number;
+  /** BTC L1 counterpart — only for stages with BTC activity */
+  btc?: {
+    tx_hash: string;
+    label: string;
+    description: string;
+    block_height: number;
+    confirmations: number;
+    status: 'confirmed' | 'mempool';
+    /** UTXO type for PegIn step */
+    utxo_type?: 'htlc' | 'vault';
+    utxo_address?: string;
+    utxo_vout?: number;
+    utxo_value?: number;
+  };
 }
 
 /** Account entity for the account list / detail pages */

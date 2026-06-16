@@ -32,12 +32,6 @@ interface Props {
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
-function truncateHash(hash: string, start = 6, end = 4): string {
-  if (!hash) return '';
-  if (hash.length <= start + end + 3) return hash;
-  return `${hash.slice(0, start)}...${hash.slice(-end)}`;
-}
-
 function truncateTx(hash: string): string {
   if (!hash) return '';
   if (hash.length <= 10) return hash;
@@ -57,32 +51,22 @@ function DetailRow({ label, children }: { label: string; children: React.ReactNo
   );
 }
 
-// ── Status-milestone timeline ────────────────────────────────────────────────
+// ── Dual-chain timeline ─────────────────────────────────────────────────────
 
-interface MilestoneEvent {
-  key: string;
-  status: VaultStatus;
-  label: string;
-  description: string;
-  isCurrent: boolean;
-  timestamp: string | null;
-  blockNumber: number | null;
-  txHash: string | null;
-  depositor?: string;
-}
-
-const MILESTONE_DESCRIPTIONS: Record<string, string> = {
-  Pending:               'Peg-in submitted. Collecting signatures from all required parties.',
-  'Signature Collected': 'Signatures collected, awaiting acknowledgements (ACK).',
-  Verified:              'All required signatures collected; awaiting activation by depositor.',
-  Available:             'Activated — Locked and usable as collateral.',
-  Redeemed:              'BTC ready to claim.',
-  Expired:               'Vault expired before activation was completed.',
-  Liquidated:            'Vault was undercollateralized and liquidated.',
+// EVM event → display status mapping
+const EVM_LABEL: Record<string, { status: VaultStatus; label: string; desc: string; role?: string }> = {
+  SUBMITTED:         { status: 'Pending',              label: 'Pending',                desc: 'Peg-in submitted. Collecting signatures from all required parties.', role: 'Depositor' },
+  SIGNATURES_POSTED: { status: 'Signature Collected',  label: 'Signatures Collected',   desc: 'Signatures collected, awaiting acknowledgement (ACK).' },
+  ACK_SUBMITTED:     { status: 'Signature Collected',  label: 'Signatures Collected',   desc: 'Acknowledgement submitted by acker.' },
+  REQUEST_VERIFIED:  { status: 'Verified',             label: 'Verified',               desc: 'All required signatures collected; awaiting activation by depositor.' },
+  ACTIVATED:         { status: 'Available',            label: 'Available',              desc: 'Activated — Locked and usable as collateral.' },
+  CLAIMABLE_BY:      { status: 'Redeemed',             label: 'Redeemed',               desc: 'BTC ready to claim.' },
+  EXPIRED:           { status: 'Expired',              label: 'Expired',                desc: 'Vault expired before activation completed.' },
+  LIQUIDATED:        { status: 'Liquidated',           label: 'Liquidated',             desc: 'Undercollateralized — vault liquidated.' },
 };
 
-// Status icon colors matching the page-level StatusIcon
-const STATUS_ICON_STYLES: Record<string, { bg: string; color: string; icon: string }> = {
+// Status icon styles with icon type
+const STATUS_ICON_STYLES: Record<string, { bg: string; color: string; icon: 'clock' | 'pencil' | 'check' | 'x' | 'alert' }> = {
   Pending:               { bg: 'bg-amber-100',   color: 'text-amber-600',   icon: 'clock' },
   'Signature Collected': { bg: 'bg-yellow-100',  color: 'text-yellow-600',  icon: 'pencil' },
   Verified:              { bg: 'bg-green-100',   color: 'text-green-600',   icon: 'check' },
@@ -92,227 +76,253 @@ const STATUS_ICON_STYLES: Record<string, { bg: string; color: string; icon: stri
   Liquidated:            { bg: 'bg-red-100',     color: 'text-red-600',     icon: 'alert' },
 };
 
-function MilestoneIcon({ status, isCurrent }: { status: string; isCurrent: boolean }) {
-  const s = STATUS_ICON_STYLES[status] ?? STATUS_ICON_STYLES.Pending;
-  const size = isCurrent ? 'h-9 w-9' : 'h-8 w-8';
-  const iconSize = isCurrent ? 'h-4 w-4' : 'h-3.5 w-3.5';
-
-  const iconEl = (() => {
-    switch (s.icon) {
-      case 'check':
-        return (
-          <svg className={iconSize} fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
-          </svg>
-        );
-      case 'clock':
-        return (
-          <svg className={iconSize} fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6l4 2" />
-          </svg>
-        );
-      case 'pencil':
-        return (
-          <svg className={iconSize} fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Z" />
-          </svg>
-        );
-      case 'x':
-        return (
-          <svg className={iconSize} fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
-          </svg>
-        );
-      case 'alert':
-        return (
-          <svg className={iconSize} fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" />
-          </svg>
-        );
-      default:
-        return null;
-    }
-  })();
+// Milestone icon SVG component
+function MilestoneIcon({ icon, bg, color, isCurrent }: { icon: string; bg: string; color: string; isCurrent?: boolean }) {
+  const svgMap: Record<string, React.ReactNode> = {
+    clock: (
+      <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+      </svg>
+    ),
+    pencil: (
+      <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Z" />
+      </svg>
+    ),
+    check: (
+      <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+      </svg>
+    ),
+    x: (
+      <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
+      </svg>
+    ),
+    alert: (
+      <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" />
+      </svg>
+    ),
+  };
 
   return (
-    <div className={`flex ${size} shrink-0 items-center justify-center rounded-full ${s.bg} ${s.color}`}>
-      {iconEl}
+    <span className={`inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full ${bg} ${color} ${
+      isCurrent ? 'ring-2 ring-[#cd6332] ring-offset-1' : ''
+    }`}>
+      {svgMap[icon] ?? svgMap.clock}
+    </span>
+  );
+}
+
+function formatDelta(ms: number): string {
+  const s = Math.floor(ms / 1000);
+  if (s < 60) return `${s}s`;
+  const m = Math.floor(s / 60);
+  if (m < 60) return `${m}m ${s % 60}s`;
+  const h = Math.floor(m / 60);
+  return `${h}h ${m % 60}m`;
+}
+
+function formatTime(ts: string): string {
+  const d = new Date(ts);
+  return d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false, timeZone: 'UTC' }) + ' UTC';
+}
+
+interface TimelineRow {
+  evmEvent: VaultLifecycleEvent;
+  evmMeta: { status: VaultStatus; label: string; desc: string; role?: string };
+  isCurrent: boolean;
+  delta: number | null; // ms from previous event
+}
+
+function buildTimeline(vault: VaultData, lifecycle: VaultLifecycleEvent[]): TimelineRow[] {
+  // Sort chronologically first to determine "current" (latest) and deltas
+  const chrono = [...lifecycle].sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
+
+  const rows = chrono.map((e, i) => {
+    const meta = EVM_LABEL[e.event_type] ?? { status: 'Pending' as VaultStatus, label: e.event_type, desc: '' };
+    const nextTs = i < chrono.length - 1 ? new Date(chrono[i + 1].timestamp).getTime() : null;
+    const curTs = new Date(e.timestamp).getTime();
+    return {
+      evmEvent: e,
+      evmMeta: meta,
+      isCurrent: i === chrono.length - 1,
+      // delta = time until the next event (shown between rows in reverse order)
+      delta: nextTs !== null ? nextTs - curTs : null,
+    };
+  });
+
+  // Reverse: most recent first
+  return rows.reverse();
+}
+
+/* ── Desktop dual-chain row ──────────────────────────────────────────────── */
+
+function DualChainRow({ row, isLast }: { row: TimelineRow; isLast: boolean }) {
+  const { evmEvent, evmMeta, isCurrent, delta } = row;
+  const btc = evmEvent.btc;
+  const iconStyle = STATUS_ICON_STYLES[evmMeta.status] ?? STATUS_ICON_STYLES.Pending;
+
+  return (
+    <div className="relative grid grid-cols-[1fr_56px_1fr] gap-0">
+      {/* ── LEFT: BTC L1 (simplified) ─────────────────────────────── */}
+      <div className="flex justify-end pr-4 py-3">
+        {btc ? (
+          <div className="max-w-[320px] text-right">
+            <span className="text-[11px] font-semibold text-[#14140f]">{btc.label}</span>
+            <p className="mt-0.5 text-[10px] leading-relaxed text-[#387085]/50">{btc.description}</p>
+            <div className="mt-1 flex items-center justify-end gap-x-2 gap-y-0.5">
+              <span className="inline-flex items-center gap-1">
+                <span className="text-[9px] font-medium uppercase tracking-wide text-[#387085]/35">TXN</span>
+                <span className="flex h-3.5 w-3.5 shrink-0 items-center justify-center rounded-full bg-orange-100 text-[8px] font-bold text-orange-600">₿</span>
+                <a
+                  href={`https://mempool.space/signet/tx/${btc.tx_hash}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="font-mono text-[10px] text-orange-600/70 hover:text-orange-600 hover:underline"
+                >
+                  {truncateTx(btc.tx_hash)}
+                </a>
+                <CopyButton text={btc.tx_hash} />
+              </span>
+            </div>
+          </div>
+        ) : (
+          <div className="flex items-center py-2">
+            <span className="text-[10px] italic text-[#387085]/20">—</span>
+          </div>
+        )}
+      </div>
+
+      {/* ── CENTER: Spine with time + ago ──────────────────────────── */}
+      <div className="relative flex flex-col items-center">
+        {/* Connector line top */}
+        <div className="w-px flex-1 bg-[#387085]/15" />
+        {/* Time label */}
+        <div className="relative z-10 flex shrink-0 flex-col items-center py-1">
+          <span className="whitespace-nowrap text-[8px] font-medium tabular-nums text-[#387085]/50">
+            {formatTime(evmEvent.timestamp)}
+          </span>
+          <span className="whitespace-nowrap text-[7px] text-[#387085]/30">
+            {formatRelativeTime(evmEvent.timestamp)}
+          </span>
+          {delta !== null && (
+            <span className="mt-0.5 whitespace-nowrap text-[7px] tabular-nums text-[#387085]/25">
+              Δ {formatDelta(delta)}
+            </span>
+          )}
+        </div>
+        {/* Connector line bottom */}
+        {!isLast && <div className="w-px flex-1 bg-[#387085]/15" />}
+        {isLast && <div className="w-px flex-1" />}
+      </div>
+
+      {/* ── RIGHT: EVM (milestone format) ─────────────────────────── */}
+      <div className="pl-4 py-3">
+        <div className="max-w-[380px]">
+          {/* Icon + Label + Current badge + Depositor */}
+          <div className="flex items-center gap-2">
+            <MilestoneIcon icon={iconStyle.icon} bg={iconStyle.bg} color={iconStyle.color} isCurrent={isCurrent} />
+            <div className="min-w-0">
+              <div className="flex items-center gap-1.5">
+                <span className="text-[12px] font-semibold text-[#14140f]">{evmMeta.label}</span>
+                {isCurrent && (
+                  <span className="rounded-full bg-[#cd6332] px-1.5 py-0.5 text-[9px] font-medium text-white">Current</span>
+                )}
+                {evmMeta.role && (
+                  <span className="inline-flex items-center gap-1 text-[9px] text-[#387085]/40">
+                    by <Link href={`/accounts/${evmEvent.depositor}`} className="font-mono hover:text-[#387085] hover:underline">{truncateTx(evmEvent.depositor)}</Link>
+                  </span>
+                )}
+              </div>
+            </div>
+          </div>
+          {/* Description */}
+          <p className="mt-1 pl-8 text-[10px] leading-relaxed text-[#387085]/55">{evmMeta.desc}</p>
+          {/* Block + TXN inline */}
+          <div className="mt-1.5 flex flex-wrap items-center gap-x-2.5 gap-y-0.5 pl-8">
+            <span className="inline-flex items-center gap-1">
+              <span className="text-[9px] font-medium uppercase tracking-wide text-[#387085]/35">Block</span>
+              <span className="font-mono text-[10px] text-[#387085]/40">#{evmEvent.block_number.toLocaleString()}</span>
+            </span>
+            <span className="inline-flex items-center gap-1">
+              <span className="text-[9px] font-medium uppercase tracking-wide text-[#387085]/35">TXN</span>
+              <Link
+                href={`/tx/${evmEvent.tx_hash}`}
+                className="font-mono text-[10px] text-[#cd6332] hover:underline"
+              >
+                {truncateTx(evmEvent.tx_hash)}
+              </Link>
+              <CopyButton text={evmEvent.tx_hash} />
+            </span>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
 
-function buildMilestones(vault: VaultData, lifecycle: VaultLifecycleEvent[]): MilestoneEvent[] {
-  const eventMap = new Map(lifecycle.map((e) => [e.event_type, e]));
-  const completedTypes = new Set(lifecycle.map((e) => e.event_type));
+/* ── Mobile single-column fallback ───────────────────────────────────────── */
 
-  const milestones: MilestoneEvent[] = [];
+function MobileTimelineRow({ row, isLast }: { row: TimelineRow; isLast: boolean }) {
+  const { evmEvent, evmMeta, isCurrent, delta } = row;
+  const btc = evmEvent.btc;
+  const iconStyle = STATUS_ICON_STYLES[evmMeta.status] ?? STATUS_ICON_STYLES.Pending;
 
-  // 1. Pending — triggered by SUBMITTED
-  if (completedTypes.has('SUBMITTED')) {
-    const e = eventMap.get('SUBMITTED')!;
-    milestones.push({
-      key: 'Pending',
-      status: 'Pending',
-      label: 'Pending',
-      description: MILESTONE_DESCRIPTIONS.Pending,
-      isCurrent: false,
-      timestamp: e.timestamp,
-      blockNumber: e.block_number,
-      txHash: e.tx_hash,
-      depositor: e.depositor,
-    });
-  }
-
-  // 2. Signature Collected — triggered by SIGNATURES_POSTED
-  if (completedTypes.has('SIGNATURES_POSTED')) {
-    const e = eventMap.get('SIGNATURES_POSTED')!;
-    milestones.push({
-      key: 'Signature Collected',
-      status: 'Signature Collected',
-      label: 'Signatures Collected',
-      description: MILESTONE_DESCRIPTIONS['Signature Collected'],
-      isCurrent: false,
-      timestamp: e.timestamp,
-      blockNumber: e.block_number,
-      txHash: e.tx_hash,
-    });
-  }
-
-  // 3. Verified — triggered by REQUEST_VERIFIED
-  if (completedTypes.has('REQUEST_VERIFIED')) {
-    const e = eventMap.get('REQUEST_VERIFIED')!;
-    milestones.push({
-      key: 'Verified',
-      status: 'Verified',
-      label: 'Verified',
-      description: MILESTONE_DESCRIPTIONS.Verified,
-      isCurrent: false,
-      timestamp: e.timestamp,
-      blockNumber: e.block_number,
-      txHash: e.tx_hash,
-    });
-  }
-
-  // 4. Available — triggered by ACTIVATED
-  if (completedTypes.has('ACTIVATED')) {
-    const e = eventMap.get('ACTIVATED')!;
-    milestones.push({
-      key: 'Available',
-      status: 'Available',
-      label: 'Available',
-      description: MILESTONE_DESCRIPTIONS.Available,
-      isCurrent: false,
-      timestamp: e.timestamp,
-      blockNumber: e.block_number,
-      txHash: e.tx_hash,
-    });
-  }
-
-  // 5. Terminal status (Redeemed / Expired / Liquidated)
-  const terminalType: VaultEventType | null = completedTypes.has('EXPIRED')
-    ? 'EXPIRED'
-    : completedTypes.has('LIQUIDATED')
-      ? 'LIQUIDATED'
-      : completedTypes.has('CLAIMABLE_BY')
-        ? 'CLAIMABLE_BY'
-        : null;
-
-  if (terminalType) {
-    const e = eventMap.get(terminalType);
-    const isRedeemed = vault.status === 'Redeemed';
-    const statusKey = isRedeemed ? 'Redeemed' : terminalType === 'EXPIRED' ? 'Expired' : 'Liquidated';
-    milestones.push({
-      key: statusKey,
-      status: statusKey as VaultStatus,
-      label: statusKey,
-      description: MILESTONE_DESCRIPTIONS[statusKey] ?? '',
-      isCurrent: false,
-      timestamp: e?.timestamp ?? vault.closedAt ?? null,
-      blockNumber: e?.block_number ?? null,
-      txHash: e?.tx_hash ?? null,
-    });
-  }
-
-  // Mark current (last milestone = current status)
-  if (milestones.length > 0) {
-    milestones[milestones.length - 1].isCurrent = true;
-  }
-
-  // Reverse so newest is on top
-  milestones.reverse();
-
-  return milestones;
-}
-
-function MilestoneRow({ event, isLast }: { event: MilestoneEvent; isLast: boolean }) {
   return (
-    <div className="relative flex gap-4 pb-7 last:pb-0">
-      {/* Left: icon + connector */}
-      <div className="flex w-9 flex-shrink-0 flex-col items-center">
-        <MilestoneIcon status={event.status} isCurrent={event.isCurrent} />
+    <div className="relative flex gap-3 pb-5 last:pb-0">
+      {/* Spine — milestone icon */}
+      <div className="flex flex-col items-center">
+        <MilestoneIcon icon={iconStyle.icon} bg={iconStyle.bg} color={iconStyle.color} isCurrent={isCurrent} />
         {!isLast && <div className="mt-1 w-px flex-1 bg-[#387085]/15" />}
       </div>
 
-      {/* Right: content */}
+      {/* Content */}
       <div className="min-w-0 flex-1 pb-1">
-        {/* Row 1: label + Current badge + right-aligned timestamp */}
-        <div className="flex items-start justify-between gap-2">
-          <div className="flex items-center gap-2">
-            <span className="text-sm font-semibold text-[#14140f]">{event.label}</span>
-            {event.isCurrent && (
-              <span className="rounded-full bg-[#cd6332] px-2 py-0.5 text-[10px] font-medium text-white">
-                Current
-              </span>
-            )}
+        {delta !== null && (
+          <span className="text-[8px] tabular-nums text-[#387085]/30">+{formatDelta(delta)}</span>
+        )}
+        {/* EVM */}
+        <div className="flex flex-wrap items-center gap-1.5">
+          <span className="text-[11px] font-semibold text-[#14140f]">{evmMeta.label}</span>
+          {isCurrent && (
+            <span className="rounded-full bg-[#cd6332] px-1.5 py-0.5 text-[9px] font-medium text-white">Current</span>
+          )}
+          {evmMeta.role && (
+            <span className="text-[9px] text-[#387085]/40">
+              by <Link href={`/accounts/${evmEvent.depositor}`} className="font-mono hover:text-[#387085] hover:underline">{truncateTx(evmEvent.depositor)}</Link>
+            </span>
+          )}
+          <span className="text-[9px] text-[#387085]/30">{formatRelativeTime(evmEvent.timestamp)}</span>
+        </div>
+        <p className="text-[10px] text-[#387085]/55">{evmMeta.desc}</p>
+        <div className="mt-1 flex flex-wrap items-center gap-2 text-[10px]">
+          <span className="font-mono text-[#387085]/40">#{evmEvent.block_number.toLocaleString()}</span>
+          <Link href={`/tx/${evmEvent.tx_hash}`} className="font-mono text-[#cd6332] hover:underline">
+            {truncateTx(evmEvent.tx_hash)}
+          </Link>
+        </div>
+
+        {/* BTC (inline card) */}
+        {btc && (
+          <div className="mt-2 rounded border border-orange-200/50 bg-orange-50/30 px-2.5 py-1.5">
+            <span className="text-[10px] font-semibold text-[#14140f]">{btc.label}</span>
+            <p className="mt-0.5 text-[9px] text-[#387085]/50">{btc.description}</p>
+            <div className="mt-1 flex items-center gap-1">
+              <span className="text-[8px] font-medium uppercase tracking-wide text-[#387085]/35">TXN</span>
+              <span className="flex h-3.5 w-3.5 shrink-0 items-center justify-center rounded-full bg-orange-100 text-[8px] font-bold text-orange-600">₿</span>
+              <a
+                href={`https://mempool.space/signet/tx/${btc.tx_hash}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-mono text-[9px] text-orange-600/70 hover:underline"
+              >
+                {truncateTx(btc.tx_hash)}
+              </a>
+            </div>
           </div>
-          {event.timestamp && (
-            <span className="shrink-0 whitespace-nowrap text-[11px] text-[#387085]/50">
-              {formatRelativeTime(event.timestamp)} ({formatDateTime(event.timestamp)})
-            </span>
-          )}
-        </div>
-
-        {/* Row 2: description */}
-        <p className="mt-0.5 text-[11px] leading-relaxed text-[#387085]/60">
-          {event.description}
-        </p>
-
-        {/* Row 3: BLOCK + TXN + DEPOSITOR inline */}
-        <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1">
-          {event.blockNumber !== null && (
-            <span className="inline-flex items-center gap-1">
-              <span className="text-[10px] font-medium uppercase tracking-wide text-[#387085]/35">Block</span>
-              <span className="font-mono text-[11px] text-[#387085]/50">#{event.blockNumber.toLocaleString()}</span>
-            </span>
-          )}
-          {event.txHash && (
-            <span className="inline-flex items-center gap-1">
-              <span className="text-[10px] font-medium uppercase tracking-wide text-[#387085]/35">TXN</span>
-              <Link
-                href={`/tx/${event.txHash}`}
-                className="font-mono text-[11px] text-[#cd6332] hover:underline"
-              >
-                {truncateTx(event.txHash)}
-              </Link>
-              <CopyButton text={event.txHash} />
-            </span>
-          )}
-          {event.depositor && (
-            <span className="inline-flex items-center gap-1">
-              <span className="text-[10px] font-medium uppercase tracking-wide text-[#387085]/35">Depositor</span>
-              <svg className="h-3 w-3 text-[#387085]/30" fill="none" viewBox="0 0 24 24" strokeWidth="1.8" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M13.19 8.688a4.5 4.5 0 0 1 1.242 7.244l-4.5 4.5a4.5 4.5 0 0 1-6.364-6.364l1.757-1.757m9.86-3.02a4.5 4.5 0 0 0-1.242-7.244l4.5-4.5a4.5 4.5 0 1 1 6.364 6.364l-1.757 1.757" />
-              </svg>
-              <Link
-                href={`/accounts/${event.depositor}`}
-                className="font-mono text-[11px] text-[#cd6332] hover:underline"
-              >
-                {truncateTx(event.depositor)}
-              </Link>
-              <CopyButton text={event.depositor} />
-            </span>
-          )}
-        </div>
+        )}
       </div>
     </div>
   );
@@ -325,7 +335,7 @@ type TabKey = 'overview' | 'transaction';
 
 export default function VaultDetailTabs({ vault, lifecycle }: Props) {
   const [activeTab, setActiveTab] = useState<TabKey>('overview');
-  const milestones = buildMilestones(vault, lifecycle);
+  const timeline = buildTimeline(vault, lifecycle);
 
   return (
     <div className="space-y-5">
@@ -354,7 +364,7 @@ export default function VaultDetailTabs({ vault, lifecycle }: Props) {
         >
           Vault Activity
           <span className={`ml-1.5 text-[10px] ${activeTab === 'transaction' ? 'text-[#cd6332]/70' : 'text-[#387085]/40'}`}>
-            {milestones.length}
+            {timeline.length}
           </span>
           {activeTab === 'transaction' && (
             <span className="absolute bottom-[-1px] left-5 right-5 h-[2px] bg-[#cd6332]" />
@@ -501,14 +511,28 @@ export default function VaultDetailTabs({ vault, lifecycle }: Props) {
           </details>
         </div>
       ) : (
-        <div className="border border-[#387085]/10 bg-white px-5 py-5">
-          {milestones.map((event, idx) => (
-            <MilestoneRow
-              key={event.key}
-              event={event}
-              isLast={idx === milestones.length - 1}
-            />
-          ))}
+        <div className="border border-[#387085]/10 bg-white">
+          {/* Desktop: dual-chain timeline */}
+          <div className="hidden px-2 py-4 sm:block">
+            {timeline.map((row, idx) => (
+              <DualChainRow
+                key={row.evmEvent.event_type + idx}
+                row={row}
+                isLast={idx === timeline.length - 1}
+              />
+            ))}
+          </div>
+
+          {/* Mobile: single-column fallback */}
+          <div className="block px-4 py-4 sm:hidden">
+            {timeline.map((row, idx) => (
+              <MobileTimelineRow
+                key={row.evmEvent.event_type + idx}
+                row={row}
+                isLast={idx === timeline.length - 1}
+              />
+            ))}
+          </div>
         </div>
       )}
     </div>
