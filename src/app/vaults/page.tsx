@@ -209,7 +209,7 @@ function VaultStatusChart({ vaults, activeFilter, onStatusClick }: VaultStatusCh
       {/* ── Distribution bar ────────────────────────────────────────── */}
       <section className="border border-[#387085]/10 bg-white">
         <div className="flex items-center justify-between px-5 py-3">
-          <h2 className="text-sm font-semibold text-[#14140f]">Vault Status Distribution</h2>
+          <h2 className="text-sm font-semibold text-[#14140f]">Vault Status</h2>
           {/* Count ↔ BTC toggle */}
           <div className="flex items-center gap-0.5 rounded-sm border border-[#387085]/15 p-0.5">
             <button
