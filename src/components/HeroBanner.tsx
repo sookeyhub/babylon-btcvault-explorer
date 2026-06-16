@@ -290,14 +290,14 @@ export default function HeroBanner() {
           </div>
           <p className="mt-0.5 text-xs text-[#387085]/40">$5,342.33 borrowed</p>
         </div>
-        {/* Card 3: Active Borrowers */}
+        {/* Card 3: Liquidations */}
         <div className="border border-[#387085]/10 bg-white p-3">
-          <p className="text-[11px] font-medium uppercase tracking-wide text-[#387085]/50">Active Borrowers</p>
+          <p className="text-[11px] font-medium uppercase tracking-wide text-[#387085]/50">Liquidations</p>
           <div className="mt-1.5 flex items-baseline gap-2">
-            <p className="text-2xl font-semibold tabular-nums text-[#14140f]">10</p>
-            <span className="text-xs text-green-600">+0.45% (24h)</span>
+            <p className="text-2xl font-semibold tabular-nums text-[#14140f]">0.3842 <span className="text-sm font-normal text-[#387085]/50">sBTC</span></p>
+            <span className="text-xs text-green-600">+1.28% (24h)</span>
           </div>
-          <p className="mt-0.5 text-xs text-[#387085]/40">of 63</p>
+          <p className="mt-0.5 text-xs text-[#387085]/40">$26,612</p>
         </div>
         {/* Card 4: Active Vaults */}
         <div className="border border-[#387085]/10 bg-white p-3">

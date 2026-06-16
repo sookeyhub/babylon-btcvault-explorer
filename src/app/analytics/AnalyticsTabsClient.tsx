@@ -103,17 +103,17 @@ export default function AnalyticsTabsClient(props: AnalyticsTabsClientProps) {
           <p className="mt-0.5 text-xs text-[#387085]/40">$5,342.33 borrowed</p>
         </div>
 
-        {/* Card 3: Active Borrowers */}
+        {/* Card 3: Liquidations */}
         <div className="relative rounded-none border border-[#387085]/20 bg-white px-5 py-4">
           <CornerBrackets />
           <p className="flex items-center gap-1 text-xs text-[rgba(56,112,133,0.55)]">
-            Active Borrowers
+            Liquidations
           </p>
           <div className="mt-1.5 flex items-baseline gap-2">
-            <p className="text-xl font-bold tabular-nums text-[#14140f]">10</p>
-            <span className="text-xs text-green-600">+0.45% (24h)</span>
+            <p className="text-xl font-bold tabular-nums text-[#14140f]">0.3842 sBTC</p>
+            <span className="text-xs text-green-600">+1.28% (24h)</span>
           </div>
-          <p className="mt-0.5 text-xs text-[#387085]/40">of 63</p>
+          <p className="mt-0.5 text-xs text-[#387085]/40">{toUsd(0.3842)}</p>
         </div>
 
         {/* Card 4: Active Vaults */}

@@ -111,8 +111,17 @@ function vaultDateGroupHeader(dateKey: string): string {
 
 /* ── Vault Status Bar Chart ────────────────────────────────────────────── */
 
-function VaultStatusChart({ vaults }: { vaults: Vault[] }) {
+type BarMetric = 'count' | 'btc';
+
+interface VaultStatusChartProps {
+  vaults: Vault[];
+  activeFilter: VaultStatus | 'ALL';
+  onStatusClick: (status: VaultStatus | 'ALL') => void;
+}
+
+function VaultStatusChart({ vaults, activeFilter, onStatusClick }: VaultStatusChartProps) {
   const [hovered, setHovered] = useState<string | null>(null);
+  const [metric, setMetric] = useState<BarMetric>('btc');
   const totalVaults = vaults.length;
   const totalBtc = vaults.reduce((s, v) => s + v.vaultSize, 0);
 
@@ -124,82 +133,200 @@ function VaultStatusChart({ vaults }: { vaults: Vault[] }) {
     }))
     .filter((s) => s.count > 0);
 
+  // Group: Setting up (Pending, Verified, Signature Collected), Active (Available), Closed (Redeemed, Expired, Liquidated)
+  const SETTING_UP: VaultStatus[] = ['Pending', 'Verified', 'Signature Collected'];
+  const ACTIVE: VaultStatus[] = ['Available'];
+  const CLOSED: VaultStatus[] = ['Redeemed', 'Expired', 'Liquidated'];
+  const settingUpCount = vaults.filter((v) => SETTING_UP.includes(v.status)).length;
+  const activeCount = vaults.filter((v) => ACTIVE.includes(v.status)).length;
+  const closedCount = vaults.filter((v) => CLOSED.includes(v.status)).length;
+  const redeemedCount = statusDist.find((s) => s.status === 'Redeemed')?.count ?? 0;
+  const expiredCount = statusDist.find((s) => s.status === 'Expired')?.count ?? 0;
+  const liquidatedCount = statusDist.find((s) => s.status === 'Liquidated')?.count ?? 0;
+  const liquidatedBtc = statusDist.find((s) => s.status === 'Liquidated')?.btc ?? 0;
+  const redeemSuccessRate = closedCount > 0 ? ((redeemedCount / closedCount) * 100).toFixed(0) : '0';
+
   if (totalVaults === 0) return null;
 
+  const totalMetric = metric === 'count' ? totalVaults : totalBtc;
+
   return (
-    <section className="border border-[#387085]/10 bg-white">
-      <div className="flex items-center justify-between px-5 py-3">
-        <h2 className="text-sm font-semibold text-[#14140f]">Vault Status Distribution</h2>
-        <span className="text-[11px] text-[#387085]/50">
-          {totalVaults.toLocaleString()} vaults · {totalBtc.toFixed(2)} sBTC
-        </span>
+    <div className="space-y-3">
+      {/* ── 4 KPI Summary Cards ─────────────────────────────────────── */}
+      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+        {/* Card 1: Locked BTC */}
+        <div className="border border-[#387085]/10 bg-white p-3" title="Total BTC locked as collateral across all vaults">
+          <p className="flex items-center gap-1 text-[11px] font-medium uppercase tracking-wide text-[#387085]/50">
+            Locked BTC
+            <svg className="h-3 w-3 text-[#387085]/30" fill="none" viewBox="0 0 24 24" strokeWidth="1.8" stroke="currentColor">
+              <title>Total BTC locked as collateral across all vaults</title>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z" />
+            </svg>
+          </p>
+          <p className="mt-1.5 text-2xl font-semibold tabular-nums text-[#14140f]">{totalBtc.toFixed(2)} <span className="text-sm font-normal text-[#387085]/50">sBTC</span></p>
+          <p className="mt-0.5 text-xs text-[#387085]/40">{toUsd(totalBtc)}</p>
+        </div>
+
+        {/* Card 2: Active Vaults */}
+        <div className="border border-[#387085]/10 bg-white p-3" title="Vaults currently active out of all vaults">
+          <p className="flex items-center gap-1 text-[11px] font-medium uppercase tracking-wide text-[#387085]/50">
+            Active Vaults
+            <svg className="h-3 w-3 text-[#387085]/30" fill="none" viewBox="0 0 24 24" strokeWidth="1.8" stroke="currentColor">
+              <title>Vaults currently active out of all vaults</title>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z" />
+            </svg>
+          </p>
+          <p className="mt-1.5 text-2xl font-semibold tabular-nums text-[#14140f]">{activeCount}</p>
+          <p className="mt-0.5 text-xs text-[#387085]/40">of {totalVaults}</p>
+        </div>
+
+        {/* Card 3: Liquidations */}
+        <div className="border border-[#387085]/10 bg-white p-3" title="Vaults liquidated to date and the BTC seized">
+          <p className="text-[11px] font-medium uppercase tracking-wide text-[#387085]/50">
+            Liquidations
+          </p>
+          <div className="mt-1.5 flex items-baseline gap-2">
+            <p className="text-2xl font-semibold tabular-nums text-[#14140f]">{liquidatedBtc.toFixed(4)} <span className="text-sm font-normal text-[#387085]/50">sBTC</span></p>
+            <span className="text-xs text-green-600">+1.28% (24h)</span>
+          </div>
+          <p className="mt-0.5 text-xs text-[#387085]/40">{toUsd(liquidatedBtc)}</p>
+        </div>
+
+        {/* Card 4: Redeem Success Rate */}
+        <div className="border border-[#387085]/10 bg-white p-3" title="Share of closed vaults that were successfully redeemed">
+          <p className="flex items-center gap-1 text-[11px] font-medium uppercase tracking-wide text-[#387085]/50">
+            Redeem Success Rate
+            <svg className="h-3 w-3 text-[#387085]/30" fill="none" viewBox="0 0 24 24" strokeWidth="1.8" stroke="currentColor">
+              <title>Share of closed vaults that were successfully redeemed</title>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z" />
+            </svg>
+          </p>
+          <p className="mt-1.5 text-2xl font-semibold tabular-nums text-[#14140f]">{redeemSuccessRate}%</p>
+          <p className="mt-0.5 text-xs text-[#387085]/40">{redeemedCount} of {closedCount} closed</p>
+        </div>
       </div>
-      <div className="px-5 pb-4">
-        {/* Stacked bar with hover tooltips */}
-        <div className="relative">
-          {/* The visible bar (clipped for rounded corners) */}
-          <div className="flex h-6 w-full overflow-hidden rounded-sm">
-            {statusDist.map((s) => {
-              const pct = ((s.count / totalVaults) * 100);
-              const isHovered = hovered === s.status;
+
+      {/* ── Distribution bar ────────────────────────────────────────── */}
+      <section className="border border-[#387085]/10 bg-white">
+        <div className="flex items-center justify-between px-5 py-3">
+          <h2 className="text-sm font-semibold text-[#14140f]">Vault Status Distribution</h2>
+          {/* Count ↔ BTC toggle */}
+          <div className="flex items-center gap-0.5 rounded-sm border border-[#387085]/15 p-0.5">
+            <button
+              onClick={() => setMetric('btc')}
+              className={`rounded-sm px-2 py-0.5 text-[10px] font-medium transition-colors ${
+                metric === 'btc' ? 'bg-[#cd6332] text-white' : 'text-[#387085]/50 hover:text-[#14140f]'
+              }`}
+            >
+              BTC
+            </button>
+            <button
+              onClick={() => setMetric('count')}
+              className={`rounded-sm px-2 py-0.5 text-[10px] font-medium transition-colors ${
+                metric === 'count' ? 'bg-[#cd6332] text-white' : 'text-[#387085]/50 hover:text-[#14140f]'
+              }`}
+            >
+              Count
+            </button>
+          </div>
+        </div>
+        <div className="px-5 pb-4">
+          {/* Stacked bar with hover tooltips */}
+          <div className="relative">
+            {/* The visible bar (clipped for rounded corners) */}
+            <div className="flex h-6 w-full overflow-hidden rounded-sm">
+              {statusDist.map((s) => {
+                const val = metric === 'count' ? s.count : s.btc;
+                const pct = (val / totalMetric) * 100;
+                const isHovered = hovered === s.status;
+                const isFiltered = activeFilter !== 'ALL' && activeFilter !== s.status;
+                return (
+                  <div
+                    key={s.status}
+                    className="h-full cursor-pointer transition-opacity"
+                    style={{
+                      width: `${pct}%`,
+                      background: STATUS_COLORS[s.status],
+                      opacity: isFiltered ? 0.2 : hovered && !isHovered ? 0.35 : 1,
+                    }}
+                    onClick={() => onStatusClick(activeFilter === s.status ? 'ALL' : s.status)}
+                    onMouseEnter={() => setHovered(s.status)}
+                    onMouseLeave={() => setHovered(null)}
+                  />
+                );
+              })}
+            </div>
+            {/* Tooltip layer (outside overflow-hidden) */}
+            {hovered && (() => {
+              const idx = statusDist.findIndex((s) => s.status === hovered);
+              if (idx < 0) return null;
+              const s = statusDist[idx];
+              const val = metric === 'count' ? s.count : s.btc;
+              const pct = (val / totalMetric) * 100;
+              const leftPct = statusDist.slice(0, idx).reduce((acc, d) => {
+                const v = metric === 'count' ? d.count : d.btc;
+                return acc + (v / totalMetric) * 100;
+              }, 0) + pct / 2;
               return (
                 <div
+                  className="pointer-events-none absolute z-50"
+                  style={{ left: `${leftPct}%`, bottom: '100%', transform: 'translateX(-50%)', marginBottom: '8px' }}
+                >
+                  <div className="whitespace-nowrap rounded bg-[#14140f] px-3 py-2 text-center shadow-lg">
+                    <p className="text-[11px] font-semibold text-white">{s.status}</p>
+                    <div className="mt-1 flex items-center justify-center gap-2">
+                      <span className="text-xs tabular-nums text-white/90">{s.count.toLocaleString()} vaults</span>
+                      <span className="text-[10px] text-white/50">({((s.count / totalVaults) * 100).toFixed(1)}%)</span>
+                    </div>
+                    <p className="mt-0.5 text-[10px] tabular-nums text-white/60">{s.btc.toFixed(2)} sBTC · {toUsd(s.btc)}</p>
+                  </div>
+                  <div className="mx-auto h-0 w-0 border-x-[5px] border-t-[5px] border-x-transparent border-t-[#14140f]" />
+                </div>
+              );
+            })()}
+          </div>
+          {/* Inline legend — click to filter */}
+          <div className="mt-2.5 flex flex-wrap items-center gap-x-4 gap-y-1">
+            {statusDist.map((s) => {
+              const isActive = activeFilter === 'ALL' || activeFilter === s.status;
+              return (
+                <button
                   key={s.status}
-                  className="h-full cursor-default transition-opacity"
-                  style={{
-                    width: `${pct}%`,
-                    background: STATUS_COLORS[s.status],
-                    opacity: hovered && !isHovered ? 0.35 : 1,
-                  }}
+                  className={`flex items-center gap-1 transition-opacity ${
+                    !isActive ? 'opacity-30' : hovered && hovered !== s.status ? 'opacity-50' : 'opacity-100'
+                  }`}
+                  onClick={() => onStatusClick(activeFilter === s.status ? 'ALL' : s.status)}
                   onMouseEnter={() => setHovered(s.status)}
                   onMouseLeave={() => setHovered(null)}
-                />
+                >
+                  <span className="h-2 w-2 shrink-0 rounded-sm" style={{ background: STATUS_COLORS[s.status] }} />
+                  <span className="text-[11px] text-[#14140f]/70">{s.status}</span>
+                  <span className="text-[10px] tabular-nums text-[#387085]/40">{((s.count / totalVaults) * 100).toFixed(1)}%</span>
+                </button>
               );
             })}
           </div>
-          {/* Tooltip layer (outside overflow-hidden) */}
-          {hovered && (() => {
-            const idx = statusDist.findIndex((s) => s.status === hovered);
-            if (idx < 0) return null;
-            const s = statusDist[idx];
-            const pct = ((s.count / totalVaults) * 100);
-            // Calculate left offset: sum of widths before this segment + half of this segment
-            const leftPct = statusDist.slice(0, idx).reduce((acc, d) => acc + (d.count / totalVaults) * 100, 0) + pct / 2;
-            return (
-              <div
-                className="pointer-events-none absolute z-50"
-                style={{ left: `${leftPct}%`, bottom: '100%', transform: 'translateX(-50%)', marginBottom: '8px' }}
-              >
-                <div className="whitespace-nowrap rounded bg-[#14140f] px-3 py-2 text-center shadow-lg">
-                  <p className="text-[11px] font-semibold text-white">{s.status}</p>
-                  <div className="mt-1 flex items-center justify-center gap-2">
-                    <span className="text-xs tabular-nums text-white/90">{s.count.toLocaleString()} vaults</span>
-                    <span className="text-[10px] text-white/50">({pct.toFixed(1)}%)</span>
-                  </div>
-                  <p className="mt-0.5 text-[10px] tabular-nums text-white/60">{s.btc.toFixed(2)} sBTC · {toUsd(s.btc)}</p>
-                </div>
-                <div className="mx-auto h-0 w-0 border-x-[5px] border-t-[5px] border-x-transparent border-t-[#14140f]" />
-              </div>
-            );
-          })()}
         </div>
-        {/* Inline legend */}
-        <div className="mt-2.5 flex flex-wrap items-center justify-center gap-x-4 gap-y-1">
-          {statusDist.map((s) => (
-            <button
-              key={s.status}
-              className={`flex items-center gap-1 transition-opacity ${hovered && hovered !== s.status ? 'opacity-35' : 'opacity-100'}`}
-              onMouseEnter={() => setHovered(s.status)}
-              onMouseLeave={() => setHovered(null)}
-            >
-              <span className="h-2 w-2 shrink-0 rounded-sm" style={{ background: STATUS_COLORS[s.status] }} />
-              <span className="text-[11px] text-[#14140f]/70">{s.status}</span>
-              <span className="text-[10px] tabular-nums text-[#387085]/40">{s.count}</span>
-            </button>
-          ))}
+
+        {/* ── Summary line: 3 groups ─────────────────────────────── */}
+        <div className="border-t border-[#387085]/8 px-5 py-2.5 text-[11px] text-[#387085]/60">
+          <div className="flex flex-wrap items-center gap-x-1 gap-y-0.5">
+            <span>Setting up <span className="font-semibold text-[#14140f]/70">{settingUpCount}</span></span>
+            <span className="mx-1.5 text-[#387085]/20">·</span>
+            <span>Active <span className="font-semibold text-[#14140f]/70">{activeCount}</span></span>
+            <span className="mx-1.5 text-[#387085]/20">·</span>
+            <span>Closed <span className="font-semibold text-[#14140f]/70">{closedCount}</span></span>
+            <span className="ml-1 text-[#387085]/30">(</span>
+            <span>Redeemed {redeemedCount}</span>
+            <span className="mx-0.5 text-[#387085]/20">/</span>
+            <span>Expired {expiredCount}</span>
+            <span className="mx-0.5 text-[#387085]/20">/</span>
+            <span>Liquidated {liquidatedCount}</span>
+            <span className="text-[#387085]/30">)</span>
+          </div>
         </div>
-      </div>
-    </section>
+      </section>
+    </div>
   );
 }
 
@@ -456,8 +583,12 @@ function VaultsPageInner() {
       </DevNote>
       <h1 className="text-lg font-semibold text-[#14140f]">Vaults</h1>
 
-      {/* Vault Status bar chart */}
-      <VaultStatusChart vaults={MOCK_VAULTS} />
+      {/* KPI strip + Vault Status bar chart + Summary */}
+      <VaultStatusChart
+        vaults={MOCK_VAULTS}
+        activeFilter={statusFilter}
+        onStatusClick={(s) => { setStatusFilter(s); setPage(1); }}
+      />
 
       {/* Tab bar */}
       <div className="flex border-b border-[#387085]/15">
