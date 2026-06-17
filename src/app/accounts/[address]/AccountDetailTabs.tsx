@@ -777,7 +777,7 @@ function ManagedVaultsPanel({ vaults, address }: { vaults: Vault[]; address: str
               <tr className="bg-[#cd6332] text-[11px] font-medium uppercase tracking-wider text-white">
                 <th className="whitespace-nowrap px-4 py-2.5 font-medium">Vault ID</th>
                 <th className="whitespace-nowrap px-4 py-2.5 font-medium">Status</th>
-                <th className="whitespace-nowrap px-4 py-2.5 font-medium text-right">Amount (BTC)</th>
+                <th className="whitespace-nowrap px-4 py-2.5 font-medium">Amount (BTC)</th>
                 <th className="whitespace-nowrap px-4 py-2.5 font-medium">Depositor</th>
                 <th className="whitespace-nowrap px-4 py-2.5 font-medium">Created</th>
               </tr>
@@ -815,7 +815,7 @@ function ManagedVaultsPanel({ vaults, address }: { vaults: Vault[]; address: str
                         </span>
                       </span>
                     </td>
-                    <td className="whitespace-nowrap px-4 py-2.5 text-right tabular-nums">
+                    <td className="whitespace-nowrap px-4 py-2.5 tabular-nums">
                       <div className="font-semibold text-[#14140f]">
                         {vault.vaultSize.toFixed(8)}
                       </div>
@@ -1068,9 +1068,9 @@ function PositionDebtsTable() {
           <tr className="bg-[#cd6332] text-[11px] font-medium uppercase tracking-wider text-white">
             <th className="whitespace-nowrap px-4 py-2.5 font-medium">Reserve ID</th>
             <th className="whitespace-nowrap px-4 py-2.5 font-medium">Token</th>
-            <th className="whitespace-nowrap px-4 py-2.5 text-right font-medium">Amount</th>
-            <th className="whitespace-nowrap px-4 py-2.5 text-right font-medium">Principal</th>
-            <th className="whitespace-nowrap px-4 py-2.5 text-right font-medium">
+            <th className="whitespace-nowrap px-4 py-2.5 font-medium">Amount</th>
+            <th className="whitespace-nowrap px-4 py-2.5 font-medium">Principal</th>
+            <th className="whitespace-nowrap px-4 py-2.5 font-medium">
               Accrued Interest
             </th>
           </tr>
@@ -1111,7 +1111,7 @@ function PositionDebtsTable() {
                 </td>
 
                 {/* Amount (principal + interest) */}
-                <td className="whitespace-nowrap px-4 py-2.5 text-right tabular-nums">
+                <td className="whitespace-nowrap px-4 py-2.5 tabular-nums">
                   <span className="text-sm font-semibold text-[#cd6332]">
                     {amount.toLocaleString('en-US', { maximumFractionDigits: 6 })}
                   </span>
@@ -1119,7 +1119,7 @@ function PositionDebtsTable() {
                 </td>
 
                 {/* Principal */}
-                <td className="whitespace-nowrap px-4 py-2.5 text-right tabular-nums">
+                <td className="whitespace-nowrap px-4 py-2.5 tabular-nums">
                   <span className="text-sm text-[#14140f]">
                     {principal.toLocaleString('en-US', { maximumFractionDigits: 6 })}
                   </span>
@@ -1127,7 +1127,7 @@ function PositionDebtsTable() {
                 </td>
 
                 {/* Accrued Interest */}
-                <td className="whitespace-nowrap px-4 py-2.5 text-right tabular-nums">
+                <td className="whitespace-nowrap px-4 py-2.5 tabular-nums">
                   {interest > 0 ? (
                     <>
                       <span className="text-sm text-[#387085]">

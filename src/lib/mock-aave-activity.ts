@@ -236,6 +236,7 @@ export interface AaveV4PositionDebt {
   totalAmount: string;   // principal + accruedInterest (raw base units)
   principal: string;
   accruedInterest: string;
+  borrowApy?: number;
 }
 
 export interface AaveV4Position {
@@ -282,6 +283,7 @@ export const MOCK_DEPOSITOR_AAVE_POSITION: AaveV4Position = {
       totalAmount: '100000000',
       principal: '99990000',
       accruedInterest: '81',
+      borrowApy: 4.2,
     },
     {
       reserveId: '0xdac17f958d2ee523a2206206994597c13d831ec7',
@@ -290,6 +292,7 @@ export const MOCK_DEPOSITOR_AAVE_POSITION: AaveV4Position = {
       totalAmount: '10000000',
       principal: '10000000',
       accruedInterest: '4',
+      borrowApy: 5.1,
     },
     {
       reserveId: '0x2260fac5e5542a773aa44fbcfedf7c193bc2c599',
@@ -298,6 +301,7 @@ export const MOCK_DEPOSITOR_AAVE_POSITION: AaveV4Position = {
       totalAmount: '1600004',
       principal: '1599894',
       accruedInterest: '146',
+      borrowApy: 1.8,
     },
   ],
 };
@@ -320,9 +324,9 @@ export const MOCK_DEPOSITOR_DAPP_POSITIONS: DAppPosition[] = [
     avgCollateralFactor: '0.78',
     riskPremium: '10.00',
     debts: [
-      { reserveId: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48', symbol: 'USDC', decimals: 6, totalAmount: '100000000', principal: '99990000', accruedInterest: '81' },
-      { reserveId: '0xdac17f958d2ee523a2206206994597c13d831ec7', symbol: 'USDT', decimals: 6, totalAmount: '10000000', principal: '10000000', accruedInterest: '4' },
-      { reserveId: '0x2260fac5e5542a773aa44fbcfedf7c193bc2c599', symbol: 'WBTC', decimals: 8, totalAmount: '1600004', principal: '1599894', accruedInterest: '146' },
+      { reserveId: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48', symbol: 'USDC', decimals: 6, totalAmount: '100000000', principal: '99990000', accruedInterest: '81', borrowApy: 4.2 },
+      { reserveId: '0xdac17f958d2ee523a2206206994597c13d831ec7', symbol: 'USDT', decimals: 6, totalAmount: '10000000', principal: '10000000', accruedInterest: '4', borrowApy: 5.1 },
+      { reserveId: '0x2260fac5e5542a773aa44fbcfedf7c193bc2c599', symbol: 'WBTC', decimals: 8, totalAmount: '1600004', principal: '1599894', accruedInterest: '146', borrowApy: 1.8 },
     ],
   },
   {
@@ -336,7 +340,7 @@ export const MOCK_DEPOSITOR_DAPP_POSITIONS: DAppPosition[] = [
     avgCollateralFactor: '0.75',
     riskPremium: '8.00',
     debts: [
-      { reserveId: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48', symbol: 'USDC', decimals: 6, totalAmount: '391200000', principal: '390000000', accruedInterest: '1200000' },
+      { reserveId: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48', symbol: 'USDC', decimals: 6, totalAmount: '391200000', principal: '390000000', accruedInterest: '1200000', borrowApy: 3.8 },
     ],
   },
   {

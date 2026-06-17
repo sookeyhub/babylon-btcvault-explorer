@@ -323,16 +323,16 @@ export default function DepositorsPage() {
             <tr className="bg-[#cd6332] text-[11px] font-medium uppercase tracking-wider text-white">
               <th className="whitespace-nowrap px-4 py-2.5 font-medium w-12">#</th>
               <th className="whitespace-nowrap px-4 py-2.5 font-medium">Address</th>
-              <th className="whitespace-nowrap px-4 py-2.5 font-medium text-right cursor-pointer select-none" onClick={() => handleSort('totalVaults')}>
+              <th className="whitespace-nowrap px-4 py-2.5 font-medium cursor-pointer select-none" onClick={() => handleSort('totalVaults')}>
                 Total Vaults <span className="opacity-60">↕</span>
               </th>
-              <th className="whitespace-nowrap px-4 py-2.5 font-medium text-right cursor-pointer select-none" onClick={() => handleSort('activeVaults')}>
+              <th className="whitespace-nowrap px-4 py-2.5 font-medium cursor-pointer select-none" onClick={() => handleSort('activeVaults')}>
                 Active Vaults <span className="opacity-60">↕</span>
               </th>
-              <th className="whitespace-nowrap px-4 py-2.5 font-medium text-right cursor-pointer select-none" onClick={() => handleSort('totalBtc')}>
+              <th className="whitespace-nowrap px-4 py-2.5 font-medium cursor-pointer select-none" onClick={() => handleSort('totalBtc')}>
                 Locked BTC <span className="opacity-60">↕</span>
               </th>
-              <th className="whitespace-nowrap px-4 py-2.5 font-medium text-right">First Deposit (Age)</th>
+              <th className="whitespace-nowrap px-4 py-2.5 font-medium">First Deposit (Age)</th>
             </tr>
           </thead>
           <tbody>
@@ -349,13 +349,13 @@ export default function DepositorsPage() {
                       <CopyIcon text={d.address} />
                     </div>
                   </td>
-                  <td className="whitespace-nowrap px-4 py-2.5 text-right tabular-nums text-[#14140f]">{d.totalVaults}</td>
-                  <td className="whitespace-nowrap px-4 py-2.5 text-right tabular-nums text-[#5a8a3c]">{d.activeVaults}</td>
-                  <td className="whitespace-nowrap px-4 py-2.5 text-right tabular-nums">
+                  <td className="whitespace-nowrap px-4 py-2.5 tabular-nums text-[#14140f]">{d.totalVaults}</td>
+                  <td className="whitespace-nowrap px-4 py-2.5 tabular-nums text-[#5a8a3c]">{d.activeVaults}</td>
+                  <td className="whitespace-nowrap px-4 py-2.5 tabular-nums">
                     <div className="text-[#14140f]">{d.totalBtc.toFixed(4)} <span className="text-[rgba(56,112,133,0.5)]">sBTC</span></div>
                     <div className="text-[10px] text-[#387085]/40">{toUsd(d.totalBtc)}</div>
                   </td>
-                  <td className="whitespace-nowrap px-4 py-2.5 text-right text-[rgba(56,112,133,0.5)]">
+                  <td className="whitespace-nowrap px-4 py-2.5 text-[rgba(56,112,133,0.5)]">
                     {formatRelativeTime(d.firstDeposit)}
                   </td>
                 </tr>

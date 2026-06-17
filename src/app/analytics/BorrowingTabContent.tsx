@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import Link from 'next/link';
 import {
   ComposedChart,
   Bar,
@@ -12,7 +11,7 @@ import {
   Legend,
   ResponsiveContainer,
 } from 'recharts';
-import { truncateAddress, formatRelativeTime, toUsd } from '@/lib/utils';
+import { toUsd } from '@/lib/utils';
 
 // ── Period types & helpers ──────────────────────────────────────────────────
 
@@ -113,13 +112,10 @@ const MOCK_LIQUIDATIONS = (() => {
 
 const TOTAL_LIQ_BTC = MOCK_LIQUIDATIONS[MOCK_LIQUIDATIONS.length - 1]?.btc ?? 0;
 
-// Sorted by totalBorrowed (sBTC) desc — economic size defines "top"
-const MOCK_TOP_BORROWERS = [
-  { address: '0x5a6b7c8d9e0f1a2b3c4d5e6f7a8b9c0d1e2f3a4b', totalBorrowed: 0.8420, borrowCount: 12, totalLiquidated: 0.0620, liquidations: 2, lastActivity: '2026-06-14T08:22:00Z' },
-  { address: '0x13eb4f5a6b7c8d9e0f1a2b3c4d5e6f7a8b9ca439', totalBorrowed: 0.5135, borrowCount: 9,  totalLiquidated: 0,      liquidations: 0, lastActivity: '2026-06-12T14:30:00Z' },
-  { address: '0x2bbf5a6b7c8d9e0f1a2b3c4d5e6f7a8b9c0d4778', totalBorrowed: 0.3780, borrowCount: 8,  totalLiquidated: 0.0210, liquidations: 1, lastActivity: '2026-06-10T03:15:00Z' },
-  { address: '0xdba35a6b7c8d9e0f1a2b3c4d5e6f7a8b9c0d055d', totalBorrowed: 0.2210, borrowCount: 7,  totalLiquidated: 0,      liquidations: 0, lastActivity: '2026-06-08T19:45:00Z' },
-  { address: '0x3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d', totalBorrowed: 0.1540, borrowCount: 6,  totalLiquidated: 0,      liquidations: 0, lastActivity: '2026-06-05T11:00:00Z' },
+const MOCK_ASSETS = [
+  { asset: 'USDC', totalBorrowed: 1_250_000, totalBorrowedUsd: 1_250_000, available: 760_000,  availableUsd: 760_000,   apy: 4.2, utilization: 62.2, active: true },
+  { asset: 'USDT', totalBorrowed: 480_000,   totalBorrowedUsd: 480_000,   available: 520_000,  availableUsd: 520_000,   apy: 5.1, utilization: 48.0, active: true },
+  { asset: 'WBTC', totalBorrowed: 3.20,      totalBorrowedUsd: 210_300,   available: 18.10,    availableUsd: 1_189_700, apy: 1.8, utilization: 15.0, active: true },
 ];
 
 // ── Component ───────────────────────────────────────────────────────────────
@@ -288,52 +284,55 @@ export default function BorrowingTabContent() {
         </div>
       </div>
 
-      {/* ── Top Borrowers table ───────────────────────────────────────── */}
-      <div className="relative border border-[#387085]/20 bg-white">
-        <CornerBrackets />
-        <div className="px-5 py-3">
-          <h3 className="text-xs font-semibold text-[#14140f]">Top Borrowers</h3>
+      {/* ── Borrowing Assets table ────────────────────────────────────── */}
+      <div className="rounded-none border border-[#cd6332]/20 bg-white">
+        <div className="px-5 py-4">
+          <h2 className="text-sm font-semibold text-[#14140f]">Borrow Markets</h2>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs">
             <thead>
-              <tr className="border-y border-[#387085]/10 bg-[#387085]/[0.03] text-[10px] font-semibold uppercase tracking-wider text-[#387085]/50">
-                <th className="whitespace-nowrap px-5 py-2 font-medium">#</th>
-                <th className="whitespace-nowrap px-4 py-2 font-medium">Address</th>
-                <th className="whitespace-nowrap px-4 py-2 text-right font-medium">Total Borrowed</th>
-                <th className="whitespace-nowrap px-4 py-2 text-right font-medium">Borrow Count</th>
-                <th className="whitespace-nowrap px-4 py-2 text-right font-medium">Total Liquidated</th>
-                <th className="whitespace-nowrap px-4 py-2 text-right font-medium">Liquidations</th>
-                <th className="whitespace-nowrap px-4 py-2 text-right font-medium">Last Activity</th>
+              <tr className="bg-[#cd6332] text-[11px] font-medium uppercase tracking-wider text-white">
+                <th className="whitespace-nowrap px-4 py-2.5 font-medium">Asset</th>
+                <th className="whitespace-nowrap px-4 py-2.5 font-medium">Total Borrowed</th>
+                <th className="whitespace-nowrap px-4 py-2.5 font-medium">Available to Borrow</th>
+                <th className="whitespace-nowrap px-4 py-2.5 font-medium">Utilization</th>
+                <th className="whitespace-nowrap px-4 py-2.5 font-medium">Borrow APY</th>
+                <th className="whitespace-nowrap px-4 py-2.5 font-medium">Status</th>
               </tr>
             </thead>
             <tbody>
-              {MOCK_TOP_BORROWERS.map((b, i) => (
-                <tr key={b.address} className="border-b border-[#387085]/6 transition-colors hover:bg-[#faf9f5]">
-                  <td className="whitespace-nowrap px-5 py-2.5 text-[#387085]/40">{i + 1}</td>
+              {MOCK_ASSETS.map((a) => (
+                <tr key={a.asset} className="border-b border-[#cd6332]/10 transition-colors hover:bg-[rgba(56,112,133,0.03)]">
                   <td className="whitespace-nowrap px-4 py-2.5">
-                    <Link href={`/accounts/${b.address}`} className="font-mono text-[11px] text-[#cd6332] hover:underline">
-                      {truncateAddress(b.address, 6, 4)}
-                    </Link>
+                    <div className="flex items-center gap-2">
+                      <span className="flex h-6 w-6 items-center justify-center rounded-full bg-[#387085]/10 text-[9px] font-bold text-[#387085]">
+                        {a.asset.charAt(0)}
+                      </span>
+                      <span className="font-semibold text-[#14140f]">{a.asset}</span>
+                    </div>
                   </td>
-                  <td className="whitespace-nowrap px-4 py-2.5 text-right">
-                    <p className="font-semibold text-[#14140f]">{b.totalBorrowed.toFixed(4)} sBTC</p>
-                    <p className="text-[10px] text-[#387085]/40">{toUsd(b.totalBorrowed)}</p>
+                  <td className="whitespace-nowrap px-4 py-2.5 tabular-nums">
+                    <div className="font-medium text-[#14140f]">
+                      {a.totalBorrowed >= 1 ? a.totalBorrowed.toLocaleString() : a.totalBorrowed}
+                    </div>
+                    <div className="text-[10px] text-[#387085]/40">${a.totalBorrowedUsd.toLocaleString()}</div>
                   </td>
-                  <td className="whitespace-nowrap px-4 py-2.5 text-right text-[#14140f]">{b.borrowCount}</td>
-                  <td className="whitespace-nowrap px-4 py-2.5 text-right">
-                    {b.totalLiquidated > 0
-                      ? <>
-                          <p className="font-semibold text-[#14140f]">{b.totalLiquidated.toFixed(4)} sBTC</p>
-                          <p className="text-[10px] text-[#387085]/40">{toUsd(b.totalLiquidated)}</p>
-                        </>
-                      : <span className="text-[#387085]/30">&mdash;</span>}
+                  <td className="whitespace-nowrap px-4 py-2.5 tabular-nums">
+                    <div className="font-medium text-[#14140f]">
+                      {a.available >= 1 ? a.available.toLocaleString() : a.available}
+                    </div>
+                    <div className="text-[10px] text-[#387085]/40">${a.availableUsd.toLocaleString()}</div>
                   </td>
-                  <td className="whitespace-nowrap px-4 py-2.5 text-right text-[#14140f]">
-                    {b.liquidations > 0 ? b.liquidations : <span className="text-[#387085]/30">&mdash;</span>}
-                  </td>
-                  <td className="whitespace-nowrap px-4 py-2.5 text-right text-[#387085]/50">
-                    {formatRelativeTime(b.lastActivity)}
+                  <td className="whitespace-nowrap px-4 py-2.5 text-[#14140f]">{a.utilization}%</td>
+                  <td className="whitespace-nowrap px-4 py-2.5 text-[#14140f]">{a.apy}%</td>
+                  <td className="whitespace-nowrap px-4 py-2.5">
+                    <span className="inline-flex items-center gap-1.5 text-[11px]">
+                      <span className={`inline-block h-2 w-2 rounded-full ${a.active ? 'bg-green-500' : 'bg-red-400'}`} />
+                      <span className={a.active ? 'text-green-700' : 'text-red-500'}>
+                        {a.active ? 'Active' : 'Paused'}
+                      </span>
+                    </span>
                   </td>
                 </tr>
               ))}

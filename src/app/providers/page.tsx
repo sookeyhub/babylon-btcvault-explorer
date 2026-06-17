@@ -220,9 +220,12 @@ export default function ProvidersPage() {
       {/* KPI summary cards */}
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         <div className="border border-[#387085]/10 bg-white p-3">
-          <p className="text-[11px] font-medium uppercase tracking-wide text-[#387085]/50">Active Providers</p>
-          <p className="mt-0.5 text-2xl font-semibold text-[#14140f]">{activeProviders}</p>
-          <p className="mt-0.5 text-xs text-[#387085]/40">of {totalProviders}</p>
+          <p className="text-[11px] font-medium uppercase tracking-wide text-[#387085]/50">Total Providers</p>
+          <p className="mt-0.5 text-2xl font-semibold text-[#14140f]">{totalProviders}</p>
+          <p className="mt-0.5 text-xs text-[#387085]/40">top holds {(() => {
+            const top5Btc = sortedProviders.slice(0, 5).reduce((s, p) => s + p.totalBtc, 0);
+            return totalBtc > 0 ? Math.round((top5Btc / totalBtc) * 100) : 0;
+          })()}%</p>
         </div>
         <div className="border border-[#387085]/10 bg-white p-3">
           <p className="text-[11px] font-medium uppercase tracking-wide text-[#387085]/50">Avg Commission</p>
@@ -402,17 +405,17 @@ export default function ProvidersPage() {
                   </div>
                 )}
               </th>
-              <th className="whitespace-nowrap px-4 py-2.5 font-medium text-right">
+              <th className="whitespace-nowrap px-4 py-2.5 font-medium">
                 <button onClick={() => toggleSort('commission')} className="inline-flex items-center gap-1 uppercase">
                   Commission <span className="text-[10px]">{sortIcon('commission')}</span>
                 </button>
               </th>
-              <th className="whitespace-nowrap px-4 py-2.5 font-medium text-right">
+              <th className="whitespace-nowrap px-4 py-2.5 font-medium">
                 <button onClick={() => toggleSort('vaultCount')} className="inline-flex items-center gap-1 uppercase">
                   Managed Vaults <span className="text-[10px]">{sortIcon('vaultCount')}</span>
                 </button>
               </th>
-              <th className="whitespace-nowrap px-4 py-2.5 font-medium text-right">
+              <th className="whitespace-nowrap px-4 py-2.5 font-medium">
                 <button onClick={() => toggleSort('totalBtc')} className="inline-flex items-center gap-1 uppercase">
                   Locked BTC <span className="text-[10px]">{sortIcon('totalBtc')}</span>
                 </button>
@@ -441,13 +444,13 @@ export default function ProvidersPage() {
                       {p.appName}
                     </Link>
                   </td>
-                  <td className="whitespace-nowrap px-4 py-2.5 text-right tabular-nums text-[#14140f]">
+                  <td className="whitespace-nowrap px-4 py-2.5 tabular-nums text-[#14140f]">
                     {(p.commission / 100).toFixed(1)}%
                   </td>
-                  <td className="whitespace-nowrap px-4 py-2.5 text-right tabular-nums text-[#14140f]">
+                  <td className="whitespace-nowrap px-4 py-2.5 tabular-nums text-[#14140f]">
                     {p.vaultCount}
                   </td>
-                  <td className="whitespace-nowrap px-4 py-2.5 text-right tabular-nums">
+                  <td className="whitespace-nowrap px-4 py-2.5 tabular-nums">
                     <div className="text-[#14140f]">{p.totalBtc.toFixed(4)} <span className="text-[rgba(56,112,133,0.5)]">sBTC</span></div>
                     <div className="text-[10px] text-[#387085]/40">{toUsd(p.totalBtc)}</div>
                   </td>

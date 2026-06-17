@@ -451,6 +451,7 @@ function PositionDebtsTable() {
           <tr className="bg-[#cd6332] text-[11px] font-medium uppercase tracking-wider text-white">
             <th className="whitespace-nowrap px-4 py-2.5 font-medium">Assets</th>
             <th className="whitespace-nowrap px-4 py-2.5 font-medium">Amount Borrowed</th>
+            <th className="whitespace-nowrap px-4 py-2.5 font-medium">Borrow APY</th>
             <th className="whitespace-nowrap px-4 py-2.5 font-medium">Interest</th>
             <th className="whitespace-nowrap px-4 py-2.5 font-medium">
               <span className="inline-flex items-center gap-1">
@@ -484,6 +485,9 @@ function PositionDebtsTable() {
                   </span>
                   <span className="ml-1 text-[11px] text-[#387085]/40">{d.symbol}</span>
                 </td>
+                <td className="whitespace-nowrap px-4 py-3 tabular-nums text-sm text-[#14140f]">
+                  {d.borrowApy != null ? `${d.borrowApy}%` : '—'}
+                </td>
                 <td className="whitespace-nowrap px-4 py-3 tabular-nums">
                   <span className="text-sm text-[#14140f]">
                     {interest.toLocaleString('en-US', { minimumFractionDigits: 6, maximumFractionDigits: 6 })}
@@ -514,7 +518,7 @@ const MOCK_DAPP_POSITIONS = [
     collateralSymbol: 'sBTC',
     collateralUsd: 1382.44,
     debts: [
-      { symbol: 'USDC', amountUsd: 498.15, interest: 0.002221, interestSymbol: 'USDC', principal: 498.148, totalRepay: 498.152221 },
+      { symbol: 'USDC', amountUsd: 498.15, interest: 0.002221, interestSymbol: 'USDC', principal: 498.148, totalRepay: 498.152221, borrowApy: 4.2 },
     ],
     ltv: 64.34,
     maxLtv: 75,
@@ -526,7 +530,7 @@ const MOCK_DAPP_POSITIONS = [
     collateralSymbol: 'sBTC',
     collateralUsd: 690.14,
     debts: [
-      { symbol: 'USDT', amountUsd: 125.40, interest: 0.400000, interestSymbol: 'USDT', principal: 125.00, totalRepay: 125.40 },
+      { symbol: 'USDT', amountUsd: 125.40, interest: 0.400000, interestSymbol: 'USDT', principal: 125.00, totalRepay: 125.40, borrowApy: 5.1 },
     ],
     ltv: 18.17,
     maxLtv: 75,
@@ -639,9 +643,10 @@ function PositionsByDApp() {
                 <thead>
                   <tr className="border-b border-[#387085]/8 bg-[#faf9f5]">
                     <th className="px-5 py-2 text-left text-[10px] font-medium uppercase tracking-wide text-[#387085]/40">Assets</th>
-                    <th className="px-5 py-2 text-right text-[10px] font-medium uppercase tracking-wide text-[#387085]/40">Amount Borrowed</th>
-                    <th className="px-5 py-2 text-right text-[10px] font-medium uppercase tracking-wide text-[#387085]/40">Interest</th>
-                    <th className="px-5 py-2 text-right text-[10px] font-medium uppercase tracking-wide text-[#387085]/40">
+                    <th className="px-5 py-2 text-[10px] font-medium uppercase tracking-wide text-[#387085]/40">Amount Borrowed</th>
+                    <th className="px-5 py-2 text-[10px] font-medium uppercase tracking-wide text-[#387085]/40">Borrow APY</th>
+                    <th className="px-5 py-2 text-[10px] font-medium uppercase tracking-wide text-[#387085]/40">Interest</th>
+                    <th className="px-5 py-2 text-[10px] font-medium uppercase tracking-wide text-[#387085]/40">
                       <span className="inline-flex items-center gap-0.5">
                         Amount to Repay
                         <svg className="h-3 w-3 text-[#387085]/30" fill="none" viewBox="0 0 24 24" strokeWidth="1.8" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z" /></svg>
@@ -660,15 +665,18 @@ function PositionsByDApp() {
                           <span className="font-medium text-[#14140f]">{d.symbol} ({d.symbol})</span>
                         </div>
                       </td>
-                      <td className="px-5 py-2.5 text-right tabular-nums font-semibold text-[#14140f]">
+                      <td className="px-5 py-2.5 tabular-nums font-semibold text-[#14140f]">
                         {d.principal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                         <span className="ml-1 text-[10px] font-normal text-[#387085]/40">{d.symbol}</span>
                       </td>
-                      <td className="px-5 py-2.5 text-right tabular-nums text-[#14140f]">
+                      <td className="px-5 py-2.5 tabular-nums text-[#14140f]">
+                        {d.borrowApy != null ? `${d.borrowApy}%` : '—'}
+                      </td>
+                      <td className="px-5 py-2.5 tabular-nums text-[#14140f]">
                         {d.interest.toFixed(6)}
                         <span className="ml-1 text-[10px] text-[#387085]/40">{d.interestSymbol}</span>
                       </td>
-                      <td className="px-5 py-2.5 text-right tabular-nums font-semibold text-[#cd6332]">
+                      <td className="px-5 py-2.5 tabular-nums font-semibold text-[#cd6332]">
                         {d.totalRepay.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 6 })}
                         <span className="ml-1 text-[10px] font-normal text-[#387085]/40">{d.symbol}</span>
                       </td>
@@ -793,6 +801,7 @@ function DAppPositionSection({ position, isFirst }: { position: DAppPosition; is
             <tr className="border-b border-[#387085]/8 bg-[#faf9f5] text-[11px] font-medium uppercase tracking-wider text-[#387085]/50">
               <th className="whitespace-nowrap px-4 py-2.5 font-medium">Assets</th>
               <th className="whitespace-nowrap px-4 py-2.5 font-medium">Amount Borrowed</th>
+              <th className="whitespace-nowrap px-4 py-2.5 font-medium">Borrow APY</th>
               <th className="whitespace-nowrap px-4 py-2.5 font-medium">Interest</th>
               <th className="whitespace-nowrap px-4 py-2.5 font-medium">
                 <span className="inline-flex items-center gap-1">
@@ -825,6 +834,9 @@ function DAppPositionSection({ position, isFirst }: { position: DAppPosition; is
                       {principal < 1 ? principal.toFixed(8) : principal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                     </span>
                     <span className="ml-1 text-[11px] text-[#387085]/40">{d.symbol}</span>
+                  </td>
+                  <td className="whitespace-nowrap px-4 py-3 tabular-nums text-sm text-[#14140f]">
+                    {d.borrowApy != null ? `${d.borrowApy}%` : '—'}
                   </td>
                   <td className="whitespace-nowrap px-4 py-3 tabular-nums">
                     <span className="text-sm text-[#14140f]">

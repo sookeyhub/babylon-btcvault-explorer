@@ -18,7 +18,6 @@ const MOCK_PERF = {
   avgActivation: '38 min',
 };
 
-const MOCK_STATUS = { status: 'Operational' as const, lastActivity: '8 min ago' };
 
 /* ── Provider-specific activity mock data ───────────────────────────────── */
 // Events a provider sees: vault activation success/failure, liquidations
@@ -170,9 +169,10 @@ const MOCK_PROVIDER_ACTIVITIES: ProviderActivity[] = [
 ];
 
 const MOCK_QUEUE = [
-  { id: '0xd388...5031', fullId: '0xd388f2c3e1a94b7d5031', stage: 'verified',             timeInStage: '14 min', timeout: '46 min', urgency: 'safe' as const },
-  { id: '0xa1b2...c3d4', fullId: '0xa1b2c3d4e5f6a7b8c3d4', stage: 'signatures_collected', timeInStage: '28 min', timeout: '32 min', urgency: 'warn' as const },
-  { id: '0x9e0f...1z2w', fullId: '0x9e0f1a2b3c4d5e6f1a2b', stage: 'pending',              timeInStage: '5 min',  timeout: '55 min', urgency: 'safe' as const },
+  { id: '0xbc59…b34b', fullId: '0xbc59a7d3e1f04b8cb34b', amount: 0.28, usd: 19_874, status: 'Signatures Collected', statusNote: 'awaiting ACK', timeInStage: '2h 30m', depositor: '0x2d3e…0d1e', requested: '6h ago' },
+  { id: '0x9c61…c368', fullId: '0x9c61b2d4f5a8c7e9c368', amount: 0.39, usd: 27_012, status: 'Verified',             statusNote: 'awaiting activation', timeInStage: '45m',   depositor: '0x5b6c…3b4c', requested: '3h ago' },
+  { id: '0x84b1…9a87', fullId: '0x84b1c3e5d7f9a2b49a87', amount: 0.10, usd: 6_931,  status: 'Pending',              statusNote: 'collecting signatures', timeInStage: '18m',   depositor: '0x7d8e…5d6e', requested: '20m ago' },
+  { id: '0xf6dc…1cc1', fullId: '0xf6dc8a3b5e7f2d411cc1', amount: 0.15, usd: 10_397, status: 'Available',            statusNote: '',                      timeInStage: '1d 4h', depositor: '0xa0b1…a8b9', requested: '2d ago' },
 ];
 
 /* ── Types ──────────────────────────────────────────────────────────────── */
@@ -193,11 +193,6 @@ const VAULT_STATUS_COLORS: Record<string, string> = {
 const VAULT_STATUS_ORDER = ['Available', 'Pending', 'Verified', 'Signature Collected', 'Redeemed', 'Expired', 'Liquidated'] as const;
 const PAGE_SIZE = 20;
 
-const STATUS_DOT_COLOR: Record<string, string> = {
-  Operational: '#16a34a',
-  Degraded:    '#d97706',
-  Inactive:    '#9ca3af',
-};
 
 /* ── CopyIcon ────────────────────────────────────────────────────────────── */
 
@@ -606,21 +601,18 @@ function VaultsTab({ vaults }: { vaults: Vault[] }) {
             <div className="overflow-x-auto">
               <table className="w-full text-left text-xs">
                 <thead>
-                  <tr className="bg-[#387085]/6 text-[11px] font-medium uppercase tracking-wider text-[#387085]/50">
-                    <th className="whitespace-nowrap px-4 py-2.5">Vault</th>
-                    <th className="whitespace-nowrap px-4 py-2.5">Stage</th>
-                    <th className="whitespace-nowrap px-4 py-2.5">Time in Stage</th>
-                    <th className="whitespace-nowrap px-4 py-2.5">Timeout</th>
-                    <th className="px-4 py-2 text-right">
-                      <button className="rounded border border-[#387085]/15 bg-white px-2 py-0.5 text-[10px] font-medium normal-case tracking-normal text-[#387085] hover:bg-[#faf9f5]">
-                        Refresh
-                      </button>
-                    </th>
+                  <tr className="bg-[#cd6332] text-[11px] font-medium uppercase tracking-wider text-white">
+                    <th className="whitespace-nowrap px-4 py-2.5 font-medium">Vault ID</th>
+                    <th className="whitespace-nowrap px-4 py-2.5 font-medium">Amount</th>
+                    <th className="whitespace-nowrap px-4 py-2.5 font-medium">Status</th>
+                    <th className="whitespace-nowrap px-4 py-2.5 font-medium">Time in stage</th>
+                    <th className="whitespace-nowrap px-4 py-2.5 font-medium">Depositor</th>
+                    <th className="whitespace-nowrap px-4 py-2.5 font-medium">Requested</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {[...MOCK_QUEUE].sort((a, b) => parseInt(b.timeInStage) - parseInt(a.timeInStage)).map((q) => (
-                    <tr key={q.id} className="h-10 border-b border-[#387085]/8 last:border-0 hover:bg-[#faf9f5]">
+                  {MOCK_QUEUE.map((q) => (
+                    <tr key={q.id} className="border-b border-[#387085]/8 last:border-0 hover:bg-[#faf9f5]">
                       <td className="whitespace-nowrap px-4 py-2.5">
                         <div className="flex items-center">
                           <Link href={`/vaults/${q.fullId}`} className="font-mono text-[11px] text-[#cd6332] hover:underline">
@@ -630,15 +622,18 @@ function VaultsTab({ vaults }: { vaults: Vault[] }) {
                         </div>
                       </td>
                       <td className="whitespace-nowrap px-4 py-2.5">
-                        <span className="font-mono text-[11px] text-[#387085]/70">{q.stage}</span>
+                        <p className="font-semibold text-[#14140f]">{q.amount.toFixed(2)} sBTC</p>
+                        <p className="text-[10px] text-[#387085]/40">${q.usd.toLocaleString()}</p>
+                      </td>
+                      <td className="whitespace-nowrap px-4 py-2.5">
+                        <p className="font-medium text-[#14140f]">{q.status}</p>
+                        {q.statusNote && <p className="text-[10px] text-[#387085]/40">{q.statusNote}</p>}
                       </td>
                       <td className="whitespace-nowrap px-4 py-2.5 text-[#14140f]">{q.timeInStage}</td>
                       <td className="whitespace-nowrap px-4 py-2.5">
-                        <span className={`font-medium ${q.urgency === 'warn' ? 'text-amber-500' : 'text-[#387085]/60'}`}>
-                          {q.timeout}
-                        </span>
+                        <span className="font-mono text-[11px] text-[#387085]/70">{q.depositor}</span>
                       </td>
-                      <td />
+                      <td className="whitespace-nowrap px-4 py-2.5 text-[#387085]/50">{q.requested}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -659,7 +654,7 @@ function VaultsTab({ vaults }: { vaults: Vault[] }) {
                 <tr className="bg-[#cd6332] text-[11px] font-medium uppercase tracking-wider text-white">
                   <th className="whitespace-nowrap px-4 py-2.5">Vault ID</th>
                   <th className="whitespace-nowrap px-4 py-2.5">Status</th>
-                  <th className="whitespace-nowrap px-4 py-2.5 text-right">Amount (BTC)</th>
+                  <th className="whitespace-nowrap px-4 py-2.5">Amount (BTC)</th>
                   <th className="whitespace-nowrap px-4 py-2.5">Depositor</th>
                   <th className="whitespace-nowrap px-4 py-2.5">Created</th>
                 </tr>
@@ -682,7 +677,7 @@ function VaultsTab({ vaults }: { vaults: Vault[] }) {
                           <span className="text-xs font-medium" style={{ color: VAULT_STATUS_COLORS[vault.status] }}>{vault.status}</span>
                         </span>
                       </td>
-                      <td className="whitespace-nowrap px-4 py-2.5 text-right tabular-nums">
+                      <td className="whitespace-nowrap px-4 py-2.5 tabular-nums">
                         <div className="font-semibold text-[#14140f]">{vault.vaultSize.toFixed(8)} sBTC</div>
                         <div className="text-[10px] text-[#387085]/40">{toUsd(vault.vaultSize)}</div>
                       </td>
@@ -748,8 +743,6 @@ export default function ProviderDetail({
   const totalBtc = vaults.reduce((s, v) => s + v.vaultSize, 0);
   const commissionPct = (commission / 100).toFixed(2);
   const joinedFormatted = new Date(joinedDate).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
-  const statusColor = STATUS_DOT_COLOR[MOCK_STATUS.status] ?? '#9ca3af';
-
   // Display name: use providerName if present, else full address
   const displayName = providerName || address;
   const addrDisplay = address;
@@ -784,18 +777,6 @@ export default function ProviderDetail({
         )}
       </div>
 
-      {/* ── Row B: Status bar ────────────────────────────────────────────── */}
-      <button
-        onClick={() => setActiveTab('activity')}
-        className="flex w-full items-center justify-between border border-[#387085]/12 bg-white px-4 py-2.5 text-left transition-colors hover:bg-[#faf9f5]"
-      >
-        <div className="flex items-center gap-2">
-          <span className="inline-block h-2.5 w-2.5 rounded-full" style={{ background: statusColor }} />
-          <span className="text-sm font-medium text-[#14140f]">{MOCK_STATUS.status}</span>
-          <span className="text-xs text-[#387085]/50">last activity {MOCK_STATUS.lastActivity}</span>
-        </div>
-        <span className="text-xs font-medium text-[#cd6332]">View all Activities ›</span>
-      </button>
 
       {/* ── Row C: 4 stat cards ──────────────────────────────────────────── */}
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
