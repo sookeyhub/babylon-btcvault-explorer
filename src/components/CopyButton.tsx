@@ -14,7 +14,7 @@ export default function CopyButton({ text }: { text: string }) {
         setCopied(true);
         setTimeout(() => setCopied(false), 1500);
       }}
-      className="ml-1 inline-flex shrink-0 text-[rgba(56,112,133,0.3)] hover:text-[#387085]"
+      className="ml-1 inline-flex shrink-0 text-[rgba(56,112,133,0.7)] hover:text-[#387085]"
       title={copied ? 'Copied!' : 'Copy'}
     >
       <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor">

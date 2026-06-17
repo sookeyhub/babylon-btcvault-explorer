@@ -409,7 +409,7 @@ const STATE_STYLE: Record<string, { bg: string; text: string }> = {
 function InfoRow({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div className="flex items-start gap-4 py-3">
-      <span className="w-36 shrink-0 text-sm text-[rgba(56,112,133,0.55)]">{label}</span>
+      <span className="w-36 shrink-0 text-sm text-[rgba(56,112,133,0.7)]">{label}</span>
       <div className="min-w-0 flex-1 text-sm text-[#14140f]">{children}</div>
     </div>
   );
@@ -437,7 +437,7 @@ function TabBtn({ label, active, onClick }: { label: string; active: boolean; on
     <button
       onClick={onClick}
       className={`relative px-5 py-3 text-[13px] font-medium transition-colors ${
-        active ? 'text-[#cd6332]' : 'text-[#387085]/50 hover:text-[#387085]'
+        active ? 'text-[#cd6332]' : 'text-[#387085]/70 hover:text-[#387085]'
       }`}
     >
       {label}
@@ -490,7 +490,7 @@ export default function TransactionTabs({ tx }: { tx: Transaction }) {
           <button
             key={key}
             onClick={() => { setEventType(key); setActiveTab('log'); setOpenEvents(new Set([0])); }}
-            className={`rounded border px-2.5 py-1 text-[11px] font-medium transition-colors ${
+            className={`rounded border px-2.5 py-1 text-xs font-medium transition-colors ${
               eventType === key
                 ? 'border-[#cd6332] bg-[#cd6332] text-white'
                 : 'border-[#387085]/15 bg-white text-[#387085]/55 hover:border-[#387085]/30 hover:text-[#387085]'
@@ -504,7 +504,7 @@ export default function TransactionTabs({ tx }: { tx: Transaction }) {
       {/* ━━━━━━━━━━━ TRANSACTION TITLE (이미지 양식) ━━━━━━━━━━━━━━━━━━━━━━ */}
       <div className="bg-white px-6 py-5">
         {/* ⇄ Transaction label */}
-        <div className="mb-3 flex items-center gap-1.5 text-[11px] text-[#387085]/45">
+        <div className="mb-3 flex items-center gap-1.5 text-xs text-[#387085]/80">
           <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" d="M7.5 21 3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5" />
           </svg>
@@ -533,16 +533,16 @@ export default function TransactionTabs({ tx }: { tx: Transaction }) {
         </div>
 
         {/* Timestamp: "27 days ago (2026/05/04 23:45:00 +UTC)" */}
-        <p className="mt-2 text-sm text-[#387085]/50">
+        <p className="mt-2 text-sm text-[#387085]/70">
           {relTime}{' '}
-          <span className="text-[#387085]/35">({absoluteUTC})</span>
+          <span className="text-[#387085]/70">({absoluteUTC})</span>
         </p>
 
         {/* Block — secondary meta */}
         <div className="mt-3 border-t border-[#387085]/8 pt-3">
           <Link
             href={`/blocks/${tx.blockNumber}`}
-            className="inline-flex items-center gap-1.5 text-[11px] text-[#387085]/50 hover:text-[#387085]"
+            className="inline-flex items-center gap-1.5 text-xs text-[#387085]/70 hover:text-[#387085]"
           >
             <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" d="m21 7.5-9-5.25L3 7.5m18 0-9 5.25m9-5.25v9l-9 5.25M3 7.5l9 5.25M3 7.5v9l9 5.25m0-9v9" />
@@ -580,20 +580,20 @@ export default function TransactionTabs({ tx }: { tx: Transaction }) {
                   />
                   <div className="min-w-0">
                     <div className="flex items-center gap-2">
-                      <span className={`rounded px-1.5 py-0.5 text-[10px] font-semibold ${ec.badge}`}>
+                      <span className={`rounded px-1.5 py-0.5 text-xs font-semibold ${ec.badge}`}>
                         {copy.h1}
                       </span>
                       {ctx.eventInstances.length > 1 && (
-                        <span className="rounded bg-[#387085]/8 px-1.5 py-0.5 text-[10px] font-medium text-[#387085]/45">
+                        <span className="rounded bg-[#387085]/8 px-1.5 py-0.5 text-xs font-medium text-[#387085]/80">
                           {idx + 1}
                         </span>
                       )}
                     </div>
-                    <p className="mt-0.5 text-[11px] text-[#14140f]/50 truncate pr-4">{evtH2}</p>
+                    <p className="mt-0.5 text-xs text-[#14140f]/50 truncate pr-4">{evtH2}</p>
                   </div>
                 </div>
                 <svg
-                  className={`h-4 w-4 shrink-0 text-[#387085]/35 transition-transform ${isOpen ? 'rotate-180' : ''}`}
+                  className={`h-4 w-4 shrink-0 text-[#387085]/70 transition-transform ${isOpen ? 'rotate-180' : ''}`}
                   fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor"
                 >
                   <path strokeLinecap="round" strokeLinejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
@@ -645,19 +645,19 @@ export default function TransactionTabs({ tx }: { tx: Transaction }) {
         {activeTab === 'log' && (
           <div className="px-6 py-5">
             {ctx.logs.length === 0 ? (
-              <p className="py-6 text-center text-sm text-[#387085]/40">No logs for this transaction.</p>
+              <p className="py-6 text-center text-sm text-[#387085]/80">No logs for this transaction.</p>
             ) : (
               <div className="space-y-4">
                 {ctx.logs.map((log, i) => (
                   <div key={i} className="rounded border border-[#387085]/12 bg-[#faf9f5]">
                     {/* Log header */}
                     <div className="flex items-center gap-2.5 border-b border-[#387085]/10 px-4 py-3">
-                      <span className="flex h-5 w-5 items-center justify-center rounded bg-[#cd6332]/10 font-mono text-[10px] font-semibold text-[#cd6332]">
+                      <span className="flex h-5 w-5 items-center justify-center rounded bg-[#cd6332]/10 font-mono text-xs font-semibold text-[#cd6332]">
                         {log.logIndex}
                       </span>
                       <span className="font-mono text-[12px] font-semibold text-[#14140f]">{log.eventName}</span>
-                      <span className="text-[#387085]/35">·</span>
-                      <span className="font-mono text-[10px] text-[#387085]/50">{log.address}</span>
+                      <span className="text-[#387085]/70">·</span>
+                      <span className="font-mono text-xs text-[#387085]/70">{log.address}</span>
                       <span className="ml-1 rounded bg-[#387085]/8 px-1.5 py-0.5 text-[9px] font-medium text-[#387085]/55">
                         {log.contractLabel}
                       </span>
@@ -666,14 +666,14 @@ export default function TransactionTabs({ tx }: { tx: Transaction }) {
                     <div className="divide-y divide-[#387085]/8 px-4">
                       {log.params.map((p, j) => (
                         <div key={j} className="flex items-start gap-3 py-2">
-                          <span className="w-40 shrink-0 font-mono text-[11px] text-[#387085]/50">{p.name}</span>
-                          <span className="w-16 shrink-0 rounded bg-[#387085]/6 px-1 py-0.5 text-center font-mono text-[9px] text-[#387085]/40">
+                          <span className="w-40 shrink-0 font-mono text-xs text-[#387085]/70">{p.name}</span>
+                          <span className="w-16 shrink-0 rounded bg-[#387085]/6 px-1 py-0.5 text-center font-mono text-[9px] text-[#387085]/80">
                             {p.type}
                           </span>
                           <div className="min-w-0 flex-1">
-                            <span className="break-all font-mono text-[11px] text-[#14140f]/75">{p.value}</span>
+                            <span className="break-all font-mono text-xs text-[#14140f]/75">{p.value}</span>
                             {p.note && (
-                              <span className="ml-2 text-[10px] text-[#387085]/40">({p.note})</span>
+                              <span className="ml-2 text-xs text-[#387085]/80">({p.note})</span>
                             )}
                           </div>
                         </div>
@@ -694,7 +694,7 @@ export default function TransactionTabs({ tx }: { tx: Transaction }) {
               <AddrCopy full={tx.hash} display={fmt(tx.hash)} />
             </InfoRow>
             <InfoRow label="Method">
-              <span className="inline-block rounded bg-[#cd6332] px-2.5 py-1 font-mono text-[10px] font-medium text-white">
+              <span className="inline-block rounded bg-[#cd6332] px-2.5 py-1 font-mono text-xs font-medium text-white">
                 {tx.method}
               </span>
             </InfoRow>
@@ -711,13 +711,13 @@ export default function TransactionTabs({ tx }: { tx: Transaction }) {
             <div className="border-t border-[#387085]/12" />
 
             <InfoRow label="Amount">
-              <span>{tx.amount} <span className="text-[#387085]/45">ETH</span></span>
+              <span>{tx.amount} <span className="text-[#387085]/80">ETH</span></span>
             </InfoRow>
             <InfoRow label="Transaction Fee">
-              <span>{tx.txFee.toFixed(10)} <span className="text-[#387085]/45">ETH</span></span>
+              <span>{tx.txFee.toFixed(10)} <span className="text-[#387085]/80">ETH</span></span>
             </InfoRow>
             <InfoRow label="Gas Price">
-              <span>{tx.gasPrice.toFixed(9)} <span className="text-[#387085]/45">Gwei</span></span>
+              <span>{tx.gasPrice.toFixed(9)} <span className="text-[#387085]/80">Gwei</span></span>
             </InfoRow>
 
             <div className="border-t border-[#387085]/12" />
@@ -725,7 +725,7 @@ export default function TransactionTabs({ tx }: { tx: Transaction }) {
             <InfoRow label="Gas Used (by Txn)">
               <span>
                 {tx.gasUsed.toLocaleString()}{' '}
-                <span className="text-[#387085]/40">({((tx.gasUsed / tx.gasLimit) * 100).toFixed(1)}%)</span>
+                <span className="text-[#387085]/80">({((tx.gasUsed / tx.gasLimit) * 100).toFixed(1)}%)</span>
               </span>
             </InfoRow>
             <InfoRow label="Gas Limit (by Txn)">
@@ -733,32 +733,32 @@ export default function TransactionTabs({ tx }: { tx: Transaction }) {
             </InfoRow>
             <InfoRow label="Gas Fees">
               <div className="flex flex-wrap gap-1.5">
-                <span className="inline-block rounded bg-[#cd6332] px-2 py-0.5 font-mono text-[10px] font-medium text-white">
+                <span className="inline-block rounded bg-[#cd6332] px-2 py-0.5 font-mono text-xs font-medium text-white">
                   Base: {tx.baseFee.toFixed(9)} Gwei
                 </span>
-                <span className="inline-block rounded bg-[#cd6332] px-2 py-0.5 font-mono text-[10px] font-medium text-white">
+                <span className="inline-block rounded bg-[#cd6332] px-2 py-0.5 font-mono text-xs font-medium text-white">
                   Max: {tx.maxFeePerGas.toFixed(9)} Gwei
                 </span>
-                <span className="inline-block rounded bg-[#cd6332] px-2 py-0.5 font-mono text-[10px] font-medium text-white">
+                <span className="inline-block rounded bg-[#cd6332] px-2 py-0.5 font-mono text-xs font-medium text-white">
                   Max Priority: {tx.maxPriorityFee.toFixed(3)} Gwei
                 </span>
               </div>
             </InfoRow>
             <InfoRow label="Other Attributes">
               <div className="flex flex-wrap gap-1.5">
-                <span className="inline-block rounded bg-[#cd6332] px-2 py-0.5 font-mono text-[10px] font-medium text-white">
+                <span className="inline-block rounded bg-[#cd6332] px-2 py-0.5 font-mono text-xs font-medium text-white">
                   Txn Type: {tx.txType}
                 </span>
-                <span className="inline-block rounded bg-[#cd6332] px-2 py-0.5 font-mono text-[10px] font-medium text-white">
+                <span className="inline-block rounded bg-[#cd6332] px-2 py-0.5 font-mono text-xs font-medium text-white">
                   Nonce: {tx.nonce}
                 </span>
-                <span className="inline-block rounded bg-[#cd6332] px-2 py-0.5 font-mono text-[10px] font-medium text-white">
+                <span className="inline-block rounded bg-[#cd6332] px-2 py-0.5 font-mono text-xs font-medium text-white">
                   Position in Block: {tx.positionInBlock}
                 </span>
               </div>
             </InfoRow>
             <InfoRow label="Input Data">
-              <div className="max-h-28 overflow-auto rounded border border-[#cd6332]/10 bg-[#faf9f5] p-3 font-mono text-[10px] leading-relaxed text-[#387085]/55">
+              <div className="max-h-28 overflow-auto rounded border border-[#cd6332]/10 bg-[#faf9f5] p-3 font-mono text-xs leading-relaxed text-[#387085]/55">
                 {tx.inputData}
               </div>
             </InfoRow>

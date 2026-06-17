@@ -60,10 +60,10 @@ export default function SearchFilter({
             <button
               key={s}
               onClick={() => onStatusChange(s)}
-              className={`rounded-none px-2.5 py-1 text-[11px] font-medium transition-colors ${
+              className={`rounded-none px-2.5 py-1 text-xs font-medium transition-colors ${
                 status === s
                   ? 'bg-white text-[#cd6332] shadow-sm'
-                  : 'text-[rgba(56,112,133,0.5)] hover:text-[#387085]'
+                  : 'text-[rgba(56,112,133,0.7)] hover:text-[#387085]'
               }`}
             >
               {s}

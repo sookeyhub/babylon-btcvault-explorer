@@ -20,7 +20,7 @@ function CopyIcon({ text }: { text: string }) {
   return (
     <button
       onClick={(e) => { e.preventDefault(); e.stopPropagation(); navigator.clipboard.writeText(text); setCopied(true); setTimeout(() => setCopied(false), 1500); }}
-      className="ml-1 inline-flex shrink-0 text-[rgba(56,112,133,0.3)] hover:text-[#387085]"
+      className="ml-1 inline-flex shrink-0 text-[rgba(56,112,133,0.7)] hover:text-[#387085]"
       title={copied ? 'Copied!' : 'Copy'}
     >
       <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor">
@@ -81,8 +81,8 @@ function VaultHistoryRow({ event }: { event: VaultActivityEvent }) {
     <div className="flex items-start gap-3 border border-[#387085]/10 bg-white px-4 py-3 transition-colors hover:bg-[#faf9f5]">
       {/* Time column */}
       <div className="w-28 shrink-0 pt-0.5">
-        <div className="text-[11px] font-medium text-[#387085]/40">{formatRelativeTime(event.blockTime)}</div>
-        <div className="font-mono text-[9px] text-[#387085]/30">({formatTimeUTC(event.blockTime)})</div>
+        <div className="text-xs font-medium text-[#387085]/80">{formatRelativeTime(event.blockTime)}</div>
+        <div className="font-mono text-[9px] text-[#387085]/70">({formatTimeUTC(event.blockTime)})</div>
       </div>
 
       {/* Content */}
@@ -90,15 +90,15 @@ function VaultHistoryRow({ event }: { event: VaultActivityEvent }) {
         {/* Row 1: Status chip + Vault + amount */}
         <div className="flex items-center justify-between gap-2">
           <div className="flex items-center gap-2">
-            <span className={`inline-block rounded-full px-2 py-0.5 text-[10px] font-medium ${style.pillClass}`}>
+            <span className={`inline-block rounded-full px-2 py-0.5 text-xs font-medium ${style.pillClass}`}>
               {style.status}
             </span>
             <span className="inline-flex items-center gap-1">
-              <span className="text-[9px] font-medium uppercase tracking-wide text-[#387085]/40">Vault</span>
-              <svg className="h-3 w-3 text-[#387085]/30" fill="none" viewBox="0 0 24 24" strokeWidth="1.8" stroke="currentColor">
+              <span className="text-[9px] font-medium uppercase tracking-wide text-[#387085]/80">Vault</span>
+              <svg className="h-3 w-3 text-[#387085]/70" fill="none" viewBox="0 0 24 24" strokeWidth="1.8" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z" />
               </svg>
-              <Link href={`/vaults/${event.vaultId}`} className="font-mono text-[10px] text-[#cd6332]/70 hover:text-[#cd6332] hover:underline">
+              <Link href={`/vaults/${event.vaultId}`} className="font-mono text-xs text-[#cd6332]/70 hover:text-[#cd6332] hover:underline">
                 {truncateAddress(event.vaultId, 6, 4)}
               </Link>
             </span>
@@ -108,19 +108,19 @@ function VaultHistoryRow({ event }: { event: VaultActivityEvent }) {
         {/* Row 2: Provider | Depositor */}
         <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-0.5">
           <span className="inline-flex items-center gap-1">
-            <span className="text-[9px] font-medium uppercase tracking-wide text-[#387085]/40">Provider</span>
-            <svg className="h-3 w-3 text-[#387085]/30" fill="none" viewBox="0 0 24 24" strokeWidth="1.8" stroke="currentColor">
+            <span className="text-[9px] font-medium uppercase tracking-wide text-[#387085]/80">Provider</span>
+            <svg className="h-3 w-3 text-[#387085]/70" fill="none" viewBox="0 0 24 24" strokeWidth="1.8" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" d="M20.25 14.15v4.25c0 1.094-.787 2.036-1.872 2.18-2.087.277-4.216.42-6.378.42s-4.291-.143-6.378-.42c-1.085-.144-1.872-1.086-1.872-2.18v-4.25m16.5 0a2.18 2.18 0 0 0 .75-1.661V8.706c0-1.081-.768-2.015-1.837-2.175a48.114 48.114 0 0 0-3.413-.387m4.5 8.006c-.194.165-.42.295-.673.38A23.978 23.978 0 0 1 12 15.75c-2.648 0-5.195-.429-7.577-1.22a2.016 2.016 0 0 1-.673-.38m0 0A2.18 2.18 0 0 1 3 12.489V8.706c0-1.081.768-2.015 1.837-2.175a48.111 48.111 0 0 1 3.413-.387m7.5 0V5.25A2.25 2.25 0 0 0 13.5 3h-3a2.25 2.25 0 0 0-2.25 2.25v.894m7.5 0a48.667 48.667 0 0 0-7.5 0" />
             </svg>
-            <span className="font-mono text-[10px] text-[#14140f]/70">{event.providerName}</span>
+            <span className="font-mono text-xs text-[#14140f]/70">{event.providerName}</span>
           </span>
           <span className="text-[#387085]/20">·</span>
           <span className="inline-flex items-center gap-1">
-            <span className="text-[9px] font-medium uppercase tracking-wide text-[#387085]/40">Depositor</span>
-            <svg className="h-3 w-3 text-[#387085]/30" fill="none" viewBox="0 0 24 24" strokeWidth="1.8" stroke="currentColor">
+            <span className="text-[9px] font-medium uppercase tracking-wide text-[#387085]/80">Depositor</span>
+            <svg className="h-3 w-3 text-[#387085]/70" fill="none" viewBox="0 0 24 24" strokeWidth="1.8" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0" />
             </svg>
-            <Link href={`/accounts/${event.depositorAddress}`} className="font-mono text-[10px] text-[#387085]/70 hover:text-[#cd6332] hover:underline">
+            <Link href={`/accounts/${event.depositorAddress}`} className="font-mono text-xs text-[#387085]/70 hover:text-[#cd6332] hover:underline">
               {truncateAddress(event.depositorAddress, 6, 4)}
             </Link>
           </span>
@@ -129,16 +129,16 @@ function VaultHistoryRow({ event }: { event: VaultActivityEvent }) {
         {/* Row 3: Txn | Block */}
         <div className="mt-1 flex flex-wrap items-center gap-3">
           <span className="inline-flex items-center gap-1">
-            <span className="text-[9px] font-medium uppercase tracking-wide text-[#387085]/40">Tx</span>
-            <Link href={`/tx/${event.txHash}`} className="font-mono text-[10px] text-[#cd6332]/70 hover:text-[#cd6332] hover:underline">
+            <span className="text-[9px] font-medium uppercase tracking-wide text-[#387085]/80">Tx</span>
+            <Link href={`/tx/${event.txHash}`} className="font-mono text-xs text-[#cd6332]/70 hover:text-[#cd6332] hover:underline">
               {truncateAddress(event.txHash, 6, 4)}
             </Link>
             <CopyIcon text={event.txHash} />
           </span>
-          <span className="text-[10px] text-[#387085]/20">·</span>
+          <span className="text-xs text-[#387085]/20">·</span>
           <span className="inline-flex items-center gap-1">
-            <span className="text-[9px] font-medium uppercase tracking-wide text-[#387085]/40">Block</span>
-            <span className="font-mono text-[10px] text-[#387085]/40">
+            <span className="text-[9px] font-medium uppercase tracking-wide text-[#387085]/80">Block</span>
+            <span className="font-mono text-xs text-[#387085]/80">
               #{event.blockNumber.toLocaleString()}
             </span>
           </span>
@@ -158,8 +158,8 @@ function LendingActivityRow({ activity }: { activity: AaveV4Activity }) {
     <div className="flex items-start border-b border-[#387085]/8 py-3">
       {/* Time */}
       <div className="w-28 shrink-0 pt-0.5">
-        <div className="text-[11px] font-medium text-[#387085]/40">{formatRelativeTime(activity.blockTime)}</div>
-        <div className="font-mono text-[9px] text-[#387085]/30">({formatTimeUTC(activity.blockTime)})</div>
+        <div className="text-xs font-medium text-[#387085]/80">{formatRelativeTime(activity.blockTime)}</div>
+        <div className="font-mono text-[9px] text-[#387085]/70">({formatTimeUTC(activity.blockTime)})</div>
       </div>
 
       {/* Content */}
@@ -172,11 +172,11 @@ function LendingActivityRow({ activity }: { activity: AaveV4Activity }) {
             </span>
             {hasVault && activity.vaultId && (
               <span className="inline-flex items-center gap-1">
-                <span className="text-[9px] font-medium uppercase tracking-wide text-[#387085]/40">Vault</span>
-                <svg className="h-3 w-3 text-[#387085]/30" fill="none" viewBox="0 0 24 24" strokeWidth="1.8" stroke="currentColor">
+                <span className="text-[9px] font-medium uppercase tracking-wide text-[#387085]/80">Vault</span>
+                <svg className="h-3 w-3 text-[#387085]/70" fill="none" viewBox="0 0 24 24" strokeWidth="1.8" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z" />
                 </svg>
-                <Link href={`/vaults/${activity.vaultId}`} className="font-mono text-[10px] text-[#cd6332]/70 hover:text-[#cd6332] hover:underline">
+                <Link href={`/vaults/${activity.vaultId}`} className="font-mono text-xs text-[#cd6332]/70 hover:text-[#cd6332] hover:underline">
                   {truncateAddress(activity.vaultId, 6, 4)}
                 </Link>
                 <CopyIcon text={activity.vaultId} />
@@ -187,18 +187,18 @@ function LendingActivityRow({ activity }: { activity: AaveV4Activity }) {
             <div className={`font-mono text-sm font-semibold ${style.amountColor}`}>
               {style.amountPrefix}{formattedAmount}
             </div>
-            <div className="text-[10px] text-[#387085]/40">{formatTokenUsd(activity.tokenAmount)}</div>
+            <div className="text-xs text-[#387085]/80">{formatTokenUsd(activity.tokenAmount)}</div>
           </div>
         </div>
 
         {/* Row 2: Depositor */}
         <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-0.5">
           <span className="inline-flex items-center gap-1">
-            <span className="text-[9px] font-medium uppercase tracking-wide text-[#387085]/40">Depositor</span>
-            <svg className="h-3 w-3 text-[#387085]/30" fill="none" viewBox="0 0 24 24" strokeWidth="1.8" stroke="currentColor">
+            <span className="text-[9px] font-medium uppercase tracking-wide text-[#387085]/80">Depositor</span>
+            <svg className="h-3 w-3 text-[#387085]/70" fill="none" viewBox="0 0 24 24" strokeWidth="1.8" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0" />
             </svg>
-            <Link href={`/accounts/${activity.depositorAddress}`} className="font-mono text-[10px] text-[#387085]/70 hover:text-[#cd6332] hover:underline">
+            <Link href={`/accounts/${activity.depositorAddress}`} className="font-mono text-xs text-[#387085]/70 hover:text-[#cd6332] hover:underline">
               {truncateAddress(activity.depositorAddress, 6, 4)}
             </Link>
           </span>
@@ -207,16 +207,16 @@ function LendingActivityRow({ activity }: { activity: AaveV4Activity }) {
         {/* Row 3: Tx + Block */}
         <div className="mt-1 flex flex-wrap items-center gap-3">
           <span className="inline-flex items-center gap-1">
-            <span className="text-[9px] font-medium uppercase tracking-wide text-[#387085]/40">Tx</span>
-            <Link href={`/tx/${activity.txHash}`} className="font-mono text-[10px] text-[#cd6332]/70 hover:text-[#cd6332] hover:underline">
+            <span className="text-[9px] font-medium uppercase tracking-wide text-[#387085]/80">Tx</span>
+            <Link href={`/tx/${activity.txHash}`} className="font-mono text-xs text-[#cd6332]/70 hover:text-[#cd6332] hover:underline">
               {truncateAddress(activity.txHash, 6, 4)}
             </Link>
             <CopyIcon text={activity.txHash} />
           </span>
-          <span className="text-[10px] text-[#387085]/20">·</span>
+          <span className="text-xs text-[#387085]/20">·</span>
           <span className="inline-flex items-center gap-1">
-            <span className="text-[9px] font-medium uppercase tracking-wide text-[#387085]/40">Block</span>
-            <span className="font-mono text-[10px] text-[#387085]/40">
+            <span className="text-[9px] font-medium uppercase tracking-wide text-[#387085]/80">Block</span>
+            <span className="font-mono text-xs text-[#387085]/80">
               #{activity.blockNumber.toLocaleString()}
             </span>
           </span>
@@ -238,7 +238,7 @@ export default function HomeActivitySections() {
       <div className="flex flex-col border border-[#387085]/10 bg-white">
         <div className="flex items-center justify-between border-b border-[#387085]/10 px-5 py-3">
           <h2 className="text-sm font-semibold text-[#14140f]">Vault Activity</h2>
-          <Link href="/vaults?tab=history" className="text-[11px] font-medium text-[#cd6332] hover:underline">
+          <Link href="/vaults?tab=history" className="text-xs font-medium text-[#cd6332] hover:underline">
             View all Vault Activity ›
           </Link>
         </div>
@@ -250,7 +250,7 @@ export default function HomeActivitySections() {
         <div className="border-t border-[#387085]/10 px-5 py-3">
           <Link
             href="/vaults?tab=history"
-            className="flex w-full items-center justify-center gap-1 rounded-sm border border-[#387085]/15 py-2 text-xs font-medium text-[#387085]/60 transition-colors hover:border-[#cd6332]/30 hover:text-[#cd6332]"
+            className="flex w-full items-center justify-center gap-1 rounded-sm border border-[#387085]/15 py-2 text-xs font-medium text-[#387085]/80 transition-colors hover:border-[#cd6332]/30 hover:text-[#cd6332]"
           >
             View all Vault Activity
             <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
@@ -264,7 +264,7 @@ export default function HomeActivitySections() {
       <div className="flex flex-col border border-[#387085]/10 bg-white">
         <div className="flex items-center justify-between border-b border-[#387085]/10 px-5 py-3">
           <h2 className="text-sm font-semibold text-[#14140f]">Lending Activity</h2>
-          <Link href="/lending-activity" className="text-[11px] font-medium text-[#cd6332] hover:underline">
+          <Link href="/lending-activity" className="text-xs font-medium text-[#cd6332] hover:underline">
             View all Lending Activity ›
           </Link>
         </div>
@@ -276,7 +276,7 @@ export default function HomeActivitySections() {
         <div className="border-t border-[#387085]/10 px-5 py-3">
           <Link
             href="/lending-activity"
-            className="flex w-full items-center justify-center gap-1 rounded-sm border border-[#387085]/15 py-2 text-xs font-medium text-[#387085]/60 transition-colors hover:border-[#cd6332]/30 hover:text-[#cd6332]"
+            className="flex w-full items-center justify-center gap-1 rounded-sm border border-[#387085]/15 py-2 text-xs font-medium text-[#387085]/80 transition-colors hover:border-[#cd6332]/30 hover:text-[#cd6332]"
           >
             View all Lending Activity
             <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">

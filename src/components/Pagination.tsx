@@ -33,7 +33,7 @@ export default function Pagination({
 
   return (
     <div className="flex items-center justify-between border-t border-[#cd6332]/10 px-5 py-3">
-      <p className="text-xs text-[rgba(56,112,133,0.5)]">
+      <p className="text-xs text-[rgba(56,112,133,0.7)]">
         Showing {start}–{end} of {total}
       </p>
       <div className="flex items-center gap-1">
@@ -46,7 +46,7 @@ export default function Pagination({
         </button>
         {pages.map((p, idx) =>
           p === '...' ? (
-            <span key={`ellipsis-${idx}`} className="px-1 text-xs text-[rgba(56,112,133,0.3)]">
+            <span key={`ellipsis-${idx}`} className="px-1 text-xs text-[rgba(56,112,133,0.7)]">
               ...
             </span>
           ) : (

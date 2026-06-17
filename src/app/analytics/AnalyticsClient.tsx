@@ -139,10 +139,10 @@ function PeriodToggles({
         <button
           key={p}
           onClick={() => onChange(p)}
-          className={`rounded-none px-2 py-1 text-[11px] font-medium transition-colors ${
+          className={`rounded-none px-2 py-1 text-xs font-medium transition-colors ${
             active === p
               ? 'bg-[#cd6332] text-white'
-              : 'text-[rgba(56,112,133,0.55)] hover:text-[#cd6332]'
+              : 'text-[rgba(56,112,133,0.7)] hover:text-[#cd6332]'
           }`}
         >
           {p}
@@ -192,13 +192,13 @@ function LineChartCard({ title, data, color, valueSuffix = '', yTickFormatter }:
               dataKey="date"
               ticks={xTicks}
               tickFormatter={formatDateLabel}
-              tick={{ fontSize: 10, fill: 'rgba(56,112,133,0.4)' }}
+              tick={{ fontSize: 10, fill: 'rgba(56,112,133,0.6)' }}
               axisLine={false}
               tickLine={false}
             />
             <YAxis
               tickFormatter={yTickFormatter ?? ((v) => `${v}`)}
-              tick={{ fontSize: 10, fill: 'rgba(56,112,133,0.4)' }}
+              tick={{ fontSize: 10, fill: 'rgba(56,112,133,0.6)' }}
               axisLine={false}
               tickLine={false}
               width={44}
@@ -262,7 +262,7 @@ function VaultCreationChart({ data }: { data: VaultCreationPoint[] }) {
               dataKey="date"
               ticks={xTicks}
               tickFormatter={formatDateLabel}
-              tick={{ fontSize: 10, fill: 'rgba(56,112,133,0.4)' }}
+              tick={{ fontSize: 10, fill: 'rgba(56,112,133,0.6)' }}
               axisLine={false}
               tickLine={false}
             />
@@ -270,7 +270,7 @@ function VaultCreationChart({ data }: { data: VaultCreationPoint[] }) {
             <YAxis
               yAxisId="count"
               orientation="left"
-              tick={{ fontSize: 10, fill: 'rgba(56,112,133,0.4)' }}
+              tick={{ fontSize: 10, fill: 'rgba(56,112,133,0.6)' }}
               axisLine={false}
               tickLine={false}
               width={36}
@@ -280,7 +280,7 @@ function VaultCreationChart({ data }: { data: VaultCreationPoint[] }) {
             <YAxis
               yAxisId="amount"
               orientation="right"
-              tick={{ fontSize: 10, fill: 'rgba(56,112,133,0.4)' }}
+              tick={{ fontSize: 10, fill: 'rgba(56,112,133,0.6)' }}
               axisLine={false}
               tickLine={false}
               width={52}
@@ -382,7 +382,7 @@ export function VaultsTabContent({
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs">
             <thead>
-              <tr className="bg-[#cd6332] text-[11px] font-medium uppercase tracking-wider text-white">
+              <tr className="bg-[#cd6332] text-xs font-medium uppercase tracking-wider text-white">
                 <th className="whitespace-nowrap px-4 py-2.5 font-medium">Vault ID</th>
                 <th className="whitespace-nowrap px-4 py-2.5 font-medium">Amount</th>
                 <th className="whitespace-nowrap px-4 py-2.5 font-medium">Depositor</th>
@@ -401,7 +401,7 @@ export function VaultsTabContent({
                     <div className="flex items-center">
                       <Link
                         href={`/vaults/${vault.id}`}
-                        className="font-mono text-[11px] font-medium text-[#cd6332] hover:text-[#b8562b]"
+                        className="font-mono text-xs font-medium text-[#cd6332] hover:text-[#b8562b]"
                       >
                         {truncateAddress(vault.id, 6, 4)}
                       </Link>
@@ -410,13 +410,13 @@ export function VaultsTabContent({
                   </td>
                   <td className="whitespace-nowrap px-4 py-2.5 tabular-nums">
                     <div className="font-medium text-[#14140f]">{vault.vaultSize} sBTC</div>
-                    <div className="text-[10px] text-[#387085]/40">{toUsd(vault.vaultSize)}</div>
+                    <div className="text-xs text-[#387085]/80">{toUsd(vault.vaultSize)}</div>
                   </td>
                   <td className="whitespace-nowrap px-4 py-2.5">
                     <div className="flex items-center">
                       <Link
                         href={`/accounts/${vault.depositorAddress}`}
-                        className="font-mono text-[11px] text-[rgba(56,112,133,0.5)] hover:text-[#cd6332]"
+                        className="font-mono text-xs text-[rgba(56,112,133,0.7)] hover:text-[#cd6332]"
                       >
                         {truncateAddress(vault.depositorAddress, 6, 4)}
                       </Link>
@@ -426,13 +426,13 @@ export function VaultsTabContent({
                   <td className="whitespace-nowrap px-4 py-2.5">
                     <Link
                       href={`/accounts/${vault.providerAddress}`}
-                      className="text-[11px] text-[#14140f] hover:text-[#cd6332]"
+                      className="text-xs text-[#14140f] hover:text-[#cd6332]"
                     >
                       {vault.providerName}
                     </Link>
                   </td>
                   <td className="whitespace-nowrap px-4 py-2.5 text-[#387085]">{vault.dappName}</td>
-                  <td className="whitespace-nowrap px-4 py-2.5 text-[11px] text-[rgba(56,112,133,0.5)]">
+                  <td className="whitespace-nowrap px-4 py-2.5 text-xs text-[rgba(56,112,133,0.7)]">
                     {vault.createdAt ? formatRelativeTime(vault.createdAt) : '—'}
                   </td>
                 </tr>

@@ -56,7 +56,7 @@ export default function StatusChart({ data }: StatusChartProps) {
               className="h-2.5 w-2.5 rounded-none"
               style={{ backgroundColor: COLORS[d.status] ?? '#387085' }}
             />
-            <span className="w-20 text-[rgba(56,112,133,0.6)]">{d.status}</span>
+            <span className="w-20 text-[rgba(56,112,133,0.8)]">{d.status}</span>
             <span className="font-semibold tabular-nums text-[#14140f]">{d.count}</span>
           </div>
         ))}

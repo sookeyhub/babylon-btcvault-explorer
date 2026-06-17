@@ -29,7 +29,7 @@ function CopyIcon({ text }: { text: string }) {
         setCopied(true);
         setTimeout(() => setCopied(false), 1500);
       }}
-      className="ml-1 inline-flex shrink-0 text-[rgba(56,112,133,0.3)] hover:text-[#387085]"
+      className="ml-1 inline-flex shrink-0 text-[rgba(56,112,133,0.7)] hover:text-[#387085]"
       title={copied ? 'Copied!' : 'Copy'}
     >
       <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor">
@@ -220,33 +220,33 @@ export default function ProvidersPage() {
       {/* KPI summary cards */}
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         <div className="border border-[#387085]/10 bg-white p-3">
-          <p className="text-[11px] font-medium uppercase tracking-wide text-[#387085]/50">Total Providers</p>
+          <p className="text-xs font-medium uppercase tracking-wide text-[#387085]/70">Total Providers</p>
           <p className="mt-0.5 text-2xl font-semibold text-[#14140f]">{totalProviders}</p>
-          <p className="mt-0.5 text-xs text-[#387085]/40">top holds {(() => {
+          <p className="mt-0.5 text-xs text-[#387085]/80">top holds {(() => {
             const top5Btc = sortedProviders.slice(0, 5).reduce((s, p) => s + p.totalBtc, 0);
             return totalBtc > 0 ? Math.round((top5Btc / totalBtc) * 100) : 0;
           })()}%</p>
         </div>
         <div className="border border-[#387085]/10 bg-white p-3">
-          <p className="text-[11px] font-medium uppercase tracking-wide text-[#387085]/50">Avg Commission</p>
+          <p className="text-xs font-medium uppercase tracking-wide text-[#387085]/70">Avg Commission</p>
           <p className="mt-0.5 text-2xl font-semibold text-[#14140f]">{(avgCommission / 100).toFixed(2)}%</p>
-          <p className="mt-0.5 text-xs text-[#387085]/40">Range {minCommission.toFixed(1)}–{maxCommission.toFixed(1)}%</p>
+          <p className="mt-0.5 text-xs text-[#387085]/80">Range {minCommission.toFixed(1)}–{maxCommission.toFixed(1)}%</p>
         </div>
         <div className="border border-[#387085]/10 bg-white p-3">
-          <p className="flex items-center gap-1 text-[11px] font-medium uppercase tracking-wide text-[#387085]/50">
+          <p className="flex items-center gap-1 text-xs font-medium uppercase tracking-wide text-[#387085]/70">
             Locked BTC
-            <svg className="h-3 w-3 text-[#387085]/30" fill="none" viewBox="0 0 24 24" strokeWidth="1.8" stroke="currentColor">
+            <svg className="h-3 w-3 text-[#387085]/70" fill="none" viewBox="0 0 24 24" strokeWidth="1.8" stroke="currentColor">
               <title>Total BTC currently locked as collateral in active vaults</title>
               <path strokeLinecap="round" strokeLinejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z" />
             </svg>
           </p>
-          <p className="mt-0.5 text-2xl font-semibold text-[#14140f]">{totalBtc.toFixed(2)} <span className="text-sm font-normal text-[#387085]/50">sBTC</span></p>
-          <p className="mt-0.5 text-xs text-[#387085]/40">{toUsd(totalBtc)}</p>
+          <p className="mt-0.5 text-2xl font-semibold text-[#14140f]">{totalBtc.toFixed(2)} <span className="text-sm font-normal text-[#387085]/70">sBTC</span></p>
+          <p className="mt-0.5 text-xs text-[#387085]/80">{toUsd(totalBtc)}</p>
         </div>
         <div className="border border-[#387085]/10 bg-white p-3">
-          <p className="text-[11px] font-medium uppercase tracking-wide text-[#387085]/50">Active Vaults</p>
+          <p className="text-xs font-medium uppercase tracking-wide text-[#387085]/70">Active Vaults</p>
           <p className="mt-0.5 text-2xl font-semibold text-[#14140f]">{activeVaultCount.toLocaleString()}</p>
-          <p className="mt-0.5 text-xs text-[#387085]/40">of {vaults.length}</p>
+          <p className="mt-0.5 text-xs text-[#387085]/80">of {vaults.length}</p>
         </div>
       </div>
 
@@ -256,15 +256,15 @@ export default function ProvidersPage() {
           <div className="flex items-center justify-between">
             <div>
               <h2 className="text-sm font-semibold text-[#14140f]">Provider TVL Trend</h2>
-              <p className="mt-0.5 text-[11px] text-[#387085]/50">
+              <p className="mt-0.5 text-xs text-[#387085]/70">
                 Daily managed BTC per provider · Top 10{hasOthers ? ' + Others' : ''}
               </p>
             </div>
             <div className="text-right">
               <p className="text-sm font-semibold text-[#14140f]">
-                {totalNow.toFixed(2)} BTC <span className="text-xs font-normal text-[#387085]/40">{toUsd(totalNow)}</span>
+                {totalNow.toFixed(2)} BTC <span className="text-xs font-normal text-[#387085]/80">{toUsd(totalNow)}</span>
               </p>
-              <p className={`text-[10px] ${totalDelta >= 0 ? 'text-green-600' : 'text-red-500'}`}>
+              <p className={`text-xs ${totalDelta >= 0 ? 'text-green-600' : 'text-red-500'}`}>
                 {totalDelta >= 0 ? '+' : ''}
                 {totalDelta.toFixed(2)} ({totalDeltaPct >= 0 ? '+' : ''}
                 {totalDeltaPct.toFixed(1)}%) · {trendPeriod.toLowerCase()}
@@ -276,10 +276,10 @@ export default function ProvidersPage() {
               <button
                 key={p}
                 onClick={() => setTrendPeriod(p)}
-                className={`rounded-none px-2.5 py-1 text-[11px] font-medium transition-colors ${
+                className={`rounded-none px-2.5 py-1 text-xs font-medium transition-colors ${
                   trendPeriod === p
                     ? 'bg-[#cd6332] text-white'
-                    : 'text-[rgba(56,112,133,0.6)] hover:text-[#cd6332]'
+                    : 'text-[rgba(56,112,133,0.8)] hover:text-[#cd6332]'
                 }`}
               >
                 {p}
@@ -369,10 +369,10 @@ export default function ProvidersPage() {
 
       {/* Results count + Pagination */}
       <div className="flex items-center justify-between">
-        <p className="text-sm text-[rgba(56,112,133,0.5)]">
+        <p className="text-sm text-[rgba(56,112,133,0.7)]">
           Showing all <span className="font-semibold text-[#14140f]">{total}</span> results
         </p>
-        <div className="flex items-center gap-1 text-xs text-[rgba(56,112,133,0.5)]">
+        <div className="flex items-center gap-1 text-xs text-[rgba(56,112,133,0.7)]">
           <button onClick={() => setPage(1)} disabled={safePage <= 1} className="rounded px-1.5 py-1 hover:bg-[rgba(56,112,133,0.05)] disabled:opacity-30">«</button>
           <button onClick={() => setPage(safePage - 1)} disabled={safePage <= 1} className="rounded px-1.5 py-1 hover:bg-[rgba(56,112,133,0.05)] disabled:opacity-30">‹</button>
           <span className="px-2 text-[#14140f]">Page <span className="font-semibold">{safePage}</span> of <span className="font-semibold">{totalPages}</span></span>
@@ -385,7 +385,7 @@ export default function ProvidersPage() {
       <div className="overflow-x-auto rounded-none border border-[#cd6332]/20 bg-white">
           <table className="w-full text-left text-xs">
           <thead>
-            <tr className="bg-[#cd6332] text-[11px] font-medium uppercase tracking-wider text-white">
+            <tr className="bg-[#cd6332] text-xs font-medium uppercase tracking-wider text-white">
               <th className="whitespace-nowrap px-4 py-2.5 font-medium w-12">#</th>
               <th className="whitespace-nowrap px-4 py-2.5 font-medium">Provider</th>
               <th className="relative whitespace-nowrap px-4 py-2.5 font-medium">
@@ -398,7 +398,7 @@ export default function ProvidersPage() {
                   <div className="absolute left-0 top-full z-50 mt-0.5 w-40 border border-[#387085]/10 bg-white py-1 shadow-lg" onMouseLeave={() => setDappDropdownOpen(false)}>
                     {[{ value: 'ALL', label: 'All DApps' }, ...uniqueDapps.map((d) => ({ value: d, label: d }))].map((opt) => (
                       <button key={opt.value} onClick={() => { setDappFilter(opt.value); setDappDropdownOpen(false); setPage(1); }}
-                        className={`block w-full px-3 py-1.5 text-left text-[11px] transition-colors ${dappFilter === opt.value ? 'bg-[#cd6332]/8 font-semibold text-[#cd6332]' : 'text-[#14140f] hover:bg-[#faf9f5]'}`}>
+                        className={`block w-full px-3 py-1.5 text-left text-xs transition-colors ${dappFilter === opt.value ? 'bg-[#cd6332]/8 font-semibold text-[#cd6332]' : 'text-[#14140f] hover:bg-[#faf9f5]'}`}>
                         {opt.label}
                       </button>
                     ))}
@@ -407,17 +407,17 @@ export default function ProvidersPage() {
               </th>
               <th className="whitespace-nowrap px-4 py-2.5 font-medium">
                 <button onClick={() => toggleSort('commission')} className="inline-flex items-center gap-1 uppercase">
-                  Commission <span className="text-[10px]">{sortIcon('commission')}</span>
+                  Commission <span className="text-xs">{sortIcon('commission')}</span>
                 </button>
               </th>
               <th className="whitespace-nowrap px-4 py-2.5 font-medium">
                 <button onClick={() => toggleSort('vaultCount')} className="inline-flex items-center gap-1 uppercase">
-                  Managed Vaults <span className="text-[10px]">{sortIcon('vaultCount')}</span>
+                  Managed Vaults <span className="text-xs">{sortIcon('vaultCount')}</span>
                 </button>
               </th>
               <th className="whitespace-nowrap px-4 py-2.5 font-medium">
                 <button onClick={() => toggleSort('totalBtc')} className="inline-flex items-center gap-1 uppercase">
-                  Locked BTC <span className="text-[10px]">{sortIcon('totalBtc')}</span>
+                  Locked BTC <span className="text-xs">{sortIcon('totalBtc')}</span>
                 </button>
               </th>
             </tr>
@@ -427,10 +427,10 @@ export default function ProvidersPage() {
               const rank = (safePage - 1) * PAGE_SIZE + i + 1;
               return (
                 <tr key={p.address} className="h-10 border-b border-[#cd6332]/10 transition-colors hover:bg-[rgba(56,112,133,0.03)]">
-                  <td className="whitespace-nowrap px-4 py-2.5 text-[rgba(56,112,133,0.5)]">{rank}</td>
+                  <td className="whitespace-nowrap px-4 py-2.5 text-[rgba(56,112,133,0.7)]">{rank}</td>
                   <td className="whitespace-nowrap px-4 py-2.5">
                     <div className="flex items-center gap-1.5">
-                      <span className="text-[#387085]/40">
+                      <span className="text-[#387085]/80">
                         <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M15.75 5.25a3 3 0 0 1 3 3m3 0a6 6 0 0 1-7.029 5.912c-.563-.097-1.159.026-1.563.43L10.5 17.25H8.25v2.25H6v2.25H2.25v-2.818c0-.597.237-1.17.659-1.591l6.499-6.499c.404-.404.527-1 .43-1.563A6 6 0 1 1 21.75 8.25Z" /></svg>
                       </span>
                       <Link href={`/accounts/${p.address}`} className="font-medium text-[#14140f] hover:text-[#cd6332]">
@@ -451,8 +451,8 @@ export default function ProvidersPage() {
                     {p.vaultCount}
                   </td>
                   <td className="whitespace-nowrap px-4 py-2.5 tabular-nums">
-                    <div className="text-[#14140f]">{p.totalBtc.toFixed(4)} <span className="text-[rgba(56,112,133,0.5)]">sBTC</span></div>
-                    <div className="text-[10px] text-[#387085]/40">{toUsd(p.totalBtc)}</div>
+                    <div className="text-[#14140f]">{p.totalBtc.toFixed(4)} <span className="text-[rgba(56,112,133,0.7)]">sBTC</span></div>
+                    <div className="text-xs text-[#387085]/80">{toUsd(p.totalBtc)}</div>
                   </td>
                 </tr>
               );

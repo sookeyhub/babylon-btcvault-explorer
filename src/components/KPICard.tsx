@@ -16,14 +16,14 @@ export default function KPICard({ label, value, sub, accent, icon }: KPICardProp
           </div>
         )}
         <div>
-          <p className="text-[11px] font-medium text-[rgba(56,112,133,0.5)]">
+          <p className="text-xs font-medium text-[rgba(56,112,133,0.7)]">
             {label}
           </p>
           <p className={`mt-0.5 text-xl font-bold tabular-nums ${accent ? 'text-[#cd6332]' : 'text-[#14140f]'}`}>
             {value}
           </p>
           {sub && (
-            <p className="mt-0.5 text-[11px] text-[rgba(56,112,133,0.5)]">{sub}</p>
+            <p className="mt-0.5 text-xs text-[rgba(56,112,133,0.7)]">{sub}</p>
           )}
         </div>
       </div>

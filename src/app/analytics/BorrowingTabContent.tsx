@@ -60,10 +60,10 @@ function PeriodToggles({ active, onChange }: { active: Period; onChange: (p: Per
         <button
           key={p}
           onClick={() => onChange(p)}
-          className={`rounded-none px-2 py-1 text-[11px] font-medium transition-colors ${
+          className={`rounded-none px-2 py-1 text-xs font-medium transition-colors ${
             active === p
               ? 'bg-[#cd6332] text-white'
-              : 'text-[rgba(56,112,133,0.55)] hover:text-[#cd6332]'
+              : 'text-[rgba(56,112,133,0.7)] hover:text-[#cd6332]'
           }`}
         >
           {p}
@@ -149,7 +149,7 @@ export default function BorrowingTabContent() {
             <h3 className="text-xs font-semibold text-[#14140f]">Liquidations</h3>
             <div className="text-right">
               <p className="text-sm font-bold tabular-nums text-[#14140f]">{TOTAL_LIQ_BTC.toFixed(4)} sBTC</p>
-              <p className="text-[11px] text-[#387085]/40">{toUsd(TOTAL_LIQ_BTC)}</p>
+              <p className="text-xs text-[#387085]/80">{toUsd(TOTAL_LIQ_BTC)}</p>
             </div>
           </div>
           <div className="mt-2 flex justify-end">
@@ -163,7 +163,7 @@ export default function BorrowingTabContent() {
                 dataKey="date"
                 ticks={liqXTicks}
                 tickFormatter={formatDateLabel}
-                tick={{ fontSize: 10, fill: 'rgba(56,112,133,0.4)' }}
+                tick={{ fontSize: 10, fill: 'rgba(56,112,133,0.6)' }}
                 axisLine={false}
                 tickLine={false}
               />
@@ -171,7 +171,7 @@ export default function BorrowingTabContent() {
                 yAxisId="count"
                 orientation="left"
                 allowDecimals={false}
-                tick={{ fontSize: 10, fill: 'rgba(56,112,133,0.4)' }}
+                tick={{ fontSize: 10, fill: 'rgba(56,112,133,0.6)' }}
                 axisLine={false}
                 tickLine={false}
                 width={24}
@@ -179,7 +179,7 @@ export default function BorrowingTabContent() {
               <YAxis
                 yAxisId="btc"
                 orientation="right"
-                tick={{ fontSize: 10, fill: 'rgba(56,112,133,0.4)' }}
+                tick={{ fontSize: 10, fill: 'rgba(56,112,133,0.6)' }}
                 axisLine={false}
                 tickLine={false}
                 width={48}
@@ -232,7 +232,7 @@ export default function BorrowingTabContent() {
                 dataKey="date"
                 ticks={borrowXTicks}
                 tickFormatter={formatDateLabel}
-                tick={{ fontSize: 10, fill: 'rgba(56,112,133,0.4)' }}
+                tick={{ fontSize: 10, fill: 'rgba(56,112,133,0.6)' }}
                 axisLine={false}
                 tickLine={false}
               />
@@ -240,7 +240,7 @@ export default function BorrowingTabContent() {
                 yAxisId="count"
                 orientation="left"
                 allowDecimals={false}
-                tick={{ fontSize: 10, fill: 'rgba(56,112,133,0.4)' }}
+                tick={{ fontSize: 10, fill: 'rgba(56,112,133,0.6)' }}
                 axisLine={false}
                 tickLine={false}
                 width={30}
@@ -248,7 +248,7 @@ export default function BorrowingTabContent() {
               <YAxis
                 yAxisId="cumulative"
                 orientation="right"
-                tick={{ fontSize: 10, fill: 'rgba(56,112,133,0.4)' }}
+                tick={{ fontSize: 10, fill: 'rgba(56,112,133,0.6)' }}
                 axisLine={false}
                 tickLine={false}
                 width={40}
@@ -292,7 +292,7 @@ export default function BorrowingTabContent() {
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs">
             <thead>
-              <tr className="bg-[#cd6332] text-[11px] font-medium uppercase tracking-wider text-white">
+              <tr className="bg-[#cd6332] text-xs font-medium uppercase tracking-wider text-white">
                 <th className="whitespace-nowrap px-4 py-2.5 font-medium">Asset</th>
                 <th className="whitespace-nowrap px-4 py-2.5 font-medium">Total Borrowed</th>
                 <th className="whitespace-nowrap px-4 py-2.5 font-medium">Available to Borrow</th>
@@ -316,18 +316,18 @@ export default function BorrowingTabContent() {
                     <div className="font-medium text-[#14140f]">
                       {a.totalBorrowed >= 1 ? a.totalBorrowed.toLocaleString() : a.totalBorrowed}
                     </div>
-                    <div className="text-[10px] text-[#387085]/40">${a.totalBorrowedUsd.toLocaleString()}</div>
+                    <div className="text-xs text-[#387085]/80">${a.totalBorrowedUsd.toLocaleString()}</div>
                   </td>
                   <td className="whitespace-nowrap px-4 py-2.5 tabular-nums">
                     <div className="font-medium text-[#14140f]">
                       {a.available >= 1 ? a.available.toLocaleString() : a.available}
                     </div>
-                    <div className="text-[10px] text-[#387085]/40">${a.availableUsd.toLocaleString()}</div>
+                    <div className="text-xs text-[#387085]/80">${a.availableUsd.toLocaleString()}</div>
                   </td>
                   <td className="whitespace-nowrap px-4 py-2.5 text-[#14140f]">{a.utilization}%</td>
                   <td className="whitespace-nowrap px-4 py-2.5 text-[#14140f]">{a.apy}%</td>
                   <td className="whitespace-nowrap px-4 py-2.5">
-                    <span className="inline-flex items-center gap-1.5 text-[11px]">
+                    <span className="inline-flex items-center gap-1.5 text-xs">
                       <span className={`inline-block h-2 w-2 rounded-full ${a.active ? 'bg-green-500' : 'bg-red-400'}`} />
                       <span className={a.active ? 'text-green-700' : 'text-red-500'}>
                         {a.active ? 'Active' : 'Paused'}

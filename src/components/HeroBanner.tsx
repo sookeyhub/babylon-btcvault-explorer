@@ -238,7 +238,7 @@ export default function HeroBanner() {
           </h1>
 
           <p
-            className={`hero-slide-up hero-delay-2 mx-auto mt-3 whitespace-nowrap text-sm text-[#387085]/60 sm:text-base ${mounted ? '' : 'opacity-0'}`}
+            className={`hero-slide-up hero-delay-2 mx-auto mt-3 whitespace-nowrap text-sm text-[#387085]/80 sm:text-base ${mounted ? '' : 'opacity-0'}`}
           >
             Native Bitcoin-backed borrowing is live on Public Testnet with Aave v4.
           </p>
@@ -263,24 +263,24 @@ export default function HeroBanner() {
       <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-4">
         {/* Card 1: Total Value Locked (TVL) */}
         <div className="border border-[#387085]/10 bg-white p-3">
-          <p className="flex items-center gap-1 text-[11px] font-medium uppercase tracking-wide text-[#387085]/50">
+          <p className="flex items-center gap-1 text-xs font-medium uppercase tracking-wide text-[#387085]/70">
             Total Value Locked (TVL)
-            <svg className="h-3 w-3 text-[#387085]/30" fill="none" viewBox="0 0 24 24" strokeWidth="1.8" stroke="currentColor">
+            <svg className="h-3 w-3 text-[#387085]/70" fill="none" viewBox="0 0 24 24" strokeWidth="1.8" stroke="currentColor">
               <title>Total number of BTC that are locked in currently active vaults</title>
               <path strokeLinecap="round" strokeLinejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z" />
             </svg>
           </p>
           <div className="mt-1.5 flex items-baseline gap-2">
-            <p className="text-2xl font-semibold tabular-nums text-[#14140f]">1.75 <span className="text-sm font-normal text-[#387085]/50">sBTC</span></p>
+            <p className="text-2xl font-semibold tabular-nums text-[#14140f]">1.75 <span className="text-sm font-normal text-[#387085]/70">sBTC</span></p>
             <span className="text-xs text-green-600">+3.42% (24h)</span>
           </div>
-          <p className="mt-0.5 text-xs text-[#387085]/40">$121,147</p>
+          <p className="mt-0.5 text-xs text-[#387085]/80">$121,147</p>
         </div>
         {/* Card 2: Utilization */}
         <div className="border border-[#387085]/10 bg-white p-3">
-          <p className="flex items-center gap-1 text-[11px] font-medium uppercase tracking-wide text-[#387085]/50">
+          <p className="flex items-center gap-1 text-xs font-medium uppercase tracking-wide text-[#387085]/70">
             Utilization
-            <svg className="h-3 w-3 text-[#387085]/30" fill="none" viewBox="0 0 24 24" strokeWidth="1.8" stroke="currentColor">
+            <svg className="h-3 w-3 text-[#387085]/70" fill="none" viewBox="0 0 24 24" strokeWidth="1.8" stroke="currentColor">
               <title>Utilization = Total Borrowed / TVL * 100</title>
               <path strokeLinecap="round" strokeLinejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z" />
             </svg>
@@ -288,25 +288,25 @@ export default function HeroBanner() {
           <div className="mt-1.5 flex items-baseline gap-2">
             <p className="text-2xl font-semibold tabular-nums text-[#14140f]">42.3%</p>
           </div>
-          <p className="mt-0.5 text-xs text-[#387085]/40">$5,342.33 borrowed</p>
+          <p className="mt-0.5 text-xs text-[#387085]/80">$5,342.33 borrowed</p>
         </div>
         {/* Card 3: Liquidations */}
         <div className="border border-[#387085]/10 bg-white p-3">
-          <p className="text-[11px] font-medium uppercase tracking-wide text-[#387085]/50">Liquidations</p>
+          <p className="text-xs font-medium uppercase tracking-wide text-[#387085]/70">Liquidations</p>
           <div className="mt-1.5 flex items-baseline gap-2">
-            <p className="text-2xl font-semibold tabular-nums text-[#14140f]">0.3842 <span className="text-sm font-normal text-[#387085]/50">sBTC</span></p>
+            <p className="text-2xl font-semibold tabular-nums text-[#14140f]">0.3842 <span className="text-sm font-normal text-[#387085]/70">sBTC</span></p>
             <span className="text-xs text-green-600">+1.28% (24h)</span>
           </div>
-          <p className="mt-0.5 text-xs text-[#387085]/40">$26,612</p>
+          <p className="mt-0.5 text-xs text-[#387085]/80">$26,612</p>
         </div>
         {/* Card 4: Active Vaults */}
         <div className="border border-[#387085]/10 bg-white p-3">
-          <p className="text-[11px] font-medium uppercase tracking-wide text-[#387085]/50">Active Vaults</p>
+          <p className="text-xs font-medium uppercase tracking-wide text-[#387085]/70">Active Vaults</p>
           <div className="mt-1.5 flex items-baseline gap-2">
             <p className="text-2xl font-semibold tabular-nums text-[#14140f]">100</p>
             <span className="text-xs text-green-600">+0.45% (24h)</span>
           </div>
-          <p className="mt-0.5 text-xs text-[#387085]/40">of 344</p>
+          <p className="mt-0.5 text-xs text-[#387085]/80">of 344</p>
         </div>
       </div>
     </div>

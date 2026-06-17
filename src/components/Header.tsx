@@ -49,7 +49,7 @@ export default function Header() {
           <div className="mx-6 hidden max-w-xl flex-1 lg:block">
             <div className="relative">
               <svg
-                className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[#387085]/40"
+                className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[#387085]/80"
                 fill="none"
                 viewBox="0 0 24 24"
                 strokeWidth="2"
@@ -64,9 +64,9 @@ export default function Header() {
               />
               {/* Cmd + K badge */}
               <div className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-0.5">
-                <kbd className="rounded border border-[#387085]/20 bg-[#387085]/5 px-1.5 py-0.5 font-mono text-[10px] text-[#387085]/50">Cmd</kbd>
-                <span className="text-[10px] text-[#387085]/35">+</span>
-                <kbd className="rounded border border-[#387085]/20 bg-[#387085]/5 px-1.5 py-0.5 font-mono text-[10px] text-[#387085]/50">K</kbd>
+                <kbd className="rounded border border-[#387085]/20 bg-[#387085]/5 px-1.5 py-0.5 font-mono text-xs text-[#387085]/70">Cmd</kbd>
+                <span className="text-xs text-[#387085]/70">+</span>
+                <kbd className="rounded border border-[#387085]/20 bg-[#387085]/5 px-1.5 py-0.5 font-mono text-xs text-[#387085]/70">K</kbd>
               </div>
             </div>
           </div>
@@ -80,7 +80,7 @@ export default function Header() {
                 <path d="M11.944 17.97L4.58 13.62 11.943 24l7.37-10.38-7.372 4.35zM12.056 0L4.69 12.223l7.365 4.354 7.365-4.35L12.056 0z" />
               </svg>
               <span className="hidden sm:inline">Ethereum Sepolia (Testnet)</span>
-              <svg className="h-3.5 w-3.5 text-[#387085]/40" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor">
+              <svg className="h-3.5 w-3.5 text-[#387085]/80" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
               </svg>
             </button>

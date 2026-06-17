@@ -27,7 +27,7 @@ function CopyIcon({ text }: { text: string }) {
   return (
     <button
       onClick={(e) => { e.preventDefault(); e.stopPropagation(); navigator.clipboard.writeText(text); setCopied(true); setTimeout(() => setCopied(false), 1500); }}
-      className="ml-1 inline-flex shrink-0 text-[rgba(56,112,133,0.3)] hover:text-[#387085]"
+      className="ml-1 inline-flex shrink-0 text-[rgba(56,112,133,0.7)] hover:text-[#387085]"
       title={copied ? 'Copied!' : 'Copy'}
     >
       <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor">
@@ -158,10 +158,10 @@ function AaveActivityTable() {
             <button
               key={opt.value}
               onClick={() => setFilter(opt.value)}
-              className={`rounded-full px-2.5 py-1 text-[10px] font-medium transition-colors ${
+              className={`rounded-full px-2.5 py-1 text-xs font-medium transition-colors ${
                 isActive
                   ? 'bg-[#cd6332] text-white'
-                  : 'bg-[#387085]/8 text-[#387085]/60 hover:bg-[#387085]/15'
+                  : 'bg-[#387085]/8 text-[#387085]/80 hover:bg-[#387085]/15'
               }`}
             >
               {opt.label}
@@ -171,7 +171,7 @@ function AaveActivityTable() {
       </div>
       {filtered.length === 0 ? (
         <div className="py-16 text-center">
-          <p className="text-sm text-[#387085]/40">
+          <p className="text-sm text-[#387085]/80">
             No activity found
             {filter !== 'ALL' && <> for <span className="font-medium">{filter}</span></>}
           </p>
@@ -186,7 +186,7 @@ function AaveActivityTable() {
           {grouped.map(([date, activities]) => (
             <div key={date}>
               <div className="mb-3 flex items-center gap-3">
-                <span className="whitespace-nowrap text-[11px] font-semibold uppercase tracking-wide text-[#387085]/50">
+                <span className="whitespace-nowrap text-xs font-semibold uppercase tracking-wide text-[#387085]/70">
                   {formatDateGroupHeader(date)}
                 </span>
                 <div className="h-px flex-1 bg-[#387085]/10" />
@@ -207,23 +207,23 @@ function AaveActivityTable() {
                     >
                       {/* Time column */}
                       <div className="w-24 shrink-0 pt-0.5">
-                        <div className="text-[11px] font-medium text-[#387085]/40">{formatRelativeTime(activity.blockTime)}</div>
-                        <div className="font-mono text-[9px] text-[#387085]/30">({formatTimeUTC(activity.blockTime)})</div>
+                        <div className="text-xs font-medium text-[#387085]/80">{formatRelativeTime(activity.blockTime)}</div>
+                        <div className="font-mono text-[9px] text-[#387085]/70">({formatTimeUTC(activity.blockTime)})</div>
                       </div>
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center justify-between gap-2">
                           <div className="flex items-center gap-2">
-                            <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-medium ${style.bg} ${style.text}`}>
+                            <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium ${style.bg} ${style.text}`}>
                               {isLiquidation && <span className="text-red-500">⚠</span>}
                               {style.label}
                             </span>
                             {activity.vaultId && (
                               <span className="inline-flex items-center gap-1">
-                                <span className="text-[9px] font-medium uppercase tracking-wide text-[#387085]/40">Vault</span>
-                                <svg className="h-3 w-3 text-[#387085]/30" fill="none" viewBox="0 0 24 24" strokeWidth="1.8" stroke="currentColor">
+                                <span className="text-[9px] font-medium uppercase tracking-wide text-[#387085]/80">Vault</span>
+                                <svg className="h-3 w-3 text-[#387085]/70" fill="none" viewBox="0 0 24 24" strokeWidth="1.8" stroke="currentColor">
                                   <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z" />
                                 </svg>
-                                <Link href={`/vaults/${activity.vaultId}`} title={`Vault ${activity.vaultId}`} className="font-mono text-[10px] text-[#cd6332]/70 transition-colors hover:text-[#cd6332] hover:underline">
+                                <Link href={`/vaults/${activity.vaultId}`} title={`Vault ${activity.vaultId}`} className="font-mono text-xs text-[#cd6332]/70 transition-colors hover:text-[#cd6332] hover:underline">
                                   {activity.vaultId.slice(0, 6)}...{activity.vaultId.slice(-4)}
                                 </Link>
                               </span>
@@ -233,22 +233,22 @@ function AaveActivityTable() {
                             <div className={`font-mono text-sm font-semibold ${style.amountColor}`}>
                               {style.amountPrefix}{formattedAmount}
                             </div>
-                            <div className="text-[10px] text-[#387085]/40">
+                            <div className="text-xs text-[#387085]/80">
                               {formatTokenUsd(activity.tokenAmount)}
                             </div>
                           </div>
                         </div>
                         <div className="mt-1.5 flex flex-wrap items-center gap-3">
                           <span className="inline-flex items-center gap-1">
-                            <span className="text-[9px] font-medium uppercase tracking-wide text-[#387085]/40">Tx</span>
-                            <Link href={`/tx/${activity.txHash}`} title={activity.txHash} className="font-mono text-[10px] text-[#cd6332]/70 transition-colors hover:text-[#cd6332] hover:underline">
+                            <span className="text-[9px] font-medium uppercase tracking-wide text-[#387085]/80">Tx</span>
+                            <Link href={`/tx/${activity.txHash}`} title={activity.txHash} className="font-mono text-xs text-[#cd6332]/70 transition-colors hover:text-[#cd6332] hover:underline">
                               {activity.txHash.slice(0, 6)}...{activity.txHash.slice(-4)}
                             </Link>
                           </span>
-                          <span className="text-[10px] text-[#387085]/20">·</span>
+                          <span className="text-xs text-[#387085]/20">·</span>
                           <span className="inline-flex items-center gap-1">
-                            <span className="text-[9px] font-medium uppercase tracking-wide text-[#387085]/40">Block</span>
-                            <span title={formatDateTime(activity.blockTime)} className="font-mono text-[10px] text-[#387085]/40">
+                            <span className="text-[9px] font-medium uppercase tracking-wide text-[#387085]/80">Block</span>
+                            <span title={formatDateTime(activity.blockTime)} className="font-mono text-xs text-[#387085]/80">
                               #{activity.blockNumber.toLocaleString()}
                             </span>
                           </span>
@@ -272,11 +272,11 @@ function DepositedVaultsTable({ vaults, address }: { vaults: Vault[]; address: s
   return (
     <div className="overflow-x-auto rounded-none border border-[#cd6332]/20 bg-white">
       {vaults.length === 0 ? (
-        <div className="py-12 text-center text-sm text-[rgba(56,112,133,0.5)]">No vaults found</div>
+        <div className="py-12 text-center text-sm text-[rgba(56,112,133,0.7)]">No vaults found</div>
       ) : (
         <table className="w-full text-left text-xs">
           <thead>
-            <tr className="bg-[#cd6332] text-[11px] font-medium uppercase tracking-wider text-white">
+            <tr className="bg-[#cd6332] text-xs font-medium uppercase tracking-wider text-white">
               <th className="whitespace-nowrap px-4 py-2.5 font-medium">Vault ID</th>
               <th className="whitespace-nowrap px-4 py-2.5 font-medium">Status</th>
               <th className="whitespace-nowrap px-4 py-2.5 font-medium">Amount</th>
@@ -290,7 +290,7 @@ function DepositedVaultsTable({ vaults, address }: { vaults: Vault[]; address: s
               <tr key={vault.id} className="h-10 border-b border-[#cd6332]/10 transition-colors hover:bg-[rgba(56,112,133,0.03)]">
                 <td className="whitespace-nowrap px-4 py-2.5">
                   <div className="flex items-center">
-                    <Link href={`/vaults/${vault.id}`} className="font-mono text-[11px] font-medium text-[#cd6332] hover:text-[#b8562b]">
+                    <Link href={`/vaults/${vault.id}`} className="font-mono text-xs font-medium text-[#cd6332] hover:text-[#b8562b]">
                       {truncateAddress(vault.id, 6, 4)}
                     </Link>
                     <CopyIcon text={vault.id} />
@@ -303,12 +303,12 @@ function DepositedVaultsTable({ vaults, address }: { vaults: Vault[]; address: s
                   </span>
                 </td>
                 <td className="whitespace-nowrap px-4 py-2.5 tabular-nums">
-                  <div className="text-[#14140f]">{vault.vaultSize.toFixed(8)} <span className="text-[rgba(56,112,133,0.5)]">sBTC</span></div>
-                  <div className="text-[10px] text-[#387085]/40">{toUsd(vault.vaultSize)}</div>
+                  <div className="text-[#14140f]">{vault.vaultSize.toFixed(8)} <span className="text-[rgba(56,112,133,0.7)]">sBTC</span></div>
+                  <div className="text-xs text-[#387085]/80">{toUsd(vault.vaultSize)}</div>
                 </td>
                 <td className="whitespace-nowrap px-4 py-2.5 text-[#14140f]">{vault.dappName}</td>
                 <td className="whitespace-nowrap px-4 py-2.5 text-[#14140f]">{vault.providerName}</td>
-                <td className="whitespace-nowrap px-4 py-2.5 text-[rgba(56,112,133,0.5)]">{formatRelativeTime(vault.createdAt)}</td>
+                <td className="whitespace-nowrap px-4 py-2.5 text-[rgba(56,112,133,0.7)]">{formatRelativeTime(vault.createdAt)}</td>
               </tr>
             ))}
           </tbody>
@@ -359,23 +359,23 @@ function PositionSummaryCard() {
     <div className="space-y-3">
       <div className="grid grid-cols-3 gap-3">
         <div className="border border-[#387085]/10 bg-white px-5 py-4">
-          <p className="text-[11px] font-medium uppercase tracking-wide text-[#387085]/50">Collateral</p>
+          <p className="text-xs font-medium uppercase tracking-wide text-[#387085]/70">Collateral</p>
           <p className="mt-1 text-xl font-bold text-[#14140f]">
-            {collateralAmount.toFixed(3)} <span className="text-sm font-normal text-[#387085]/50">{p.totalCollateral.symbol ?? 'sBTC'}</span>
+            {collateralAmount.toFixed(3)} <span className="text-sm font-normal text-[#387085]/70">{p.totalCollateral.symbol ?? 'sBTC'}</span>
           </p>
           {collateralUsd != null && (
-            <p className="mt-0.5 text-xs text-[#387085]/40"> ${collateralUsd.toLocaleString('en-US', { maximumFractionDigits: 1 })}</p>
+            <p className="mt-0.5 text-xs text-[#387085]/80"> ${collateralUsd.toLocaleString('en-US', { maximumFractionDigits: 1 })}</p>
           )}
         </div>
         <div className="border border-[#387085]/10 bg-white px-5 py-4">
-          <p className="text-[11px] font-medium uppercase tracking-wide text-[#387085]/50">Current LTV</p>
+          <p className="text-xs font-medium uppercase tracking-wide text-[#387085]/70">Current LTV</p>
           <p className="mt-1 text-xl font-bold text-[#14140f]">{currentLtv.toFixed(2)}%</p>
-          <p className="mt-0.5 text-xs text-[#387085]/40">of {maxLtv.toFixed(0)}% max</p>
+          <p className="mt-0.5 text-xs text-[#387085]/80">of {maxLtv.toFixed(0)}% max</p>
         </div>
         <div className="border border-[#387085]/10 bg-white px-5 py-4">
-          <p className="text-[11px] font-medium uppercase tracking-wide text-[#387085]/50">Debt</p>
+          <p className="text-xs font-medium uppercase tracking-wide text-[#387085]/70">Debt</p>
           <p className="mt-1 text-xl font-bold text-[#14140f]">
-            {debtTotal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} <span className="text-sm font-normal text-[#387085]/50">{debtSymbol}</span>
+            {debtTotal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} <span className="text-sm font-normal text-[#387085]/70">{debtSymbol}</span>
           </p>
           {interestTotal > 0 && (
             <p className="mt-0.5 text-xs text-green-600">
@@ -387,14 +387,14 @@ function PositionSummaryCard() {
 
       <div className="border border-[#387085]/10 bg-white px-5 py-4">
         <div className="mb-3 flex items-center justify-between">
-          <p className="text-[11px] font-medium uppercase tracking-wide text-[#387085]/50">Health Factor</p>
-          <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${status.bg} ${status.text}`}>
+          <p className="text-xs font-medium uppercase tracking-wide text-[#387085]/70">Health Factor</p>
+          <span className={`rounded-full px-2 py-0.5 text-xs font-semibold ${status.bg} ${status.text}`}>
             {hf < 1 && '⚠ '}{status.label}
           </span>
         </div>
         <div className="flex items-baseline gap-3">
           <p className="text-3xl font-bold" style={{ color: status.color }}>{hf.toFixed(2)}</p>
-          <p className="text-[11px] text-[#387085]/40">
+          <p className="text-xs text-[#387085]/80">
             {hf < 1 ? 'subject to liquidation' : `${(hf - 1).toFixed(2)} above liquidation threshold`}
           </p>
         </div>
@@ -417,12 +417,12 @@ function PositionSummaryCard() {
             { pct: healthyMarker, label: '1.5' },
             { pct: safeMarker, label: '2.0' },
           ].map((m) => (
-            <div key={m.label} className="absolute top-3 -translate-x-1/2 text-[9px] text-[#387085]/40" style={{ left: `${m.pct}%` }}>
+            <div key={m.label} className="absolute top-3 -translate-x-1/2 text-[9px] text-[#387085]/80" style={{ left: `${m.pct}%` }}>
               {m.label}
             </div>
           ))}
         </div>
-        <div className="mt-6 flex justify-between text-[10px] text-[#387085]/40">
+        <div className="mt-6 flex justify-between text-xs text-[#387085]/80">
           <span>Liquidation</span>
           <span>Caution</span>
           <span>Healthy</span>
@@ -439,7 +439,7 @@ function PositionDebtsTable() {
   if (debts.length === 0) {
     return (
       <div className="overflow-x-auto rounded-none border border-[#cd6332]/20 bg-white">
-        <div className="py-12 text-center text-sm text-[#387085]/40">No debts</div>
+        <div className="py-12 text-center text-sm text-[#387085]/80">No debts</div>
       </div>
     );
   }
@@ -448,7 +448,7 @@ function PositionDebtsTable() {
     <div className="overflow-x-auto rounded-none border border-[#cd6332]/20 bg-white">
       <table className="w-full text-left text-xs">
         <thead>
-          <tr className="bg-[#cd6332] text-[11px] font-medium uppercase tracking-wider text-white">
+          <tr className="bg-[#cd6332] text-xs font-medium uppercase tracking-wider text-white">
             <th className="whitespace-nowrap px-4 py-2.5 font-medium">Assets</th>
             <th className="whitespace-nowrap px-4 py-2.5 font-medium">Amount Borrowed</th>
             <th className="whitespace-nowrap px-4 py-2.5 font-medium">Borrow APY</th>
@@ -483,7 +483,7 @@ function PositionDebtsTable() {
                   <span className="text-sm font-semibold text-[#14140f]">
                     {principal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                   </span>
-                  <span className="ml-1 text-[11px] text-[#387085]/40">{d.symbol}</span>
+                  <span className="ml-1 text-xs text-[#387085]/80">{d.symbol}</span>
                 </td>
                 <td className="whitespace-nowrap px-4 py-3 tabular-nums text-sm text-[#14140f]">
                   {d.borrowApy != null ? `${d.borrowApy}%` : '—'}
@@ -492,13 +492,13 @@ function PositionDebtsTable() {
                   <span className="text-sm text-[#14140f]">
                     {interest.toLocaleString('en-US', { minimumFractionDigits: 6, maximumFractionDigits: 6 })}
                   </span>
-                  <span className="ml-1 text-[11px] text-[#387085]/40">{d.symbol}</span>
+                  <span className="ml-1 text-xs text-[#387085]/80">{d.symbol}</span>
                 </td>
                 <td className="whitespace-nowrap px-4 py-3 tabular-nums">
                   <span className="text-sm font-semibold text-[#14140f]">
                     {totalRepay.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                   </span>
-                  <span className="ml-1 text-[11px] text-[#387085]/40">{d.symbol}</span>
+                  <span className="ml-1 text-xs text-[#387085]/80">{d.symbol}</span>
                 </td>
               </tr>
             );
@@ -557,7 +557,7 @@ function HFBar({ hf, color }: { hf: number; color: string }) {
         style={{ left: `calc(${hfPct}% - 1px)` }}
         title={`HF ${hf.toFixed(2)}`}
       />
-      <div className="mt-1 flex justify-between text-[9px] text-[#387085]/35">
+      <div className="mt-1 flex justify-between text-[9px] text-[#387085]/70">
         <span>1.0</span><span>1.5</span><span>2.0</span><span>3.0+</span>
       </div>
     </div>
@@ -588,41 +588,41 @@ function PositionsByDApp() {
             <div className="grid grid-cols-2 gap-0 divide-x divide-y divide-[#387085]/8 sm:grid-cols-4 sm:divide-y-0">
               {/* Collateral */}
               <div className="px-5 py-4">
-                <p className="text-[10px] font-medium uppercase tracking-wide text-[#387085]/40">Collateral</p>
+                <p className="text-xs font-medium uppercase tracking-wide text-[#387085]/80">Collateral</p>
                 <p className="mt-1 text-xl font-bold text-[#14140f]">
-                  {pos.collateral.toFixed(4)} <span className="text-xs font-normal text-[#387085]/50">{pos.collateralSymbol}</span>
+                  {pos.collateral.toFixed(4)} <span className="text-xs font-normal text-[#387085]/70">{pos.collateralSymbol}</span>
                 </p>
-                <p className="mt-0.5 text-[11px] text-[#387085]/40"> ${pos.collateralUsd.toLocaleString('en-US', { maximumFractionDigits: 2 })}</p>
+                <p className="mt-0.5 text-xs text-[#387085]/80"> ${pos.collateralUsd.toLocaleString('en-US', { maximumFractionDigits: 2 })}</p>
               </div>
 
               {/* Debt — in USD */}
               <div className="px-5 py-4">
-                <p className="text-[10px] font-medium uppercase tracking-wide text-[#387085]/40">Debt</p>
+                <p className="text-xs font-medium uppercase tracking-wide text-[#387085]/80">Debt</p>
                 <p className="mt-1 text-xl font-bold text-[#14140f]">
                   ${totalDebtUsd.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                 </p>
-                <p className="mt-0.5 text-[11px] text-green-600">
+                <p className="mt-0.5 text-xs text-green-600">
                   Interest {totalInterest.toLocaleString('en-US', { minimumFractionDigits: 6, maximumFractionDigits: 6 })}
                 </p>
               </div>
 
               {/* LTV */}
               <div className="px-5 py-4">
-                <p className="text-[10px] font-medium uppercase tracking-wide text-[#387085]/40">Current LTV</p>
+                <p className="text-xs font-medium uppercase tracking-wide text-[#387085]/80">Current LTV</p>
                 <p className="mt-1 text-xl font-bold text-[#14140f]">{pos.ltv.toFixed(2)}%</p>
                 <div className="mt-2 flex items-center gap-1.5">
                   <div className="h-1.5 w-full bg-[#387085]/10">
                     <div className="h-full transition-all" style={{ width: `${ltvPct}%`, background: ltvColor }} />
                   </div>
                 </div>
-                <p className="mt-1 text-[10px] text-[#387085]/40">max {pos.maxLtv}%</p>
+                <p className="mt-1 text-xs text-[#387085]/80">max {pos.maxLtv}%</p>
               </div>
 
               {/* Health Factor with mini gradient bar */}
               <div className="px-5 py-4">
                 <div className="flex items-center gap-1">
-                  <p className="text-[10px] font-medium uppercase tracking-wide text-[#387085]/40">Health Factor</p>
-                  <svg className="h-3 w-3 text-[#387085]/30" fill="none" viewBox="0 0 24 24" strokeWidth="1.8" stroke="currentColor">
+                  <p className="text-xs font-medium uppercase tracking-wide text-[#387085]/80">Health Factor</p>
+                  <svg className="h-3 w-3 text-[#387085]/70" fill="none" viewBox="0 0 24 24" strokeWidth="1.8" stroke="currentColor">
                     <title>Liquidation occurs when Health Factor falls below 1.0</title>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z" />
                   </svg>
@@ -642,14 +642,14 @@ function PositionsByDApp() {
               <table className="w-full text-xs">
                 <thead>
                   <tr className="border-b border-[#387085]/8 bg-[#faf9f5]">
-                    <th className="px-5 py-2 text-left text-[10px] font-medium uppercase tracking-wide text-[#387085]/40">Assets</th>
-                    <th className="px-5 py-2 text-[10px] font-medium uppercase tracking-wide text-[#387085]/40">Amount Borrowed</th>
-                    <th className="px-5 py-2 text-[10px] font-medium uppercase tracking-wide text-[#387085]/40">Borrow APY</th>
-                    <th className="px-5 py-2 text-[10px] font-medium uppercase tracking-wide text-[#387085]/40">Interest</th>
-                    <th className="px-5 py-2 text-[10px] font-medium uppercase tracking-wide text-[#387085]/40">
+                    <th className="px-5 py-2 text-left text-xs font-medium uppercase tracking-wide text-[#387085]/80">Assets</th>
+                    <th className="px-5 py-2 text-xs font-medium uppercase tracking-wide text-[#387085]/80">Amount Borrowed</th>
+                    <th className="px-5 py-2 text-xs font-medium uppercase tracking-wide text-[#387085]/80">Borrow APY</th>
+                    <th className="px-5 py-2 text-xs font-medium uppercase tracking-wide text-[#387085]/80">Interest</th>
+                    <th className="px-5 py-2 text-xs font-medium uppercase tracking-wide text-[#387085]/80">
                       <span className="inline-flex items-center gap-0.5">
                         Amount to Repay
-                        <svg className="h-3 w-3 text-[#387085]/30" fill="none" viewBox="0 0 24 24" strokeWidth="1.8" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z" /></svg>
+                        <svg className="h-3 w-3 text-[#387085]/70" fill="none" viewBox="0 0 24 24" strokeWidth="1.8" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z" /></svg>
                       </span>
                     </th>
                   </tr>
@@ -667,18 +667,18 @@ function PositionsByDApp() {
                       </td>
                       <td className="px-5 py-2.5 tabular-nums font-semibold text-[#14140f]">
                         {d.principal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                        <span className="ml-1 text-[10px] font-normal text-[#387085]/40">{d.symbol}</span>
+                        <span className="ml-1 text-xs font-normal text-[#387085]/80">{d.symbol}</span>
                       </td>
                       <td className="px-5 py-2.5 tabular-nums text-[#14140f]">
                         {d.borrowApy != null ? `${d.borrowApy}%` : '—'}
                       </td>
                       <td className="px-5 py-2.5 tabular-nums text-[#14140f]">
                         {d.interest.toFixed(6)}
-                        <span className="ml-1 text-[10px] text-[#387085]/40">{d.interestSymbol}</span>
+                        <span className="ml-1 text-xs text-[#387085]/80">{d.interestSymbol}</span>
                       </td>
                       <td className="px-5 py-2.5 tabular-nums font-semibold text-[#cd6332]">
                         {d.totalRepay.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 6 })}
-                        <span className="ml-1 text-[10px] font-normal text-[#387085]/40">{d.symbol}</span>
+                        <span className="ml-1 text-xs font-normal text-[#387085]/80">{d.symbol}</span>
                       </td>
                     </tr>
                   ))}
@@ -737,29 +737,29 @@ function DAppPositionSection({ position, isFirst }: { position: DAppPosition; is
       <div className="grid grid-cols-2 gap-0">
         {/* Collateral */}
         <div className="border-b border-r border-[#387085]/10 px-5 py-4">
-          <p className="text-[11px] font-medium uppercase tracking-wide text-[#387085]/50">Collateral</p>
+          <p className="text-xs font-medium uppercase tracking-wide text-[#387085]/70">Collateral</p>
           <p className="mt-1.5 text-xl font-bold text-[#14140f]">
-            {collateral.toFixed(3)} <span className="text-sm font-normal text-[#387085]/50">{p.totalCollateral.symbol}</span>
+            {collateral.toFixed(3)} <span className="text-sm font-normal text-[#387085]/70">{p.totalCollateral.symbol}</span>
           </p>
           {collateralUsdVal != null && (
-            <p className="mt-0.5 text-xs text-[#387085]/40"> $ {collateralUsdVal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
+            <p className="mt-0.5 text-xs text-[#387085]/80"> $ {collateralUsdVal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
           )}
         </div>
 
         {/* Debt */}
         <div className="border-b border-[#387085]/10 px-5 py-4">
-          <p className="text-[11px] font-medium uppercase tracking-wide text-[#387085]/50">Debt</p>
+          <p className="text-xs font-medium uppercase tracking-wide text-[#387085]/70">Debt</p>
           <p className="mt-1.5 text-xl font-bold text-[#14140f]">
             $ {debtUsd.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
           </p>
-          <p className="mt-0.5 text-xs text-[#387085]/40">{p.debts.length} Asset{p.debts.length !== 1 ? 's' : ''}</p>
+          <p className="mt-0.5 text-xs text-[#387085]/80">{p.debts.length} Asset{p.debts.length !== 1 ? 's' : ''}</p>
         </div>
 
         {/* Current LTV */}
         <div className="border-r border-[#387085]/10 px-5 py-4">
-          <p className="text-[11px] font-medium uppercase tracking-wide text-[#387085]/50">Current LTV</p>
+          <p className="text-xs font-medium uppercase tracking-wide text-[#387085]/70">Current LTV</p>
           <p className="mt-1.5 text-xl font-bold text-[#14140f]">{ltv.toFixed(2)}%</p>
-          <p className="mt-0.5 text-xs text-[#387085]/40">of {maxLtv.toFixed(0)}% max</p>
+          <p className="mt-0.5 text-xs text-[#387085]/80">of {maxLtv.toFixed(0)}% max</p>
           <div className="mt-2 h-2 w-full bg-[#e5e7eb]">
             <div className="h-full transition-all" style={{ width: `${ltvPct}%`, background: ltvColor }} />
           </div>
@@ -767,10 +767,10 @@ function DAppPositionSection({ position, isFirst }: { position: DAppPosition; is
 
         {/* Health Factor */}
         <div className="px-5 py-4">
-          <p className="text-[11px] font-medium uppercase tracking-wide text-[#387085]/50">Health Factor</p>
+          <p className="text-xs font-medium uppercase tracking-wide text-[#387085]/70">Health Factor</p>
           <div className="mt-1.5 flex items-center gap-2">
             <p className="text-xl font-bold" style={{ color: hfStatus.color }}>{hf.toFixed(2)}</p>
-            <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${hfStatus.bg} ${hfStatus.text}`}>
+            <span className={`rounded-full px-2 py-0.5 text-xs font-semibold ${hfStatus.bg} ${hfStatus.text}`}>
               {hf < 1 && '⚠ '}{hfStatus.label}
             </span>
           </div>
@@ -785,7 +785,7 @@ function DAppPositionSection({ position, isFirst }: { position: DAppPosition; is
               className="absolute top-[-2px] h-[14px] w-[3px] rounded-sm bg-[#14140f]"
               style={{ left: `calc(${hfPct}% - 1.5px)` }}
             />
-            <div className="mt-1 flex justify-between text-[9px] text-[#387085]/40">
+            <div className="mt-1 flex justify-between text-[9px] text-[#387085]/80">
               {markers.map((m) => (
                 <span key={m.label} style={{ position: 'absolute', left: `${m.pct}%`, transform: 'translateX(-50%)' }}>{m.label}</span>
               ))}
@@ -798,7 +798,7 @@ function DAppPositionSection({ position, isFirst }: { position: DAppPosition; is
       <div className="overflow-x-auto border-t border-[#387085]/10">
         <table className="w-full text-left text-xs">
           <thead>
-            <tr className="border-b border-[#387085]/8 bg-[#faf9f5] text-[11px] font-medium uppercase tracking-wider text-[#387085]/50">
+            <tr className="border-b border-[#387085]/8 bg-[#faf9f5] text-xs font-medium uppercase tracking-wider text-[#387085]/70">
               <th className="whitespace-nowrap px-4 py-2.5 font-medium">Assets</th>
               <th className="whitespace-nowrap px-4 py-2.5 font-medium">Amount Borrowed</th>
               <th className="whitespace-nowrap px-4 py-2.5 font-medium">Borrow APY</th>
@@ -806,7 +806,7 @@ function DAppPositionSection({ position, isFirst }: { position: DAppPosition; is
               <th className="whitespace-nowrap px-4 py-2.5 font-medium">
                 <span className="inline-flex items-center gap-1">
                   Amount to Repay
-                  <svg className="h-3 w-3 text-[#387085]/30" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor">
+                  <svg className="h-3 w-3 text-[#387085]/70" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z" />
                   </svg>
                 </span>
@@ -833,7 +833,7 @@ function DAppPositionSection({ position, isFirst }: { position: DAppPosition; is
                     <span className="text-sm font-semibold text-[#14140f]">
                       {principal < 1 ? principal.toFixed(8) : principal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                     </span>
-                    <span className="ml-1 text-[11px] text-[#387085]/40">{d.symbol}</span>
+                    <span className="ml-1 text-xs text-[#387085]/80">{d.symbol}</span>
                   </td>
                   <td className="whitespace-nowrap px-4 py-3 tabular-nums text-sm text-[#14140f]">
                     {d.borrowApy != null ? `${d.borrowApy}%` : '—'}
@@ -842,13 +842,13 @@ function DAppPositionSection({ position, isFirst }: { position: DAppPosition; is
                     <span className="text-sm text-[#14140f]">
                       {interest < 0.001 ? interest.toFixed(6) : interest.toLocaleString('en-US', { minimumFractionDigits: 6, maximumFractionDigits: 6 })}
                     </span>
-                    <span className="ml-1 text-[11px] text-[#387085]/40">{d.symbol}</span>
+                    <span className="ml-1 text-xs text-[#387085]/80">{d.symbol}</span>
                   </td>
                   <td className="whitespace-nowrap px-4 py-3 tabular-nums">
                     <span className="text-sm font-semibold text-[#14140f]">
                       {totalRepay < 1 ? totalRepay.toFixed(7) : totalRepay.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 2 })}
                     </span>
-                    <span className="ml-1 text-[11px] text-[#387085]/40">{d.symbol}</span>
+                    <span className="ml-1 text-xs text-[#387085]/80">{d.symbol}</span>
                   </td>
                 </tr>
               );
@@ -927,7 +927,7 @@ export default function DepositorDetail({ address, vaults }: DepositorDetailProp
     <div className="space-y-4">
 
       {/* ── Page label ──────────────────────────────────────────────── */}
-      <p className="text-[11px] font-medium uppercase tracking-widest text-[#387085]/35">Depositor</p>
+      <p className="text-xs font-medium uppercase tracking-widest text-[#387085]/70">Depositor</p>
 
       {/* ── Identity strip ──────────────────────────────────────────── */}
       <div className="flex items-center gap-2">
@@ -941,27 +941,27 @@ export default function DepositorDetail({ address, vaults }: DepositorDetailProp
         {/* 1. Total BTC */}
         <div className="border border-[#387085]/10 bg-white p-4">
           <div className="flex items-center gap-1">
-            <p className="text-[11px] font-semibold uppercase tracking-wide text-[#387085]/45">Total BTC</p>
-            <svg className="h-3 w-3 text-[#387085]/30" fill="none" viewBox="0 0 24 24" strokeWidth="1.8" stroke="currentColor">
+            <p className="text-xs font-semibold uppercase tracking-wide text-[#387085]/80">Total BTC</p>
+            <svg className="h-3 w-3 text-[#387085]/70" fill="none" viewBox="0 0 24 24" strokeWidth="1.8" stroke="currentColor">
               <title>Total BTC locked across all vaults</title>
               <path strokeLinecap="round" strokeLinejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z" />
             </svg>
           </div>
           <p className="mt-1.5 text-2xl font-bold text-[#14140f]">
-            {totalBtc.toFixed(3)} <span className="text-sm font-normal text-[#387085]/50">sBTC</span>
+            {totalBtc.toFixed(3)} <span className="text-sm font-normal text-[#387085]/70">sBTC</span>
           </p>
-          <p className="mt-0.5 text-[11px] text-[#387085]/40">
+          <p className="mt-0.5 text-xs text-[#387085]/80">
              ${(totalBtc * BTC_USD_RATE).toLocaleString('en-US', { maximumFractionDigits: 0 })}
           </p>
         </div>
 
         {/* 2. Total Collateral */}
         <div className="border border-[#387085]/10 bg-white p-4">
-          <p className="text-[11px] font-semibold uppercase tracking-wide text-[#387085]/45">Total Collateral</p>
+          <p className="text-xs font-semibold uppercase tracking-wide text-[#387085]/80">Total Collateral</p>
           <p className="mt-1.5 text-2xl font-bold text-[#14140f]">
-            {collateralAmount.toFixed(3)} <span className="text-sm font-normal text-[#387085]/50">vaultBTC</span>
+            {collateralAmount.toFixed(3)} <span className="text-sm font-normal text-[#387085]/70">vaultBTC</span>
           </p>
-          <p className="mt-0.5 text-[11px] text-[#387085]/40">
+          <p className="mt-0.5 text-xs text-[#387085]/80">
             {collateralUsd != null ? ` $${collateralUsd.toLocaleString('en-US', { maximumFractionDigits: 0 })}` : '—'}
           </p>
         </div>
@@ -969,10 +969,10 @@ export default function DepositorDetail({ address, vaults }: DepositorDetailProp
         {/* 3. Total Debt */}
         <div className="border border-[#387085]/10 bg-white p-4">
           <div className="flex items-start justify-between">
-            <p className="text-[11px] font-semibold uppercase tracking-wide text-[#387085]/45">Total Debt</p>
+            <p className="text-xs font-semibold uppercase tracking-wide text-[#387085]/80">Total Debt</p>
             <button
               onClick={() => setActiveTab('collateral')}
-              className="text-[10px] font-medium text-[#cd6332] hover:underline"
+              className="text-xs font-medium text-[#cd6332] hover:underline"
             >
               View all Assets ›
             </button>
@@ -980,16 +980,16 @@ export default function DepositorDetail({ address, vaults }: DepositorDetailProp
           <p className="mt-1.5 text-2xl font-bold text-[#14140f]">
             $ {debtTotalUsd.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
           </p>
-          <p className="mt-0.5 text-[11px] text-[#387085]/40">{debtAssetCount} Asset{debtAssetCount !== 1 ? 's' : ''}</p>
+          <p className="mt-0.5 text-xs text-[#387085]/80">{debtAssetCount} Asset{debtAssetCount !== 1 ? 's' : ''}</p>
         </div>
 
         {/* 4. Vaults */}
         <div className="border border-[#387085]/10 bg-white p-4">
           <div className="flex items-start justify-between">
-            <p className="text-[11px] font-semibold uppercase tracking-wide text-[#387085]/45">Active Vaults</p>
+            <p className="text-xs font-semibold uppercase tracking-wide text-[#387085]/80">Active Vaults</p>
             <button
               onClick={() => setActiveTab('deposited')}
-              className="text-[10px] font-medium text-[#cd6332] hover:underline"
+              className="text-xs font-medium text-[#cd6332] hover:underline"
             >
               View all Vaults ›
             </button>
@@ -997,7 +997,7 @@ export default function DepositorDetail({ address, vaults }: DepositorDetailProp
           <p className="mt-1.5 text-2xl font-bold text-[#14140f]">
             {activeVaults}
           </p>
-          <p className="mt-0.5 text-[11px] text-[#387085]/40">out of {totalVaults} vault{totalVaults !== 1 ? 's' : ''}</p>
+          <p className="mt-0.5 text-xs text-[#387085]/80">out of {totalVaults} vault{totalVaults !== 1 ? 's' : ''}</p>
         </div>
       </div>
 
@@ -1014,19 +1014,19 @@ export default function DepositorDetail({ address, vaults }: DepositorDetailProp
             <div className="min-w-0 flex-1">
               {/* Row 1: title + timestamp inline */}
               <div className="flex items-center gap-2">
-                <span className="text-sm text-[#387085]/50">Latest Activity</span>
-                <span className="text-[11px] text-[#387085]/35">{formatRelativeTime(latestActivity.blockTime)}</span>
-                <span className="text-[11px] text-[#387085]/25">{fullTimestamp}</span>
+                <span className="text-sm text-[#387085]/70">Latest Activity</span>
+                <span className="text-xs text-[#387085]/70">{formatRelativeTime(latestActivity.blockTime)}</span>
+                <span className="text-xs text-[#387085]/25">{fullTimestamp}</span>
               </div>
               {/* Row 2: status + amount */}
               <div className="mt-1.5 flex items-center gap-2">
-                <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-medium ${style.bg} ${style.text}`}>
+                <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium ${style.bg} ${style.text}`}>
                   {style.label}
                 </span>
                 <span className="text-sm font-medium text-[#14140f]">
                   {style.amountPrefix}{formattedAmount}
                 </span>
-                <span className="text-[11px] text-[#387085]/40">
+                <span className="text-xs text-[#387085]/80">
                   {formatTokenUsd(latestActivity.tokenAmount)}
                 </span>
               </div>
@@ -1034,7 +1034,7 @@ export default function DepositorDetail({ address, vaults }: DepositorDetailProp
             {/* Right: View all button — vertically centered */}
             <button
               onClick={() => setActiveTab('aave_activity')}
-              className="shrink-0 text-[10px] font-medium text-[#cd6332] hover:underline"
+              className="shrink-0 text-xs font-medium text-[#cd6332] hover:underline"
             >
               View all Activities ›
             </button>
@@ -1051,7 +1051,7 @@ export default function DepositorDetail({ address, vaults }: DepositorDetailProp
             className={`px-5 py-2.5 text-sm font-medium transition-colors ${
               activeTab === tab.key
                 ? 'border-b-2 border-[#cd6332] text-[#cd6332]'
-                : 'text-[#387085]/50 hover:text-[#14140f]'
+                : 'text-[#387085]/70 hover:text-[#14140f]'
             }`}
           >
             {tab.label}

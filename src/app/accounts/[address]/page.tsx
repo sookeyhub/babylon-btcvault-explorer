@@ -97,7 +97,7 @@ export default async function AccountDetailPage({ params }: Props) {
       </DevNote>
 
       {/* Breadcrumb */}
-      <nav className="flex items-center gap-1.5 text-xs text-[rgba(56,112,133,0.55)]">
+      <nav className="flex items-center gap-1.5 text-xs text-[rgba(56,112,133,0.7)]">
         <Link href="/providers" className="transition-colors hover:text-[#cd6332]">Accounts</Link>
         <span>/</span>
         <span className="font-medium text-[#14140f]">
@@ -108,12 +108,12 @@ export default async function AccountDetailPage({ params }: Props) {
       {/* ── Header (non-provider, non-depositor only) ─────────────────── */}
       {!provider && !isDepositor && (
         <div className="space-y-1.5">
-          <div className="flex items-center gap-1.5 text-xs text-[rgba(56,112,133,0.55)]">
+          <div className="flex items-center gap-1.5 text-xs text-[rgba(56,112,133,0.7)]">
             <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" strokeWidth="1.8" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0" />
             </svg>
             <span>Account</span>
-            <span className={`ml-1 rounded-full px-2 py-0.5 text-[10px] font-semibold ${typeBadge[account.type]}`}>
+            <span className={`ml-1 rounded-full px-2 py-0.5 text-xs font-semibold ${typeBadge[account.type]}`}>
               {account.type === 'Contract' ? 'CA' : account.type}
             </span>
           </div>
@@ -136,19 +136,19 @@ export default async function AccountDetailPage({ params }: Props) {
       {!provider && !isDepositor && (
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
           <div className="border border-[#387085]/10 bg-[#faf9f5] p-3">
-            <p className="text-[11px] font-medium uppercase tracking-wide text-[#387085]/50">Total BTC</p>
+            <p className="text-xs font-medium uppercase tracking-wide text-[#387085]/70">Total BTC</p>
             <p className="mt-0.5 text-lg font-semibold text-[#14140f]">{depositorTotalBtc.toFixed(4)} sBTC</p>
           </div>
           <div className="border border-[#387085]/10 bg-[#faf9f5] p-3">
-            <p className="text-[11px] font-medium uppercase tracking-wide text-[#387085]/50">Total Vaults</p>
+            <p className="text-xs font-medium uppercase tracking-wide text-[#387085]/70">Total Vaults</p>
             <p className="mt-0.5 text-lg font-semibold text-[#14140f]">{depositorTotalVaults.toLocaleString()}</p>
           </div>
           <div className="border border-[#387085]/10 bg-[#faf9f5] p-3">
-            <p className="text-[11px] font-medium uppercase tracking-wide text-[#387085]/50">Active Vaults</p>
+            <p className="text-xs font-medium uppercase tracking-wide text-[#387085]/70">Active Vaults</p>
             <p className="mt-0.5 text-lg font-semibold text-green-600">{depositorActiveVaults.toLocaleString()}</p>
           </div>
           <div className="border border-[#387085]/10 bg-[#faf9f5] p-3">
-            <p className="text-[11px] font-medium uppercase tracking-wide text-[#387085]/50">Txn Count</p>
+            <p className="text-xs font-medium uppercase tracking-wide text-[#387085]/70">Txn Count</p>
             <p className="mt-0.5 text-lg font-semibold text-[#14140f]">{account.txnCount.toLocaleString()}</p>
           </div>
         </div>

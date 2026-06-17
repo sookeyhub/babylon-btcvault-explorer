@@ -44,7 +44,7 @@ function CopyIcon({ text }: { text: string }) {
         setCopied(true);
         setTimeout(() => setCopied(false), 1500);
       }}
-      className="ml-1 inline-flex shrink-0 text-[rgba(56,112,133,0.3)] hover:text-[#387085]"
+      className="ml-1 inline-flex shrink-0 text-[rgba(56,112,133,0.7)] hover:text-[#387085]"
       title={copied ? 'Copied!' : 'Copy'}
     >
       <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor">
@@ -156,53 +156,53 @@ function VaultStatusChart({ vaults, activeFilter, onStatusClick }: VaultStatusCh
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         {/* Card 1: Locked BTC */}
         <div className="border border-[#387085]/10 bg-white p-3" title="Total BTC locked as collateral across all vaults">
-          <p className="flex items-center gap-1 text-[11px] font-medium uppercase tracking-wide text-[#387085]/50">
+          <p className="flex items-center gap-1 text-xs font-medium uppercase tracking-wide text-[#387085]/70">
             Locked BTC
-            <svg className="h-3 w-3 text-[#387085]/30" fill="none" viewBox="0 0 24 24" strokeWidth="1.8" stroke="currentColor">
+            <svg className="h-3 w-3 text-[#387085]/70" fill="none" viewBox="0 0 24 24" strokeWidth="1.8" stroke="currentColor">
               <title>Total BTC locked as collateral across all vaults</title>
               <path strokeLinecap="round" strokeLinejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z" />
             </svg>
           </p>
-          <p className="mt-1.5 text-2xl font-semibold tabular-nums text-[#14140f]">{totalBtc.toFixed(2)} <span className="text-sm font-normal text-[#387085]/50">sBTC</span></p>
-          <p className="mt-0.5 text-xs text-[#387085]/40">{toUsd(totalBtc)}</p>
+          <p className="mt-1.5 text-2xl font-semibold tabular-nums text-[#14140f]">{totalBtc.toFixed(2)} <span className="text-sm font-normal text-[#387085]/70">sBTC</span></p>
+          <p className="mt-0.5 text-xs text-[#387085]/80">{toUsd(totalBtc)}</p>
         </div>
 
         {/* Card 2: Active Vaults */}
         <div className="border border-[#387085]/10 bg-white p-3" title="Vaults currently active out of all vaults">
-          <p className="flex items-center gap-1 text-[11px] font-medium uppercase tracking-wide text-[#387085]/50">
+          <p className="flex items-center gap-1 text-xs font-medium uppercase tracking-wide text-[#387085]/70">
             Active Vaults
-            <svg className="h-3 w-3 text-[#387085]/30" fill="none" viewBox="0 0 24 24" strokeWidth="1.8" stroke="currentColor">
+            <svg className="h-3 w-3 text-[#387085]/70" fill="none" viewBox="0 0 24 24" strokeWidth="1.8" stroke="currentColor">
               <title>Vaults currently active out of all vaults</title>
               <path strokeLinecap="round" strokeLinejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z" />
             </svg>
           </p>
           <p className="mt-1.5 text-2xl font-semibold tabular-nums text-[#14140f]">{activeCount}</p>
-          <p className="mt-0.5 text-xs text-[#387085]/40">of {totalVaults}</p>
+          <p className="mt-0.5 text-xs text-[#387085]/80">of {totalVaults}</p>
         </div>
 
         {/* Card 3: Liquidations */}
         <div className="border border-[#387085]/10 bg-white p-3" title="Vaults liquidated to date and the BTC seized">
-          <p className="text-[11px] font-medium uppercase tracking-wide text-[#387085]/50">
+          <p className="text-xs font-medium uppercase tracking-wide text-[#387085]/70">
             Liquidations
           </p>
           <div className="mt-1.5 flex items-baseline gap-2">
-            <p className="text-2xl font-semibold tabular-nums text-[#14140f]">{liquidatedBtc.toFixed(4)} <span className="text-sm font-normal text-[#387085]/50">sBTC</span></p>
+            <p className="text-2xl font-semibold tabular-nums text-[#14140f]">{liquidatedBtc.toFixed(4)} <span className="text-sm font-normal text-[#387085]/70">sBTC</span></p>
             <span className="text-xs text-green-600">+1.28% (24h)</span>
           </div>
-          <p className="mt-0.5 text-xs text-[#387085]/40">{toUsd(liquidatedBtc)}</p>
+          <p className="mt-0.5 text-xs text-[#387085]/80">{toUsd(liquidatedBtc)}</p>
         </div>
 
         {/* Card 4: Redeem Success Rate */}
         <div className="border border-[#387085]/10 bg-white p-3" title="Share of closed vaults that were successfully redeemed">
-          <p className="flex items-center gap-1 text-[11px] font-medium uppercase tracking-wide text-[#387085]/50">
+          <p className="flex items-center gap-1 text-xs font-medium uppercase tracking-wide text-[#387085]/70">
             Redeem Success Rate
-            <svg className="h-3 w-3 text-[#387085]/30" fill="none" viewBox="0 0 24 24" strokeWidth="1.8" stroke="currentColor">
+            <svg className="h-3 w-3 text-[#387085]/70" fill="none" viewBox="0 0 24 24" strokeWidth="1.8" stroke="currentColor">
               <title>Share of closed vaults that were successfully redeemed</title>
               <path strokeLinecap="round" strokeLinejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z" />
             </svg>
           </p>
           <p className="mt-1.5 text-2xl font-semibold tabular-nums text-[#14140f]">{redeemSuccessRate}%</p>
-          <p className="mt-0.5 text-xs text-[#387085]/40">{redeemedCount} of {closedCount} closed</p>
+          <p className="mt-0.5 text-xs text-[#387085]/80">{redeemedCount} of {closedCount} closed</p>
         </div>
       </div>
 
@@ -214,16 +214,16 @@ function VaultStatusChart({ vaults, activeFilter, onStatusClick }: VaultStatusCh
           <div className="flex items-center gap-0.5 rounded-sm border border-[#387085]/15 p-0.5">
             <button
               onClick={() => setMetric('btc')}
-              className={`rounded-sm px-2 py-0.5 text-[10px] font-medium transition-colors ${
-                metric === 'btc' ? 'bg-[#cd6332] text-white' : 'text-[#387085]/50 hover:text-[#14140f]'
+              className={`rounded-sm px-2 py-0.5 text-xs font-medium transition-colors ${
+                metric === 'btc' ? 'bg-[#cd6332] text-white' : 'text-[#387085]/70 hover:text-[#14140f]'
               }`}
             >
               BTC
             </button>
             <button
               onClick={() => setMetric('count')}
-              className={`rounded-sm px-2 py-0.5 text-[10px] font-medium transition-colors ${
-                metric === 'count' ? 'bg-[#cd6332] text-white' : 'text-[#387085]/50 hover:text-[#14140f]'
+              className={`rounded-sm px-2 py-0.5 text-xs font-medium transition-colors ${
+                metric === 'count' ? 'bg-[#cd6332] text-white' : 'text-[#387085]/70 hover:text-[#14140f]'
               }`}
             >
               Count
@@ -273,12 +273,12 @@ function VaultStatusChart({ vaults, activeFilter, onStatusClick }: VaultStatusCh
                   style={{ left: `${leftPct}%`, bottom: '100%', transform: 'translateX(-50%)', marginBottom: '8px' }}
                 >
                   <div className="whitespace-nowrap rounded bg-[#14140f] px-3 py-2 text-center shadow-lg">
-                    <p className="text-[11px] font-semibold text-white">{s.status}</p>
+                    <p className="text-xs font-semibold text-white">{s.status}</p>
                     <div className="mt-1 flex items-center justify-center gap-2">
                       <span className="text-xs tabular-nums text-white/90">{s.count.toLocaleString()} vaults</span>
-                      <span className="text-[10px] text-white/50">({((s.count / totalVaults) * 100).toFixed(1)}%)</span>
+                      <span className="text-xs text-white/50">({((s.count / totalVaults) * 100).toFixed(1)}%)</span>
                     </div>
-                    <p className="mt-0.5 text-[10px] tabular-nums text-white/60">{s.btc.toFixed(2)} sBTC · {toUsd(s.btc)}</p>
+                    <p className="mt-0.5 text-xs tabular-nums text-white/60">{s.btc.toFixed(2)} sBTC · {toUsd(s.btc)}</p>
                   </div>
                   <div className="mx-auto h-0 w-0 border-x-[5px] border-t-[5px] border-x-transparent border-t-[#14140f]" />
                 </div>
@@ -300,8 +300,8 @@ function VaultStatusChart({ vaults, activeFilter, onStatusClick }: VaultStatusCh
                   onMouseLeave={() => setHovered(null)}
                 >
                   <span className="h-2 w-2 shrink-0 rounded-sm" style={{ background: STATUS_COLORS[s.status] }} />
-                  <span className="text-[11px] text-[#14140f]/70">{s.status}</span>
-                  <span className="text-[10px] tabular-nums text-[#387085]/40">{((s.count / totalVaults) * 100).toFixed(1)}%</span>
+                  <span className="text-xs text-[#14140f]/70">{s.status}</span>
+                  <span className="text-xs tabular-nums text-[#387085]/80">{((s.count / totalVaults) * 100).toFixed(1)}%</span>
                 </button>
               );
             })}
@@ -309,20 +309,20 @@ function VaultStatusChart({ vaults, activeFilter, onStatusClick }: VaultStatusCh
         </div>
 
         {/* ── Summary line: 3 groups ─────────────────────────────── */}
-        <div className="border-t border-[#387085]/8 px-5 py-2.5 text-[11px] text-[#387085]/60">
+        <div className="border-t border-[#387085]/8 px-5 py-2.5 text-xs text-[#387085]/80">
           <div className="flex flex-wrap items-center gap-x-1 gap-y-0.5">
-            <span>Setting up <span className="font-semibold text-[#14140f]/70">{settingUpCount}</span></span>
-            <span className="mx-1.5 text-[#387085]/20">·</span>
             <span>Active <span className="font-semibold text-[#14140f]/70">{activeCount}</span></span>
             <span className="mx-1.5 text-[#387085]/20">·</span>
+            <span>Setting up <span className="font-semibold text-[#14140f]/70">{settingUpCount}</span></span>
+            <span className="mx-1.5 text-[#387085]/20">·</span>
             <span>Closed <span className="font-semibold text-[#14140f]/70">{closedCount}</span></span>
-            <span className="ml-1 text-[#387085]/30">(</span>
+            <span className="ml-1 text-[#387085]/70">(</span>
             <span>Redeemed {redeemedCount}</span>
             <span className="mx-0.5 text-[#387085]/20">/</span>
             <span>Expired {expiredCount}</span>
             <span className="mx-0.5 text-[#387085]/20">/</span>
             <span>Liquidated {liquidatedCount}</span>
-            <span className="text-[#387085]/30">)</span>
+            <span className="text-[#387085]/70">)</span>
           </div>
         </div>
       </section>
@@ -351,10 +351,10 @@ function VaultsActivityTab() {
           <button
             key={opt.value}
             onClick={() => setFilter(opt.value)}
-            className={`rounded-full px-2.5 py-1 text-[10px] font-medium transition-colors ${
+            className={`rounded-full px-2.5 py-1 text-xs font-medium transition-colors ${
               filter === opt.value
                 ? 'bg-[#cd6332] text-white'
-                : 'bg-[#387085]/8 text-[#387085]/60 hover:bg-[#387085]/15'
+                : 'bg-[#387085]/8 text-[#387085]/80 hover:bg-[#387085]/15'
             }`}
           >
             {opt.label}
@@ -365,7 +365,7 @@ function VaultsActivityTab() {
       {/* Timeline */}
       {filtered.length === 0 ? (
         <div className="py-16 text-center">
-          <p className="text-sm text-[#387085]/40">No vault events found</p>
+          <p className="text-sm text-[#387085]/80">No vault events found</p>
           {filter !== 'ALL' && (
             <button onClick={() => setFilter('ALL')} className="mx-auto mt-1 block text-xs text-[#cd6332] hover:underline">
               Show all events
@@ -377,7 +377,7 @@ function VaultsActivityTab() {
           {grouped.map(([date, activities]) => (
             <div key={date}>
               <div className="mb-3 flex items-center gap-3">
-                <span className="whitespace-nowrap text-[11px] font-semibold uppercase tracking-wide text-[#387085]/50">
+                <span className="whitespace-nowrap text-xs font-semibold uppercase tracking-wide text-[#387085]/70">
                   {vaultDateGroupHeader(date)}
                 </span>
                 <div className="h-px flex-1 bg-[#387085]/10" />
@@ -393,8 +393,8 @@ function VaultsActivityTab() {
                     >
                       {/* Time column */}
                       <div className="flex w-28 shrink-0 flex-col items-end pt-0.5">
-                        <span className="text-[11px] font-medium text-[#387085]/40">{formatRelativeTime(event.blockTime)}</span>
-                        <span className="font-mono text-[9px] text-[#387085]/30">({formatTimeUTC(event.blockTime)})</span>
+                        <span className="text-xs font-medium text-[#387085]/80">{formatRelativeTime(event.blockTime)}</span>
+                        <span className="font-mono text-[9px] text-[#387085]/70">({formatTimeUTC(event.blockTime)})</span>
                       </div>
 
                       {/* Content */}
@@ -402,15 +402,15 @@ function VaultsActivityTab() {
                         {/* Row 1: Status chip + Vault + amount (for terminal states) */}
                         <div className="flex items-center justify-between gap-2">
                           <div className="flex items-center gap-2">
-                            <span className={`inline-block rounded-full px-2 py-0.5 text-[10px] font-medium ${style.pillClass}`}>
+                            <span className={`inline-block rounded-full px-2 py-0.5 text-xs font-medium ${style.pillClass}`}>
                               {style.status}
                             </span>
                             <span className="inline-flex items-center gap-1">
-                              <span className="text-[9px] font-medium uppercase tracking-wide text-[#387085]/40">Vault</span>
-                              <svg className="h-3 w-3 text-[#387085]/30" fill="none" viewBox="0 0 24 24" strokeWidth="1.8" stroke="currentColor">
+                              <span className="text-[9px] font-medium uppercase tracking-wide text-[#387085]/80">Vault</span>
+                              <svg className="h-3 w-3 text-[#387085]/70" fill="none" viewBox="0 0 24 24" strokeWidth="1.8" stroke="currentColor">
                                 <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z" />
                               </svg>
-                              <Link href={`/vaults/${event.vaultId}`} className="font-mono text-[10px] text-[#cd6332]/70 hover:text-[#cd6332] hover:underline">
+                              <Link href={`/vaults/${event.vaultId}`} className="font-mono text-xs text-[#cd6332]/70 hover:text-[#cd6332] hover:underline">
                                 {truncateAddress(event.vaultId, 6, 4)}
                               </Link>
                             </span>
@@ -424,9 +424,9 @@ function VaultsActivityTab() {
                           {['Available', 'Redeemed', 'Expired', 'Liquidated'].includes(style.status) && (
                             <div className="flex-shrink-0 text-right">
                               <div className="font-mono text-sm font-semibold text-[#14140f]">
-                                {parseFloat(event.amount).toFixed(6)} <span className="text-xs font-normal text-[#387085]/50">sBTC</span>
+                                {parseFloat(event.amount).toFixed(6)} <span className="text-xs font-normal text-[#387085]/70">sBTC</span>
                               </div>
-                              <div className="text-[10px] text-[#387085]/40">{toUsd(parseFloat(event.amount))}</div>
+                              <div className="text-xs text-[#387085]/80">{toUsd(parseFloat(event.amount))}</div>
                             </div>
                           )}
                         </div>
@@ -434,19 +434,19 @@ function VaultsActivityTab() {
                         {/* Row 2: Provider | Depositor */}
                         <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-0.5">
                           <span className="inline-flex items-center gap-1">
-                            <span className="text-[9px] font-medium uppercase tracking-wide text-[#387085]/40">Provider</span>
-                            <svg className="h-3 w-3 text-[#387085]/30" fill="none" viewBox="0 0 24 24" strokeWidth="1.8" stroke="currentColor">
+                            <span className="text-[9px] font-medium uppercase tracking-wide text-[#387085]/80">Provider</span>
+                            <svg className="h-3 w-3 text-[#387085]/70" fill="none" viewBox="0 0 24 24" strokeWidth="1.8" stroke="currentColor">
                               <path strokeLinecap="round" strokeLinejoin="round" d="M20.25 14.15v4.25c0 1.094-.787 2.036-1.872 2.18-2.087.277-4.216.42-6.378.42s-4.291-.143-6.378-.42c-1.085-.144-1.872-1.086-1.872-2.18v-4.25m16.5 0a2.18 2.18 0 0 0 .75-1.661V8.706c0-1.081-.768-2.015-1.837-2.175a48.114 48.114 0 0 0-3.413-.387m4.5 8.006c-.194.165-.42.295-.673.38A23.978 23.978 0 0 1 12 15.75c-2.648 0-5.195-.429-7.577-1.22a2.016 2.016 0 0 1-.673-.38m0 0A2.18 2.18 0 0 1 3 12.489V8.706c0-1.081.768-2.015 1.837-2.175a48.111 48.111 0 0 1 3.413-.387m7.5 0V5.25A2.25 2.25 0 0 0 13.5 3h-3a2.25 2.25 0 0 0-2.25 2.25v.894m7.5 0a48.667 48.667 0 0 0-7.5 0" />
                             </svg>
-                            <span className="font-mono text-[10px] text-[#14140f]/70">{event.providerName}</span>
+                            <span className="font-mono text-xs text-[#14140f]/70">{event.providerName}</span>
                           </span>
                           <span className="text-[#387085]/20">·</span>
                           <span className="inline-flex items-center gap-1">
-                            <span className="text-[9px] font-medium uppercase tracking-wide text-[#387085]/40">Depositor</span>
-                            <svg className="h-3 w-3 text-[#387085]/30" fill="none" viewBox="0 0 24 24" strokeWidth="1.8" stroke="currentColor">
+                            <span className="text-[9px] font-medium uppercase tracking-wide text-[#387085]/80">Depositor</span>
+                            <svg className="h-3 w-3 text-[#387085]/70" fill="none" viewBox="0 0 24 24" strokeWidth="1.8" stroke="currentColor">
                               <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0" />
                             </svg>
-                            <Link href={`/accounts/${event.depositorAddress}`} className="font-mono text-[10px] text-[#387085]/70 hover:text-[#cd6332] hover:underline">
+                            <Link href={`/accounts/${event.depositorAddress}`} className="font-mono text-xs text-[#387085]/70 hover:text-[#cd6332] hover:underline">
                               {truncateAddress(event.depositorAddress, 6, 4)}
                             </Link>
                           </span>
@@ -455,16 +455,16 @@ function VaultsActivityTab() {
                         {/* Row 3: Txn | Block */}
                         <div className="mt-1 flex flex-wrap items-center gap-3">
                           <span className="inline-flex items-center gap-1">
-                            <span className="text-[9px] font-medium uppercase tracking-wide text-[#387085]/40">Tx</span>
-                            <Link href={`/tx/${event.txHash}`} className="font-mono text-[10px] text-[#cd6332]/70 hover:text-[#cd6332] hover:underline">
+                            <span className="text-[9px] font-medium uppercase tracking-wide text-[#387085]/80">Tx</span>
+                            <Link href={`/tx/${event.txHash}`} className="font-mono text-xs text-[#cd6332]/70 hover:text-[#cd6332] hover:underline">
                               {truncateAddress(event.txHash, 6, 4)}
                             </Link>
                             <CopyIcon text={event.txHash} />
                           </span>
-                          <span className="text-[10px] text-[#387085]/20">·</span>
+                          <span className="text-xs text-[#387085]/20">·</span>
                           <span className="inline-flex items-center gap-1">
-                            <span className="text-[9px] font-medium uppercase tracking-wide text-[#387085]/40">Block</span>
-                            <span className="font-mono text-[10px] text-[#387085]/40">
+                            <span className="text-[9px] font-medium uppercase tracking-wide text-[#387085]/80">Block</span>
+                            <span className="font-mono text-xs text-[#387085]/80">
                               #{event.blockNumber.toLocaleString()}
                             </span>
                           </span>
@@ -602,10 +602,10 @@ function VaultsPageInner() {
             className={`px-5 py-2.5 text-sm font-medium transition-colors ${
               activeTab === tab.key
                 ? 'border-b-2 border-[#cd6332] text-[#cd6332]'
-                : 'text-[#387085]/50 hover:text-[#14140f]'
+                : 'text-[#387085]/70 hover:text-[#14140f]'
             }`}
           >
-            {tab.label} <span className="text-[10px] text-[#387085]/40">({tab.count})</span>
+            {tab.label} <span className="text-xs text-[#387085]/80">({tab.count})</span>
           </button>
         ))}
       </div>
@@ -615,10 +615,10 @@ function VaultsPageInner() {
       {activeTab === 'all' && <>
       {/* Results count + Pagination */}
       <div className="flex items-center justify-between">
-        <p className="text-sm text-[rgba(56,112,133,0.5)]">
+        <p className="text-sm text-[rgba(56,112,133,0.7)]">
           Showing all <span className="font-semibold text-[#14140f]">{total}</span> results
         </p>
-        <div className="flex items-center gap-1 text-xs text-[rgba(56,112,133,0.5)]">
+        <div className="flex items-center gap-1 text-xs text-[rgba(56,112,133,0.7)]">
           <button
             onClick={() => setPage(1)}
             disabled={safePage <= 1}
@@ -657,7 +657,7 @@ function VaultsPageInner() {
       <div className="overflow-x-auto rounded-none border border-[#cd6332]/20 bg-white">
         <table className="w-full text-left text-xs">
           <thead>
-            <tr className="bg-[#cd6332] text-[11px] font-medium uppercase tracking-wider text-white">
+            <tr className="bg-[#cd6332] text-xs font-medium uppercase tracking-wider text-white">
               <th className="whitespace-nowrap px-4 py-2.5 font-medium">Vault ID</th>
               <th
                 className="cursor-pointer whitespace-nowrap px-4 py-2.5 font-medium select-none"
@@ -669,18 +669,18 @@ function VaultsPageInner() {
               <th className="relative whitespace-nowrap px-4 py-2.5 font-medium">
                 <button onClick={() => { setStatusDropdownOpen(!statusDropdownOpen); setDappDropdownOpen(false); }} className="inline-flex items-center gap-1">
                   Status
-                  <span className="ml-0.5 text-[10px]">≡</span>
+                  <span className="ml-0.5 text-xs">≡</span>
                   {statusFilter !== 'ALL' && <span className="ml-0.5 inline-flex h-1.5 w-1.5 rounded-full bg-white" />}
                 </button>
                 {statusDropdownOpen && (
                   <div className="absolute left-0 top-full z-50 mt-0.5 w-40 border border-[#387085]/10 bg-white py-1 shadow-lg" onMouseLeave={() => setStatusDropdownOpen(false)}>
                     <button onClick={() => { setStatusFilter('ALL'); setStatusDropdownOpen(false); setPage(1); }}
-                      className={`block w-full px-3 py-1.5 text-left text-[11px] transition-colors ${statusFilter === 'ALL' ? 'bg-[#cd6332]/8 font-semibold text-[#cd6332]' : 'text-[#14140f] hover:bg-[#faf9f5]'}`}>
+                      className={`block w-full px-3 py-1.5 text-left text-xs transition-colors ${statusFilter === 'ALL' ? 'bg-[#cd6332]/8 font-semibold text-[#cd6332]' : 'text-[#14140f] hover:bg-[#faf9f5]'}`}>
                       All
                     </button>
                     {ALL_STATUSES.map((s) => (
                       <button key={s} onClick={() => { setStatusFilter(s); setStatusDropdownOpen(false); setPage(1); }}
-                        className={`block w-full px-3 py-1.5 text-left text-[11px] transition-colors ${statusFilter === s ? 'bg-[#cd6332]/8 font-semibold text-[#cd6332]' : 'text-[#14140f] hover:bg-[#faf9f5]'}`}>
+                        className={`block w-full px-3 py-1.5 text-left text-xs transition-colors ${statusFilter === s ? 'bg-[#cd6332]/8 font-semibold text-[#cd6332]' : 'text-[#14140f] hover:bg-[#faf9f5]'}`}>
                         {s}
                       </button>
                     ))}
@@ -693,18 +693,18 @@ function VaultsPageInner() {
               <th className="relative whitespace-nowrap px-4 py-2.5 font-medium">
                 <button onClick={() => { setDappDropdownOpen(!dappDropdownOpen); setStatusDropdownOpen(false); }} className="inline-flex items-center gap-1">
                   DApp
-                  <span className="ml-0.5 text-[10px]">≡</span>
+                  <span className="ml-0.5 text-xs">≡</span>
                   {dappFilter !== 'ALL' && <span className="ml-0.5 inline-flex h-1.5 w-1.5 rounded-full bg-white" />}
                 </button>
                 {dappDropdownOpen && (
                   <div className="absolute left-0 top-full z-50 mt-0.5 w-40 border border-[#387085]/10 bg-white py-1 shadow-lg" onMouseLeave={() => setDappDropdownOpen(false)}>
                     <button onClick={() => { setDappFilter('ALL'); setDappDropdownOpen(false); setPage(1); }}
-                      className={`block w-full px-3 py-1.5 text-left text-[11px] transition-colors ${dappFilter === 'ALL' ? 'bg-[#cd6332]/8 font-semibold text-[#cd6332]' : 'text-[#14140f] hover:bg-[#faf9f5]'}`}>
+                      className={`block w-full px-3 py-1.5 text-left text-xs transition-colors ${dappFilter === 'ALL' ? 'bg-[#cd6332]/8 font-semibold text-[#cd6332]' : 'text-[#14140f] hover:bg-[#faf9f5]'}`}>
                       All
                     </button>
                     {ALL_DAPPS.map((d) => (
                       <button key={d} onClick={() => { setDappFilter(d); setDappDropdownOpen(false); setPage(1); }}
-                        className={`block w-full px-3 py-1.5 text-left text-[11px] transition-colors ${dappFilter === d ? 'bg-[#cd6332]/8 font-semibold text-[#cd6332]' : 'text-[#14140f] hover:bg-[#faf9f5]'}`}>
+                        className={`block w-full px-3 py-1.5 text-left text-xs transition-colors ${dappFilter === d ? 'bg-[#cd6332]/8 font-semibold text-[#cd6332]' : 'text-[#14140f] hover:bg-[#faf9f5]'}`}>
                         {d}
                       </button>
                     ))}
@@ -731,7 +731,7 @@ function VaultsPageInner() {
                   <div className="flex items-center">
                     <Link
                       href={`/vaults/${vault.id}`}
-                      className="font-mono text-[11px] font-medium text-[#cd6332] hover:text-[#b8562b]"
+                      className="font-mono text-xs font-medium text-[#cd6332] hover:text-[#b8562b]"
                     >
                       {truncateAddress(vault.id, 6, 4)}
                     </Link>
@@ -741,8 +741,8 @@ function VaultsPageInner() {
 
                 {/* Amount */}
                 <td className="whitespace-nowrap px-4 py-2.5 tabular-nums">
-                  <div className="text-[#14140f]">{vault.vaultSize.toFixed(8)} <span className="text-[rgba(56,112,133,0.5)]">sBTC</span></div>
-                  <div className="text-[10px] text-[#387085]/40">{toUsd(vault.vaultSize)}</div>
+                  <div className="text-[#14140f]">{vault.vaultSize.toFixed(8)} <span className="text-[rgba(56,112,133,0.7)]">sBTC</span></div>
+                  <div className="text-xs text-[#387085]/80">{toUsd(vault.vaultSize)}</div>
                 </td>
 
                 {/* Status */}
@@ -760,7 +760,7 @@ function VaultsPageInner() {
                   <div className="flex items-center">
                     <Link
                       href={`/accounts/${vault.depositorAddress}`}
-                      className="font-mono text-[11px] text-[#387085] hover:text-[#cd6332]"
+                      className="font-mono text-xs text-[#387085] hover:text-[#cd6332]"
                     >
                       {truncateAddress(vault.depositorAddress, 6, 4)}
                     </Link>
@@ -785,12 +785,12 @@ function VaultsPageInner() {
                 </td>
 
                 {/* Created (Age) */}
-                <td className="whitespace-nowrap px-4 py-2.5 text-[rgba(56,112,133,0.5)]">
+                <td className="whitespace-nowrap px-4 py-2.5 text-[rgba(56,112,133,0.7)]">
                   {vault.createdAt ? formatRelativeTime(vault.createdAt) : '—'}
                 </td>
 
                 {/* Closed (Age) */}
-                <td className="whitespace-nowrap px-4 py-2.5 text-[rgba(56,112,133,0.5)]">
+                <td className="whitespace-nowrap px-4 py-2.5 text-[rgba(56,112,133,0.7)]">
                   {vault.closedAt ? formatRelativeTime(vault.closedAt) : '—'}
                 </td>
               </tr>

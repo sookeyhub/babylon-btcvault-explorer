@@ -58,7 +58,7 @@ export default function AreaChartCard({
           <p className="mt-1 text-xl font-bold tabular-nums" style={{ color }}>
             {valuePrefix}{latestValue.toLocaleString()}{valueSuffix}
           </p>
-          <p className="text-xs text-[#387085]/40">
+          <p className="text-xs text-[#387085]/80">
             {toUsd(latestValue)}
           </p>
         </div>
@@ -67,7 +67,7 @@ export default function AreaChartCard({
             <button
               key={r}
               onClick={() => setRange(r)}
-              className={`rounded-none px-2 py-0.5 text-[10px] font-medium transition-colors ${
+              className={`rounded-none px-2 py-0.5 text-xs font-medium transition-colors ${
                 range === r
                   ? 'bg-white text-[#cd6332] shadow-sm'
                   : 'text-[rgba(56,112,133,0.45)] hover:text-[#387085]'

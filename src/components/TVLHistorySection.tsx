@@ -51,10 +51,10 @@ export default function TVLHistorySection({ data }: TVLHistorySectionProps) {
             <button
               key={p}
               onClick={() => setActivePeriod(p)}
-              className={`rounded-none px-2.5 py-1 text-[11px] font-medium transition-colors ${
+              className={`rounded-none px-2.5 py-1 text-xs font-medium transition-colors ${
                 activePeriod === p
                   ? 'bg-[#cd6332] text-white'
-                  : 'text-[rgba(56,112,133,0.6)] hover:text-[#cd6332]'
+                  : 'text-[rgba(56,112,133,0.8)] hover:text-[#cd6332]'
               }`}
             >
               {p}

@@ -152,9 +152,9 @@ function getLendingStatus(vaultStatus: VaultStatus): LendingBannerConfig {
     status: 'Not supplied',
     bg: 'bg-[#387085]/5',
     iconBg: 'bg-[#387085]/10',
-    iconColor: 'text-[#387085]/60',
+    iconColor: 'text-[#387085]/80',
     labelText: 'text-[#387085]',
-    subText: 'text-[#387085]/50',
+    subText: 'text-[#387085]/70',
     desc: 'Not supplied as collateral, and currently holds no loan.',
     icon: (
       <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor">
@@ -242,7 +242,7 @@ export default async function VaultDetailPage({ params }: Props) {
       {/* ── Header area ───────────────────────────────────────────────────── */}
       <div className="space-y-1.5">
           {/* "Vault" label row */}
-          <div className="flex items-center gap-1.5 text-xs text-[rgba(56,112,133,0.55)]">
+          <div className="flex items-center gap-1.5 text-xs text-[rgba(56,112,133,0.7)]">
             <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" strokeWidth="1.8" stroke="currentColor">
               <rect x="3" y="11" width="18" height="10" rx="1" />
               <path strokeLinecap="round" strokeLinejoin="round" d="M7 11V7a5 5 0 0 1 10 0v4" />
@@ -266,11 +266,11 @@ export default async function VaultDetailPage({ params }: Props) {
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         {/* Card 1: Amount */}
         <div className="border border-[#387085]/10 bg-[#faf9f5] p-3">
-          <p className="text-[11px] font-medium uppercase tracking-wide text-[#387085]/50">Amount</p>
+          <p className="text-xs font-medium uppercase tracking-wide text-[#387085]/70">Amount</p>
           <p className="mt-0.5 text-2xl font-semibold text-[#14140f]">
-            {vault.vaultSize.toFixed(2)} <span className="text-sm font-normal text-[#387085]/60">sBTC</span>
+            {vault.vaultSize.toFixed(2)} <span className="text-sm font-normal text-[#387085]/80">sBTC</span>
           </p>
-          <p className="mt-0.5 text-xs text-[#387085]/40">{toUsd(vault.vaultSize)}</p>
+          <p className="mt-0.5 text-xs text-[#387085]/80">{toUsd(vault.vaultSize)}</p>
         </div>
 
         {/* Card 2: Current Status */}
@@ -280,16 +280,16 @@ export default async function VaultDetailPage({ params }: Props) {
           return (
             <div className="border border-[#387085]/10 bg-[#faf9f5] p-3">
               <div className="flex items-center justify-between">
-                <p className="text-[11px] font-medium uppercase tracking-wide text-[#387085]/50">Current Status</p>
-                <button className="text-[10px] font-medium text-[#cd6332] hover:underline">View all Vault Activity ›</button>
+                <p className="text-xs font-medium uppercase tracking-wide text-[#387085]/70">Current Status</p>
+                <button className="text-xs font-medium text-[#cd6332] hover:underline">View all Vault Activity ›</button>
               </div>
               <div className="mt-1 flex items-center gap-2">
                 <StatusIcon status={vault.status} />
                 <span className="text-lg font-semibold text-[#14140f]">{vault.status}</span>
               </div>
-              <p className="mt-0.5 text-xs text-[#387085]/40">
+              <p className="mt-0.5 text-xs text-[#387085]/80">
                 {formatRelativeTime(timeIso)}
-                <span className="ml-1 text-[10px] text-[#387085]/30">({formatDateTime(timeIso)})</span>
+                <span className="ml-1 text-xs text-[#387085]/70">({formatDateTime(timeIso)})</span>
               </p>
             </div>
           );
@@ -297,16 +297,16 @@ export default async function VaultDetailPage({ params }: Props) {
 
         {/* Card 3: Provider */}
         <div className="border border-[#387085]/10 bg-[#faf9f5] p-3">
-          <p className="text-[11px] font-medium uppercase tracking-wide text-[#387085]/50">Provider</p>
+          <p className="text-xs font-medium uppercase tracking-wide text-[#387085]/70">Provider</p>
           <p className="mt-0.5 flex items-center gap-1.5 text-lg font-semibold">
-            <svg className="h-4 w-4 text-[#387085]/40" fill="none" viewBox="0 0 24 24" strokeWidth="1.8" stroke="currentColor">
+            <svg className="h-4 w-4 text-[#387085]/80" fill="none" viewBox="0 0 24 24" strokeWidth="1.8" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 5.25a3 3 0 0 1 3 3m3 0a6 6 0 0 1-7.029 5.912c-.563-.097-1.159.026-1.563.43L10.5 17.25H8.25v2.25H6v2.25H2.25v-2.818c0-.597.237-1.17.659-1.591l6.499-6.499c.404-.404.527-1 .43-1.563A6 6 0 1 1 21.75 8.25Z" />
             </svg>
             <Link href={`/accounts/${vault.providerAddress}`} className="text-[#cd6332] hover:underline">
               {vault.providerName}
             </Link>
           </p>
-          <p className="mt-0.5 text-xs text-[#387085]/40">Success rate 94.7%</p>
+          <p className="mt-0.5 text-xs text-[#387085]/80">Success rate 94.7%</p>
         </div>
 
         {/* Card 4: Depositor */}
@@ -314,13 +314,13 @@ export default async function VaultDetailPage({ params }: Props) {
           const depositorVaultCount = MOCK_VAULTS.filter((v) => v.depositorAddress === vault.depositorAddress).length;
           return (
             <div className="border border-[#387085]/10 bg-[#faf9f5] p-3">
-              <p className="text-[11px] font-medium uppercase tracking-wide text-[#387085]/50">Depositor</p>
+              <p className="text-xs font-medium uppercase tracking-wide text-[#387085]/70">Depositor</p>
               <p className="mt-0.5 text-lg font-semibold text-[#14140f]">
                 <Link href={`/accounts/${vault.depositorAddress}`} className="font-mono text-sm text-[#cd6332] hover:underline">
                   {truncateAddress(vault.depositorAddress, 6, 4)}
                 </Link>
               </p>
-              <p className="mt-0.5 text-xs text-[#387085]/40">{depositorVaultCount} vaults</p>
+              <p className="mt-0.5 text-xs text-[#387085]/80">{depositorVaultCount} vaults</p>
             </div>
           );
         })()}

@@ -18,7 +18,7 @@ function CopyIcon({ text }: { text: string }) {
   return (
     <button
       onClick={(e) => { e.preventDefault(); e.stopPropagation(); navigator.clipboard.writeText(text); setCopied(true); setTimeout(() => setCopied(false), 1500); }}
-      className="ml-1 inline-flex shrink-0 text-[rgba(56,112,133,0.3)] hover:text-[#387085]"
+      className="ml-1 inline-flex shrink-0 text-[rgba(56,112,133,0.7)] hover:text-[#387085]"
       title={copied ? 'Copied!' : 'Copy'}
     >
       <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor">
@@ -168,7 +168,7 @@ export default function LendingActivityPage() {
               className={`rounded-sm px-3 py-1.5 text-xs font-medium transition-colors ${
                 isActive
                   ? 'bg-[#cd6332] text-white'
-                  : 'text-[#387085]/60 hover:text-[#14140f]'
+                  : 'text-[#387085]/80 hover:text-[#14140f]'
               }`}
             >
               {opt.label}
@@ -179,10 +179,10 @@ export default function LendingActivityPage() {
 
       {/* Results count + Pagination */}
       <div className="flex items-center justify-between">
-        <p className="text-sm text-[rgba(56,112,133,0.5)]">
+        <p className="text-sm text-[rgba(56,112,133,0.7)]">
           Showing all <span className="font-semibold text-[#14140f]">{total}</span> results
         </p>
-        <div className="flex items-center gap-1 text-xs text-[rgba(56,112,133,0.5)]">
+        <div className="flex items-center gap-1 text-xs text-[rgba(56,112,133,0.7)]">
           <button onClick={() => setPage(1)} disabled={safePage <= 1} className="rounded px-1.5 py-1 hover:bg-[rgba(56,112,133,0.05)] disabled:opacity-30">«</button>
           <button onClick={() => setPage(safePage - 1)} disabled={safePage <= 1} className="rounded px-1.5 py-1 hover:bg-[rgba(56,112,133,0.05)] disabled:opacity-30">‹</button>
           <span className="px-2 text-[#14140f]">Page <span className="font-semibold">{safePage}</span> of <span className="font-semibold">{totalPages}</span></span>
@@ -194,7 +194,7 @@ export default function LendingActivityPage() {
       {/* Timeline */}
       {filtered.length === 0 ? (
         <div className="py-16 text-center">
-          <p className="text-sm text-[#387085]/40">No activity found</p>
+          <p className="text-sm text-[#387085]/80">No activity found</p>
           {filter !== 'ALL' && (
             <button onClick={() => setFilter('ALL')} className="mx-auto mt-1 block text-xs text-[#cd6332] hover:underline">
               Show all activity
@@ -205,7 +205,7 @@ export default function LendingActivityPage() {
         <div className="space-y-6">
           {grouped.map(([date, activities]) => (
             <div key={date}>
-              <div className="mb-4 text-[11px] font-bold uppercase tracking-wider text-[#14140f]">
+              <div className="mb-4 text-xs font-bold uppercase tracking-wider text-[#14140f]">
                 {formatDateGroupHeader(date)}
               </div>
               <div className="space-y-0">
@@ -220,8 +220,8 @@ export default function LendingActivityPage() {
                     >
                       {/* Time */}
                       <div className="w-28 shrink-0 pt-0.5">
-                        <div className="text-[11px] font-medium text-[#387085]/40">{formatRelativeTime(activity.blockTime)}</div>
-                        <div className="font-mono text-[9px] text-[#387085]/30">({formatTimeUTC(activity.blockTime)})</div>
+                        <div className="text-xs font-medium text-[#387085]/80">{formatRelativeTime(activity.blockTime)}</div>
+                        <div className="font-mono text-[9px] text-[#387085]/70">({formatTimeUTC(activity.blockTime)})</div>
                       </div>
 
                       {/* Content */}
@@ -234,11 +234,11 @@ export default function LendingActivityPage() {
                             </span>
                             {hasVault && activity.vaultId && (
                               <span className="inline-flex items-center gap-1">
-                                <span className="text-[9px] font-medium uppercase tracking-wide text-[#387085]/40">Vault</span>
-                                <svg className="h-3 w-3 text-[#387085]/30" fill="none" viewBox="0 0 24 24" strokeWidth="1.8" stroke="currentColor">
+                                <span className="text-[9px] font-medium uppercase tracking-wide text-[#387085]/80">Vault</span>
+                                <svg className="h-3 w-3 text-[#387085]/70" fill="none" viewBox="0 0 24 24" strokeWidth="1.8" stroke="currentColor">
                                   <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z" />
                                 </svg>
-                                <Link href={`/vaults/${activity.vaultId}`} className="font-mono text-[10px] text-[#cd6332]/70 hover:text-[#cd6332] hover:underline">
+                                <Link href={`/vaults/${activity.vaultId}`} className="font-mono text-xs text-[#cd6332]/70 hover:text-[#cd6332] hover:underline">
                                   {truncateAddress(activity.vaultId, 6, 4)}
                                 </Link>
                                 <CopyIcon text={activity.vaultId} />
@@ -249,18 +249,18 @@ export default function LendingActivityPage() {
                             <div className={`font-mono text-sm font-semibold ${style.amountColor}`}>
                               {style.amountPrefix}{formattedAmount}
                             </div>
-                            <div className="text-[10px] text-[#387085]/40">{formatTokenUsd(activity.tokenAmount)}</div>
+                            <div className="text-xs text-[#387085]/80">{formatTokenUsd(activity.tokenAmount)}</div>
                           </div>
                         </div>
 
                         {/* Row 2: Depositor + Tx + Block */}
                         <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-0.5">
                           <span className="inline-flex items-center gap-1">
-                            <span className="text-[9px] font-medium uppercase tracking-wide text-[#387085]/40">Depositor</span>
-                            <svg className="h-3 w-3 text-[#387085]/30" fill="none" viewBox="0 0 24 24" strokeWidth="1.8" stroke="currentColor">
+                            <span className="text-[9px] font-medium uppercase tracking-wide text-[#387085]/80">Depositor</span>
+                            <svg className="h-3 w-3 text-[#387085]/70" fill="none" viewBox="0 0 24 24" strokeWidth="1.8" stroke="currentColor">
                               <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0" />
                             </svg>
-                            <Link href={`/accounts/${activity.depositorAddress}`} className="font-mono text-[10px] text-[#387085]/70 hover:text-[#cd6332] hover:underline">
+                            <Link href={`/accounts/${activity.depositorAddress}`} className="font-mono text-xs text-[#387085]/70 hover:text-[#cd6332] hover:underline">
                               {truncateAddress(activity.depositorAddress, 6, 4)}
                             </Link>
                           </span>
@@ -268,16 +268,16 @@ export default function LendingActivityPage() {
                         {/* Row 3: Tx + Block */}
                         <div className="mt-1 flex flex-wrap items-center gap-3">
                           <span className="inline-flex items-center gap-1">
-                            <span className="text-[9px] font-medium uppercase tracking-wide text-[#387085]/40">Tx</span>
-                            <Link href={`/tx/${activity.txHash}`} className="font-mono text-[10px] text-[#cd6332]/70 hover:text-[#cd6332] hover:underline">
+                            <span className="text-[9px] font-medium uppercase tracking-wide text-[#387085]/80">Tx</span>
+                            <Link href={`/tx/${activity.txHash}`} className="font-mono text-xs text-[#cd6332]/70 hover:text-[#cd6332] hover:underline">
                               {truncateAddress(activity.txHash, 6, 4)}
                             </Link>
                             <CopyIcon text={activity.txHash} />
                           </span>
-                          <span className="text-[10px] text-[#387085]/20">·</span>
+                          <span className="text-xs text-[#387085]/20">·</span>
                           <span className="inline-flex items-center gap-1">
-                            <span className="text-[9px] font-medium uppercase tracking-wide text-[#387085]/40">Block</span>
-                            <span className="font-mono text-[10px] text-[#387085]/40">
+                            <span className="text-[9px] font-medium uppercase tracking-wide text-[#387085]/80">Block</span>
+                            <span className="font-mono text-xs text-[#387085]/80">
                               #{activity.blockNumber.toLocaleString()}
                             </span>
                           </span>
@@ -295,7 +295,7 @@ export default function LendingActivityPage() {
       {/* Bottom pagination */}
       {total > PAGE_SIZE && (
         <div className="flex items-center justify-end">
-          <div className="flex items-center gap-1 text-xs text-[rgba(56,112,133,0.5)]">
+          <div className="flex items-center gap-1 text-xs text-[rgba(56,112,133,0.7)]">
             <button onClick={() => setPage(1)} disabled={safePage <= 1} className="rounded px-1.5 py-1 hover:bg-[rgba(56,112,133,0.05)] disabled:opacity-30">«</button>
             <button onClick={() => setPage(safePage - 1)} disabled={safePage <= 1} className="rounded px-1.5 py-1 hover:bg-[rgba(56,112,133,0.05)] disabled:opacity-30">‹</button>
             <span className="px-2 text-[#14140f]">Page <span className="font-semibold">{safePage}</span> of <span className="font-semibold">{totalPages}</span></span>

@@ -13,7 +13,7 @@ interface VaultTableProps {
 export default function VaultTable({ vaults, compact, title, headerLink }: VaultTableProps) {
   if (vaults.length === 0) {
     return (
-      <div className="flex h-32 items-center justify-center text-sm text-[rgba(56,112,133,0.4)]">
+      <div className="flex h-32 items-center justify-center text-sm text-[rgba(56,112,133,0.8)]">
         No vaults found
       </div>
     );
@@ -36,7 +36,7 @@ export default function VaultTable({ vaults, compact, title, headerLink }: Vault
       <div className="overflow-x-auto bg-white">
         <table className="w-full text-left text-xs">
           <thead>
-            <tr className="border-b border-[#cd6332]/10 text-[11px] font-medium uppercase tracking-wider text-[rgba(56,112,133,0.45)]">
+            <tr className="border-b border-[#cd6332]/10 text-xs font-medium uppercase tracking-wider text-[rgba(56,112,133,0.45)]">
               <th className="px-5 py-3 font-medium">Vault ID</th>
               <th className="px-5 py-3 font-medium">Status</th>
               {!compact && (
@@ -66,7 +66,7 @@ export default function VaultTable({ vaults, compact, title, headerLink }: Vault
                 <td className="px-5 py-3">
                   <Link
                     href={`/vaults/${vault.id}`}
-                    className="font-mono text-[11px] font-medium text-[#cd6332] hover:text-[#b8562b]"
+                    className="font-mono text-xs font-medium text-[#cd6332] hover:text-[#b8562b]"
                   >
                     {truncateAddress(vault.id, 6, 4)}
                   </Link>
@@ -76,13 +76,13 @@ export default function VaultTable({ vaults, compact, title, headerLink }: Vault
                 </td>
                 {!compact && (
                   <td className="hidden px-5 py-3 lg:table-cell">
-                    <span className="font-mono text-[11px] text-[rgba(56,112,133,0.4)]">
+                    <span className="font-mono text-xs text-[rgba(56,112,133,0.8)]">
                       {truncateAddress(vault.btcAddress, 6, 4)}
                     </span>
                   </td>
                 )}
                 <td className="px-5 py-3">
-                  <Link href={`/accounts/${vault.depositorAddress}`} className="font-mono text-[11px] text-[rgba(56,112,133,0.5)] transition-colors hover:text-[#cd6332]">
+                  <Link href={`/accounts/${vault.depositorAddress}`} className="font-mono text-xs text-[rgba(56,112,133,0.7)] transition-colors hover:text-[#cd6332]">
                     {truncateAddress(vault.depositorAddress, 6, 4)}
                   </Link>
                 </td>
@@ -93,20 +93,20 @@ export default function VaultTable({ vaults, compact, title, headerLink }: Vault
                 {!compact && (
                   <>
                     <td className="hidden px-5 py-3 md:table-cell">
-                      <Link href={`/accounts/${vault.providerAddress}`} className="text-[rgba(56,112,133,0.6)] transition-colors hover:text-[#cd6332]">
+                      <Link href={`/accounts/${vault.providerAddress}`} className="text-[rgba(56,112,133,0.8)] transition-colors hover:text-[#cd6332]">
                         {vault.providerName}
                       </Link>
                     </td>
                     <td className="hidden px-5 py-3 xl:table-cell">
-                      <span className="font-mono text-[11px] text-[rgba(56,112,133,0.4)]">
+                      <span className="font-mono text-xs text-[rgba(56,112,133,0.8)]">
                         {truncateAddress(vault.providerAddress, 6, 4)}
                       </span>
                     </td>
                   </>
                 )}
-                <td className="px-5 py-3 text-[rgba(56,112,133,0.5)]">{formatRelativeTime(vault.createdAt)}</td>
+                <td className="px-5 py-3 text-[rgba(56,112,133,0.7)]">{formatRelativeTime(vault.createdAt)}</td>
                 {!compact && (
-                  <td className="hidden px-5 py-3 text-[rgba(56,112,133,0.5)] md:table-cell">
+                  <td className="hidden px-5 py-3 text-[rgba(56,112,133,0.7)] md:table-cell">
                     {vault.closedAt ? formatRelativeTime(vault.closedAt) : '—'}
                   </td>
                 )}

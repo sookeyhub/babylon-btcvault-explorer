@@ -503,7 +503,7 @@ export default function LendingPage() {
         <div className="flex gap-1">
           {['all', 'supply', 'borrow', 'repay', 'withdraw'].map(type => (
             <button key={type} onClick={() => setActiveType(type)}
-              className={`px-3 py-1.5 text-xs font-medium transition-colors ${activeType === type ? 'bg-[#cd6332] text-white' : 'text-[rgba(56,112,133,0.5)] hover:text-[#cd6332] hover:bg-[rgba(205,99,50,0.04)]'}`}>
+              className={`px-3 py-1.5 text-xs font-medium transition-colors ${activeType === type ? 'bg-[#cd6332] text-white' : 'text-[rgba(56,112,133,0.7)] hover:text-[#cd6332] hover:bg-[rgba(205,99,50,0.04)]'}`}>
               {type === 'all' ? 'All Types' : type.charAt(0).toUpperCase() + type.slice(1)}
             </button>
           ))}
@@ -512,7 +512,7 @@ export default function LendingPage() {
         <div className="flex gap-1">
           {['all', 'success', 'failed'].map(status => (
             <button key={status} onClick={() => setActiveStatus(status)}
-              className={`flex items-center gap-1 px-3 py-1.5 text-xs font-medium transition-colors ${activeStatus === status ? 'bg-[#cd6332] text-white' : 'text-[rgba(56,112,133,0.5)] hover:text-[#cd6332] hover:bg-[rgba(205,99,50,0.04)]'}`}>
+              className={`flex items-center gap-1 px-3 py-1.5 text-xs font-medium transition-colors ${activeStatus === status ? 'bg-[#cd6332] text-white' : 'text-[rgba(56,112,133,0.7)] hover:text-[#cd6332] hover:bg-[rgba(205,99,50,0.04)]'}`}>
               {status === 'success' && <CheckCircle className="h-2.5 w-2.5" />}
               {status === 'failed' && <XCircle className="h-2.5 w-2.5" />}
               {status === 'all' ? 'All' : status.charAt(0).toUpperCase() + status.slice(1)}
@@ -520,9 +520,9 @@ export default function LendingPage() {
           ))}
         </div>
         <div className="ml-auto flex items-center gap-2 border border-[rgba(56,112,133,0.1)] bg-[#faf9f5] px-3 py-1.5">
-          <Search className="h-3.5 w-3.5 text-[rgba(56,112,133,0.3)]" />
+          <Search className="h-3.5 w-3.5 text-[rgba(56,112,133,0.7)]" />
           <input type="text" placeholder="Search by hash, token, protocol..." value={searchVal} onChange={e => setSearchVal(e.target.value)}
-            className="w-48 bg-transparent text-xs text-[#387085] outline-none placeholder:text-[rgba(56,112,133,0.3)]" />
+            className="w-48 bg-transparent text-xs text-[#387085] outline-none placeholder:text-[rgba(56,112,133,0.7)]" />
         </div>
       </div>
 
@@ -579,13 +579,13 @@ export default function LendingPage() {
                     </div>
                     <div className="lending-hero-identity">
                       <div className="lending-hero-row">
-                        <span className="text-[11px] text-[rgba(56,112,133,0.45)]">Transaction</span>
+                        <span className="text-xs text-[rgba(56,112,133,0.45)]">Transaction</span>
                         <span className="lending-hero-hash" onClick={() => copyText(tx.detail.txHash)}>
                           {tx.detail.txHashShort} <Copy className="h-3 w-3" />
                         </span>
                       </div>
                       <div className="lending-hero-row">
-                        <span className="text-[11px] text-[rgba(56,112,133,0.45)]">Block</span>
+                        <span className="text-xs text-[rgba(56,112,133,0.45)]">Block</span>
                         <span className="lending-hero-block">{tx.detail.block}</span>
                       </div>
                     </div>
@@ -662,11 +662,11 @@ export default function LendingPage() {
                     <div className="lending-bento-card">
                       <div className="lending-card-header"><span className="lending-card-title"><FileText className="h-4 w-4" />Transaction Details</span></div>
                       <div className="lending-detail-list">
-                        <div className="lending-c-row"><span className="lending-c-row-key">{tx.status === 'failed' ? 'Fee (Consumed)' : 'Fee'}</span><span className="lending-c-row-val" style={tx.status === 'failed' ? { color: '#c83232' } : {}}>{tx.detail.overview.fee} <span className="font-mono text-[11px] text-[rgba(56,112,133,0.45)] ml-1">{tx.detail.overview.feeEth}</span> {tx.detail.overview.feePill.text && <span className={`lending-pill ${tx.detail.overview.feePill.type}`}>{tx.detail.overview.feePill.text}</span>}</span></div>
-                        <div className="lending-c-row"><span className="lending-c-row-key">Time</span><span className="lending-c-row-val">{tx.detail.overview.time} <span className="text-[11px] text-[rgba(56,112,133,0.45)] ml-1">{tx.detail.overview.timeDetail}</span></span></div>
+                        <div className="lending-c-row"><span className="lending-c-row-key">{tx.status === 'failed' ? 'Fee (Consumed)' : 'Fee'}</span><span className="lending-c-row-val" style={tx.status === 'failed' ? { color: '#c83232' } : {}}>{tx.detail.overview.fee} <span className="font-mono text-xs text-[rgba(56,112,133,0.45)] ml-1">{tx.detail.overview.feeEth}</span> {tx.detail.overview.feePill.text && <span className={`lending-pill ${tx.detail.overview.feePill.type}`}>{tx.detail.overview.feePill.text}</span>}</span></div>
+                        <div className="lending-c-row"><span className="lending-c-row-key">Time</span><span className="lending-c-row-val">{tx.detail.overview.time} <span className="text-xs text-[rgba(56,112,133,0.45)] ml-1">{tx.detail.overview.timeDetail}</span></span></div>
                         {tx.detail.overview.confirmations && <div className="lending-c-row"><span className="lending-c-row-key">Confirmations</span><span className="lending-c-row-val">{tx.detail.overview.confirmations} <span className={`lending-pill ${tx.detail.overview.confirmPill.type}`}>{tx.detail.overview.confirmPill.text}</span></span></div>}
                         {tx.status === 'failed' && <div className="lending-c-row"><span className="lending-c-row-key">Execution Result</span><span className="lending-c-row-val"><span className="lending-pill error">Reverted</span></span></div>}
-                        <div className="lending-c-row"><span className="lending-c-row-key">Network</span><span className="lending-c-row-val">{tx.detail.overview.network} <span className="text-[11px] text-[rgba(56,112,133,0.45)] ml-1">Mainnet</span></span></div>
+                        <div className="lending-c-row"><span className="lending-c-row-key">Network</span><span className="lending-c-row-val">{tx.detail.overview.network} <span className="text-xs text-[rgba(56,112,133,0.45)] ml-1">Mainnet</span></span></div>
                       </div>
                       <div className="lending-detail-separator"><span className="lending-detail-separator-line" /><span className="lending-detail-separator-label">More Details</span><span className="lending-detail-separator-line" /></div>
                       <div className="lending-detail-list pb-2">
@@ -761,7 +761,7 @@ export default function LendingPage() {
                               <td><span className="lending-addr">{tr.from}</span></td>
                               <td><span className="lending-addr">{tr.to}</span></td>
                               <td><span className={`lending-type-badge ${tr.type === 'IN' ? 'type-in' : 'type-out'}`}>{tr.type}</span></td>
-                              <td className="font-mono text-[11px]">{tr.amount}</td>
+                              <td className="font-mono text-xs">{tr.amount}</td>
                               <td>
                                 <div className="flex items-center gap-2">
                                   <span className={`lending-flow-icon ${tr.tokenIcon}`} style={{ width: 18, height: 18, fontSize: 8 }}>{tr.tokenLetter}</span>
@@ -794,7 +794,7 @@ export default function LendingPage() {
                                 <div className="lending-log-idx">{log.idx}</div>
                                 <div><span className="lending-log-event">{log.event}</span><span className="lending-log-contract">{log.contract}</span></div>
                               </div>
-                              <ChevronDown className={`h-4 w-4 text-[rgba(56,112,133,0.3)] transition-transform ${openLogs[logKey] ? 'rotate-180' : ''}`} />
+                              <ChevronDown className={`h-4 w-4 text-[rgba(56,112,133,0.7)] transition-transform ${openLogs[logKey] ? 'rotate-180' : ''}`} />
                             </div>
                             <div className="lending-log-body">
                               <div className="lending-log-section-label">Address</div>

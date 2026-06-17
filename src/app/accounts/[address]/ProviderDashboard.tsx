@@ -11,7 +11,7 @@ export default function ProviderDashboard({ provider }: { provider: ProviderInfo
   return (
     <div className="flex flex-wrap items-center gap-x-5 gap-y-1.5 border border-[#387085]/10 bg-[#faf9f5] px-5 py-2.5 text-[12px] text-[#387085]/70">
       {/* Connected DApp */}
-      <span className="text-[#387085]/40">Connected to</span>
+      <span className="text-[#387085]/80">Connected to</span>
       <Link
         href={`/accounts/${provider.appAddress}`}
         className="font-medium text-[#14140f] transition-colors hover:text-[#cd6332]"
@@ -24,15 +24,15 @@ export default function ProviderDashboard({ provider }: { provider: ProviderInfo
       {/* Commission */}
       <span>
         <span className="font-semibold text-[#14140f]">{commissionPct}%</span>
-        <span className="ml-1 text-[#387085]/40">commission</span>
+        <span className="ml-1 text-[#387085]/80">commission</span>
       </span>
 
       <span className="text-[#387085]/20">·</span>
 
       {/* Operator Address */}
-      <span className="flex items-center gap-1 text-[#387085]/40">
+      <span className="flex items-center gap-1 text-[#387085]/80">
         Operator
-        <span title={provider.address} className="ml-1 font-mono text-[11px] text-[#387085]/60 break-all">
+        <span title={provider.address} className="ml-1 font-mono text-xs text-[#387085]/80 break-all">
           {provider.address}
         </span>
         <CopyButton text={provider.address} />
@@ -41,9 +41,9 @@ export default function ProviderDashboard({ provider }: { provider: ProviderInfo
       <span className="text-[#387085]/20">·</span>
 
       {/* DApp Address */}
-      <span className="flex items-center gap-1 text-[#387085]/40">
+      <span className="flex items-center gap-1 text-[#387085]/80">
         DApp
-        <span title={provider.appAddress} className="ml-1 font-mono text-[11px] text-[#387085]/60 break-all">
+        <span title={provider.appAddress} className="ml-1 font-mono text-xs text-[#387085]/80 break-all">
           {provider.appAddress}
         </span>
         <CopyButton text={provider.appAddress} />

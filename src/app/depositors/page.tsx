@@ -30,7 +30,7 @@ function CopyIcon({ text }: { text: string }) {
         setCopied(true);
         setTimeout(() => setCopied(false), 1500);
       }}
-      className="ml-1 inline-flex shrink-0 text-[rgba(56,112,133,0.3)] hover:text-[#387085]"
+      className="ml-1 inline-flex shrink-0 text-[rgba(56,112,133,0.7)] hover:text-[#387085]"
       title={copied ? 'Copied!' : 'Copy'}
     >
       <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor">
@@ -197,36 +197,36 @@ export default function DepositorsPage() {
       {/* KPI summary cards */}
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         <div className="border border-[#387085]/10 bg-white p-3">
-          <p className="text-[11px] font-medium uppercase tracking-wide text-[#387085]/50">Total Depositors</p>
+          <p className="text-xs font-medium uppercase tracking-wide text-[#387085]/70">Total Depositors</p>
           <p className="mt-0.5 text-2xl font-semibold text-[#14140f]">{totalDepositors.toLocaleString()}</p>
-          <p className="mt-0.5 text-xs text-[#387085]/40">{borrowingCount} borrowing</p>
+          <p className="mt-0.5 text-xs text-[#387085]/80">{borrowingCount} borrowing</p>
         </div>
         <div className="border border-[#387085]/10 bg-white p-3">
-          <p className="flex items-center gap-1 text-[11px] font-medium uppercase tracking-wide text-[#387085]/50">
+          <p className="flex items-center gap-1 text-xs font-medium uppercase tracking-wide text-[#387085]/70">
             Total Borrowed
-            <svg className="h-3 w-3 text-[#387085]/30" fill="none" viewBox="0 0 24 24" strokeWidth="1.8" stroke="currentColor">
+            <svg className="h-3 w-3 text-[#387085]/70" fill="none" viewBox="0 0 24 24" strokeWidth="1.8" stroke="currentColor">
               <title>Total debt borrowed against deposited collateral</title>
               <path strokeLinecap="round" strokeLinejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z" />
             </svg>
           </p>
           <p className="mt-0.5 text-2xl font-semibold text-[#14140f]">${totalBorrowedUsd.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</p>
-          <p className="mt-0.5 text-xs text-[#387085]/40">Utilization {utilizationRate}%</p>
+          <p className="mt-0.5 text-xs text-[#387085]/80">Utilization {utilizationRate}%</p>
         </div>
         <div className="border border-[#387085]/10 bg-white p-3">
-          <p className="flex items-center gap-1 text-[11px] font-medium uppercase tracking-wide text-[#387085]/50">
+          <p className="flex items-center gap-1 text-xs font-medium uppercase tracking-wide text-[#387085]/70">
             Locked BTC
-            <svg className="h-3 w-3 text-[#387085]/30" fill="none" viewBox="0 0 24 24" strokeWidth="1.8" stroke="currentColor">
+            <svg className="h-3 w-3 text-[#387085]/70" fill="none" viewBox="0 0 24 24" strokeWidth="1.8" stroke="currentColor">
               <title>Total BTC currently locked as collateral in active vaults</title>
               <path strokeLinecap="round" strokeLinejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z" />
             </svg>
           </p>
-          <p className="mt-0.5 text-2xl font-semibold text-[#14140f]">{totalBtc.toFixed(2)} <span className="text-sm font-normal text-[#387085]/50">sBTC</span></p>
-          <p className="mt-0.5 text-xs text-[#387085]/40">{toUsd(totalBtc)}</p>
+          <p className="mt-0.5 text-2xl font-semibold text-[#14140f]">{totalBtc.toFixed(2)} <span className="text-sm font-normal text-[#387085]/70">sBTC</span></p>
+          <p className="mt-0.5 text-xs text-[#387085]/80">{toUsd(totalBtc)}</p>
         </div>
         <div className="border border-[#387085]/10 bg-white p-3">
-          <p className="text-[11px] font-medium uppercase tracking-wide text-[#387085]/50">Active Vaults</p>
+          <p className="text-xs font-medium uppercase tracking-wide text-[#387085]/70">Active Vaults</p>
           <p className="mt-0.5 text-2xl font-semibold text-[#14140f]">{activeVaultCount.toLocaleString()}</p>
-          <p className="mt-0.5 text-xs text-[#387085]/40">of {vaults.length}</p>
+          <p className="mt-0.5 text-xs text-[#387085]/80">of {vaults.length}</p>
         </div>
       </div>
 
@@ -236,11 +236,11 @@ export default function DepositorsPage() {
           <div className="flex items-center justify-between">
             <div>
               <h2 className="text-sm font-semibold text-[#14140f]">New Depositors</h2>
-              <p className="mt-0.5 text-[11px] text-[#387085]/50">Weekly new depositors</p>
+              <p className="mt-0.5 text-xs text-[#387085]/70">Weekly new depositors</p>
             </div>
             <div className="text-right">
               <span className="text-lg font-semibold text-[#cd6332]">+{totalNewDepositors}</span>
-              <p className="text-[10px] text-[#387085]/40">{chartPeriod === 'ALL' ? 'all time' : chartPeriod.toLowerCase()}</p>
+              <p className="text-xs text-[#387085]/80">{chartPeriod === 'ALL' ? 'all time' : chartPeriod.toLowerCase()}</p>
             </div>
           </div>
           <div className="mt-2 flex items-center justify-end gap-1">
@@ -248,10 +248,10 @@ export default function DepositorsPage() {
               <button
                 key={p}
                 onClick={() => setChartPeriod(p)}
-                className={`rounded-none px-2.5 py-1 text-[11px] font-medium transition-colors ${
+                className={`rounded-none px-2.5 py-1 text-xs font-medium transition-colors ${
                   chartPeriod === p
                     ? 'bg-[#cd6332] text-white'
-                    : 'text-[rgba(56,112,133,0.6)] hover:text-[#cd6332]'
+                    : 'text-[rgba(56,112,133,0.8)] hover:text-[#cd6332]'
                 }`}
               >
                 {p}
@@ -293,21 +293,21 @@ export default function DepositorsPage() {
         <div className="flex items-center gap-5 border-t border-[#387085]/8 px-5 py-2">
           <div className="flex items-center gap-1.5">
             <span className="h-3 w-3 shrink-0 rounded-sm bg-[#cd6332] opacity-75" />
-            <span className="text-[11px] text-[#387085]/60">New depositors</span>
+            <span className="text-xs text-[#387085]/80">New depositors</span>
           </div>
           <div className="flex items-center gap-1.5">
             <span className="h-0.5 w-6 shrink-0 bg-[#387085]" />
-            <span className="text-[11px] text-[#387085]/60">Total (cumulative)</span>
+            <span className="text-xs text-[#387085]/80">Total (cumulative)</span>
           </div>
         </div>
       </section>
 
       {/* Results count + Pagination */}
       <div className="flex items-center justify-between">
-        <p className="text-sm text-[rgba(56,112,133,0.5)]">
+        <p className="text-sm text-[rgba(56,112,133,0.7)]">
           Showing all <span className="font-semibold text-[#14140f]">{total}</span> results
         </p>
-        <div className="flex items-center gap-1 text-xs text-[rgba(56,112,133,0.5)]">
+        <div className="flex items-center gap-1 text-xs text-[rgba(56,112,133,0.7)]">
           <button onClick={() => setPage(1)} disabled={safePage <= 1} className="rounded px-1.5 py-1 hover:bg-[rgba(56,112,133,0.05)] disabled:opacity-30">«</button>
           <button onClick={() => setPage(safePage - 1)} disabled={safePage <= 1} className="rounded px-1.5 py-1 hover:bg-[rgba(56,112,133,0.05)] disabled:opacity-30">‹</button>
           <span className="px-2 text-[#14140f]">Page <span className="font-semibold">{safePage}</span> of <span className="font-semibold">{totalPages}</span></span>
@@ -320,7 +320,7 @@ export default function DepositorsPage() {
       <div className="overflow-x-auto rounded-none border border-[#cd6332]/20 bg-white">
           <table className="w-full text-left text-xs">
           <thead>
-            <tr className="bg-[#cd6332] text-[11px] font-medium uppercase tracking-wider text-white">
+            <tr className="bg-[#cd6332] text-xs font-medium uppercase tracking-wider text-white">
               <th className="whitespace-nowrap px-4 py-2.5 font-medium w-12">#</th>
               <th className="whitespace-nowrap px-4 py-2.5 font-medium">Address</th>
               <th className="whitespace-nowrap px-4 py-2.5 font-medium cursor-pointer select-none" onClick={() => handleSort('totalVaults')}>
@@ -340,10 +340,10 @@ export default function DepositorsPage() {
               const rank = (safePage - 1) * PAGE_SIZE + i + 1;
               return (
                 <tr key={d.address} className="h-10 border-b border-[#cd6332]/10 transition-colors hover:bg-[rgba(56,112,133,0.03)]">
-                  <td className="whitespace-nowrap px-4 py-2.5 text-[rgba(56,112,133,0.5)]">{rank}</td>
+                  <td className="whitespace-nowrap px-4 py-2.5 text-[rgba(56,112,133,0.7)]">{rank}</td>
                   <td className="whitespace-nowrap px-4 py-2.5">
                     <div className="flex items-center">
-                      <Link href={`/accounts/${d.address}`} className="font-mono text-[11px] font-medium text-[#cd6332] hover:text-[#b8562b]">
+                      <Link href={`/accounts/${d.address}`} className="font-mono text-xs font-medium text-[#cd6332] hover:text-[#b8562b]">
                         {truncateAddress(d.address, 6, 4)}
                       </Link>
                       <CopyIcon text={d.address} />
@@ -352,10 +352,10 @@ export default function DepositorsPage() {
                   <td className="whitespace-nowrap px-4 py-2.5 tabular-nums text-[#14140f]">{d.totalVaults}</td>
                   <td className="whitespace-nowrap px-4 py-2.5 tabular-nums text-[#5a8a3c]">{d.activeVaults}</td>
                   <td className="whitespace-nowrap px-4 py-2.5 tabular-nums">
-                    <div className="text-[#14140f]">{d.totalBtc.toFixed(4)} <span className="text-[rgba(56,112,133,0.5)]">sBTC</span></div>
-                    <div className="text-[10px] text-[#387085]/40">{toUsd(d.totalBtc)}</div>
+                    <div className="text-[#14140f]">{d.totalBtc.toFixed(4)} <span className="text-[rgba(56,112,133,0.7)]">sBTC</span></div>
+                    <div className="text-xs text-[#387085]/80">{toUsd(d.totalBtc)}</div>
                   </td>
-                  <td className="whitespace-nowrap px-4 py-2.5 text-[rgba(56,112,133,0.5)]">
+                  <td className="whitespace-nowrap px-4 py-2.5 text-[rgba(56,112,133,0.7)]">
                     {formatRelativeTime(d.firstDeposit)}
                   </td>
                 </tr>

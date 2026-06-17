@@ -43,7 +43,7 @@ function truncateTx(hash: string): string {
 function DetailRow({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div className="flex flex-col gap-1 py-3 sm:flex-row sm:items-start sm:gap-4">
-      <span className="w-36 shrink-0 text-xs text-[rgba(56,112,133,0.55)]">{label}</span>
+      <span className="w-36 shrink-0 text-xs text-[rgba(56,112,133,0.7)]">{label}</span>
       <div className="flex min-w-0 flex-1 items-center gap-1 text-sm text-[#14140f]">
         {children}
       </div>
@@ -165,22 +165,19 @@ function DualChainRow({ row, isLast }: { row: TimelineRow; isLast: boolean }) {
       <div className="flex items-center pr-4 py-2">
         {btc ? (
           <div className="w-full rounded border border-[#387085]/10 bg-[#faf9f5]/60 p-3 text-right">
-            <div className="flex items-start justify-between gap-2">
-              <span className="shrink-0 whitespace-nowrap text-[10px] tabular-nums text-[#387085]/40 text-left">
-                {formatRelativeTime(evmEvent.timestamp)} ({formatDateTime(evmEvent.timestamp)})
-              </span>
+            <div className="flex items-start justify-end gap-2">
               <span className="text-[12px] font-semibold text-[#14140f]">{btc.label}</span>
             </div>
-            <p className="mt-1 text-[10px] leading-relaxed text-[#387085]/50">{btc.description}</p>
+            <p className="mt-1 text-xs leading-relaxed text-[#387085]/70">{btc.description}</p>
             <div className="mt-1.5 flex flex-wrap items-center justify-end gap-x-2.5 gap-y-0.5">
               <span className="inline-flex items-center gap-1">
-                <span className="text-[9px] font-medium uppercase tracking-wide text-[#387085]/35">TXN</span>
+                <span className="text-[9px] font-medium uppercase tracking-wide text-[#387085]/70">TXN</span>
                 <span className="flex h-3.5 w-3.5 shrink-0 items-center justify-center rounded-full bg-orange-100 text-[8px] font-bold text-orange-600">₿</span>
                 <a
                   href={`https://mempool.space/signet/tx/${btc.tx_hash}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="font-mono text-[10px] text-orange-600/70 hover:text-orange-600 hover:underline"
+                  className="font-mono text-xs text-orange-600/70 hover:text-orange-600 hover:underline"
                 >
                   {truncateTx(btc.tx_hash)}
                 </a>
@@ -212,21 +209,21 @@ function DualChainRow({ row, isLast }: { row: TimelineRow; isLast: boolean }) {
                 <span className="rounded-full bg-[#cd6332] px-1.5 py-0.5 text-[9px] font-medium text-white">Current</span>
               )}
             </div>
-            <span className="shrink-0 whitespace-nowrap text-[10px] tabular-nums text-[#387085]/40">
+            <span className="shrink-0 whitespace-nowrap text-xs tabular-nums text-[#387085]/80">
               {formatRelativeTime(evmEvent.timestamp)} ({formatDateTime(evmEvent.timestamp)})
             </span>
           </div>
-          <p className="mt-1 text-[10px] leading-relaxed text-[#387085]/55">{evmMeta.desc}</p>
+          <p className="mt-1 text-xs leading-relaxed text-[#387085]/55">{evmMeta.desc}</p>
           <div className="mt-1.5 flex flex-wrap items-center gap-x-2.5 gap-y-0.5">
             <span className="inline-flex items-center gap-1">
-              <span className="text-[9px] font-medium uppercase tracking-wide text-[#387085]/35">Block</span>
-              <span className="font-mono text-[10px] text-[#387085]/40">#{evmEvent.block_number.toLocaleString()}</span>
+              <span className="text-[9px] font-medium uppercase tracking-wide text-[#387085]/70">Block</span>
+              <span className="font-mono text-xs text-[#387085]/80">#{evmEvent.block_number.toLocaleString()}</span>
             </span>
             <span className="inline-flex items-center gap-1">
-              <span className="text-[9px] font-medium uppercase tracking-wide text-[#387085]/35">TXN</span>
+              <span className="text-[9px] font-medium uppercase tracking-wide text-[#387085]/70">TXN</span>
               <Link
                 href={`/tx/${evmEvent.tx_hash}`}
-                className="font-mono text-[10px] text-[#cd6332] hover:underline"
+                className="font-mono text-xs text-[#cd6332] hover:underline"
               >
                 {truncateTx(evmEvent.tx_hash)}
               </Link>
@@ -234,8 +231,8 @@ function DualChainRow({ row, isLast }: { row: TimelineRow; isLast: boolean }) {
             </span>
             {evmMeta.role && (
               <span className="inline-flex items-center gap-1">
-                <span className="text-[9px] font-medium uppercase tracking-wide text-[#387085]/35">Depositor</span>
-                <Link href={`/accounts/${evmEvent.depositor}`} className="font-mono text-[10px] text-[#387085]/40 hover:text-[#387085] hover:underline">{truncateTx(evmEvent.depositor)}</Link>
+                <span className="text-[9px] font-medium uppercase tracking-wide text-[#387085]/70">Depositor</span>
+                <Link href={`/accounts/${evmEvent.depositor}`} className="font-mono text-xs text-[#387085]/80 hover:text-[#387085] hover:underline">{truncateTx(evmEvent.depositor)}</Link>
                 <CopyButton text={evmEvent.depositor} />
               </span>
             )}
@@ -264,39 +261,39 @@ function MobileTimelineRow({ row, isLast }: { row: TimelineRow; isLast: boolean 
       {/* Content */}
       <div className="min-w-0 flex-1 pb-1">
         {delta !== null && (
-          <span className="text-[8px] tabular-nums text-[#387085]/30">+{formatDelta(delta)}</span>
+          <span className="text-[8px] tabular-nums text-[#387085]/70">+{formatDelta(delta)}</span>
         )}
         {/* EVM */}
         <div className="flex flex-wrap items-center gap-1.5">
-          <span className="text-[11px] font-semibold text-[#14140f]">{evmMeta.label}</span>
+          <span className="text-xs font-semibold text-[#14140f]">{evmMeta.label}</span>
           {isCurrent && (
             <span className="rounded-full bg-[#cd6332] px-1.5 py-0.5 text-[9px] font-medium text-white">Current</span>
           )}
           {evmMeta.role && (
-            <span className="text-[9px] text-[#387085]/40">
+            <span className="text-[9px] text-[#387085]/80">
               by <Link href={`/accounts/${evmEvent.depositor}`} className="font-mono hover:text-[#387085] hover:underline">{truncateTx(evmEvent.depositor)}</Link>
             </span>
           )}
         </div>
-        <p className="mt-0.5 text-[9px] text-[#387085]/30">
+        <p className="mt-0.5 text-[9px] text-[#387085]/70">
           {formatRelativeTime(evmEvent.timestamp)} ({formatDateTime(evmEvent.timestamp)})
         </p>
-        <p className="text-[10px] text-[#387085]/55">{evmMeta.desc}</p>
-        <div className="mt-1 flex flex-wrap items-center gap-2 text-[10px]">
+        <p className="text-xs text-[#387085]/55">{evmMeta.desc}</p>
+        <div className="mt-1 flex flex-wrap items-center gap-2 text-xs">
           <span className="inline-flex items-center gap-1">
-            <span className="text-[9px] font-medium uppercase tracking-wide text-[#387085]/35">Block</span>
-            <span className="font-mono text-[#387085]/40">#{evmEvent.block_number.toLocaleString()}</span>
+            <span className="text-[9px] font-medium uppercase tracking-wide text-[#387085]/70">Block</span>
+            <span className="font-mono text-[#387085]/80">#{evmEvent.block_number.toLocaleString()}</span>
           </span>
           <span className="inline-flex items-center gap-1">
-            <span className="text-[9px] font-medium uppercase tracking-wide text-[#387085]/35">TXN</span>
+            <span className="text-[9px] font-medium uppercase tracking-wide text-[#387085]/70">TXN</span>
             <Link href={`/tx/${evmEvent.tx_hash}`} className="font-mono text-[#cd6332] hover:underline">
               {truncateTx(evmEvent.tx_hash)}
             </Link>
           </span>
           {evmMeta.role && (
             <span className="inline-flex items-center gap-1">
-              <span className="text-[9px] font-medium uppercase tracking-wide text-[#387085]/35">Depositor</span>
-              <Link href={`/accounts/${evmEvent.depositor}`} className="font-mono text-[#387085]/40 hover:text-[#387085] hover:underline">{truncateTx(evmEvent.depositor)}</Link>
+              <span className="text-[9px] font-medium uppercase tracking-wide text-[#387085]/70">Depositor</span>
+              <Link href={`/accounts/${evmEvent.depositor}`} className="font-mono text-[#387085]/80 hover:text-[#387085] hover:underline">{truncateTx(evmEvent.depositor)}</Link>
               <CopyButton text={evmEvent.depositor} />
             </span>
           )}
@@ -305,13 +302,10 @@ function MobileTimelineRow({ row, isLast }: { row: TimelineRow; isLast: boolean 
         {/* BTC (inline card) */}
         {btc && (
           <div className="mt-2 rounded border border-orange-200/50 bg-orange-50/30 px-2.5 py-1.5">
-            <span className="text-[10px] font-semibold text-[#14140f]">{btc.label}</span>
-            <p className="mt-0.5 text-[9px] text-[#387085]/30">
-              {formatRelativeTime(evmEvent.timestamp)} ({formatDateTime(evmEvent.timestamp)})
-            </p>
-            <p className="mt-0.5 text-[9px] text-[#387085]/50">{btc.description}</p>
+            <span className="text-xs font-semibold text-[#14140f]">{btc.label}</span>
+            <p className="mt-0.5 text-[9px] text-[#387085]/70">{btc.description}</p>
             <div className="mt-1 flex items-center gap-1">
-              <span className="text-[8px] font-medium uppercase tracking-wide text-[#387085]/35">TXN</span>
+              <span className="text-[8px] font-medium uppercase tracking-wide text-[#387085]/70">TXN</span>
               <span className="flex h-3.5 w-3.5 shrink-0 items-center justify-center rounded-full bg-orange-100 text-[8px] font-bold text-orange-600">₿</span>
               <a
                 href={`https://mempool.space/signet/tx/${btc.tx_hash}`}
@@ -335,7 +329,7 @@ function MobileTimelineRow({ row, isLast }: { row: TimelineRow; isLast: boolean 
 type TabKey = 'overview' | 'transaction';
 
 export default function VaultDetailTabs({ vault, lifecycle }: Props) {
-  const [activeTab, setActiveTab] = useState<TabKey>('overview');
+  const [activeTab, setActiveTab] = useState<TabKey>('transaction');
   const timeline = buildTimeline(vault, lifecycle);
 
   return (
@@ -343,31 +337,31 @@ export default function VaultDetailTabs({ vault, lifecycle }: Props) {
       {/* ── Tab headers ─────────────────────────────────────────────────── */}
       <div className="flex border-b border-[#387085]/15">
         <button
-          onClick={() => setActiveTab('overview')}
-          className={`relative px-5 py-2.5 text-sm font-medium transition-colors ${
-            activeTab === 'overview'
-              ? 'text-[#cd6332]'
-              : 'text-[#387085]/60 hover:text-[#14140f]'
-          }`}
-        >
-          Overview
-          {activeTab === 'overview' && (
-            <span className="absolute bottom-[-1px] left-5 right-5 h-[2px] bg-[#cd6332]" />
-          )}
-        </button>
-        <button
           onClick={() => setActiveTab('transaction')}
           className={`relative px-5 py-2.5 text-sm font-medium transition-colors ${
             activeTab === 'transaction'
               ? 'text-[#cd6332]'
-              : 'text-[#387085]/60 hover:text-[#14140f]'
+              : 'text-[#387085]/80 hover:text-[#14140f]'
           }`}
         >
           Vault Activity
-          <span className={`ml-1.5 text-[10px] ${activeTab === 'transaction' ? 'text-[#cd6332]/70' : 'text-[#387085]/40'}`}>
+          <span className={`ml-1.5 text-xs ${activeTab === 'transaction' ? 'text-[#cd6332]/70' : 'text-[#387085]/80'}`}>
             {timeline.length}
           </span>
           {activeTab === 'transaction' && (
+            <span className="absolute bottom-[-1px] left-5 right-5 h-[2px] bg-[#cd6332]" />
+          )}
+        </button>
+        <button
+          onClick={() => setActiveTab('overview')}
+          className={`relative px-5 py-2.5 text-sm font-medium transition-colors ${
+            activeTab === 'overview'
+              ? 'text-[#cd6332]'
+              : 'text-[#387085]/80 hover:text-[#14140f]'
+          }`}
+        >
+          Overview
+          {activeTab === 'overview' && (
             <span className="absolute bottom-[-1px] left-5 right-5 h-[2px] bg-[#cd6332]" />
           )}
         </button>
@@ -378,7 +372,7 @@ export default function VaultDetailTabs({ vault, lifecycle }: Props) {
         <div className="space-y-5">
           <div className="border border-[#387085]/10 bg-white px-5 py-2">
             <DetailRow label="Provider">
-              <svg className="h-3.5 w-3.5 shrink-0 text-[#387085]/40" fill="none" viewBox="0 0 24 24" strokeWidth="1.8" stroke="currentColor">
+              <svg className="h-3.5 w-3.5 shrink-0 text-[#387085]/80" fill="none" viewBox="0 0 24 24" strokeWidth="1.8" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 5.25a3 3 0 0 1 3 3m3 0a6 6 0 0 1-7.029 5.912c-.563-.097-1.159.026-1.563.43L10.5 17.25H8.25v2.25H6v2.25H2.25v-2.818c0-.597.237-1.17.659-1.591l6.499-6.499c.404-.404.527-1 .43-1.563A6 6 0 1 1 21.75 8.25Z" />
               </svg>
               <Link
@@ -399,7 +393,7 @@ export default function VaultDetailTabs({ vault, lifecycle }: Props) {
             )}
 
             <DetailRow label="Depositor">
-              <svg className="h-3.5 w-3.5 shrink-0 text-[#387085]/40" fill="none" viewBox="0 0 24 24" strokeWidth="1.8" stroke="currentColor">
+              <svg className="h-3.5 w-3.5 shrink-0 text-[#387085]/80" fill="none" viewBox="0 0 24 24" strokeWidth="1.8" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0" />
               </svg>
               <Link
@@ -424,7 +418,7 @@ export default function VaultDetailTabs({ vault, lifecycle }: Props) {
             <DetailRow label="Requested">
               <div className="flex flex-col gap-0.5">
                 <span className="font-bold">{formatRelativeTime(vault.createdAt)}</span>
-                <span className="text-xs text-[rgba(56,112,133,0.55)]">{formatDateTime(vault.createdAt)}</span>
+                <span className="text-xs text-[rgba(56,112,133,0.7)]">{formatDateTime(vault.createdAt)}</span>
               </div>
             </DetailRow>
 
@@ -432,7 +426,7 @@ export default function VaultDetailTabs({ vault, lifecycle }: Props) {
               {vault.closedAt ? (
                 <div className="flex flex-col gap-0.5">
                   <span className="font-bold">{formatRelativeTime(vault.closedAt)}</span>
-                  <span className="text-xs text-[rgba(56,112,133,0.55)]">{formatDateTime(vault.closedAt)}</span>
+                  <span className="text-xs text-[rgba(56,112,133,0.7)]">{formatDateTime(vault.closedAt)}</span>
                 </div>
               ) : (
                 <span className="text-[rgba(20,20,15,0.35)]">—</span>
@@ -448,7 +442,7 @@ export default function VaultDetailTabs({ vault, lifecycle }: Props) {
 
           {/* Raw Transactions — collapsible */}
           <details className="group border border-[#387085]/10 bg-white" open>
-            <summary className="flex cursor-pointer list-none items-center gap-2 px-5 py-3 text-sm font-medium text-[#387085]/60 transition-colors hover:text-[#14140f]">
+            <summary className="flex cursor-pointer list-none items-center gap-2 px-5 py-3 text-sm font-medium text-[#387085]/80 transition-colors hover:text-[#14140f]">
               <svg
                 className="h-3.5 w-3.5 transition-transform duration-200 group-open:rotate-90"
                 fill="none"
@@ -484,7 +478,7 @@ export default function VaultDetailTabs({ vault, lifecycle }: Props) {
               </DetailRow>
 
               <DetailRow label="HTLC Hashlock">
-                <svg className="h-3.5 w-3.5 shrink-0 text-[#387085]/30" fill="none" viewBox="0 0 24 24" strokeWidth="1.8" stroke="currentColor">
+                <svg className="h-3.5 w-3.5 shrink-0 text-[#387085]/70" fill="none" viewBox="0 0 24 24" strokeWidth="1.8" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z" />
                 </svg>
                 <span className="break-all font-mono text-xs text-[#387085]">{vault.hashlock}</span>
@@ -492,7 +486,7 @@ export default function VaultDetailTabs({ vault, lifecycle }: Props) {
               </DetailRow>
 
               <DetailRow label="HTLC Output Index">
-                <svg className="h-3.5 w-3.5 shrink-0 text-[#387085]/30" fill="none" viewBox="0 0 24 24" strokeWidth="1.8" stroke="currentColor">
+                <svg className="h-3.5 w-3.5 shrink-0 text-[#387085]/70" fill="none" viewBox="0 0 24 24" strokeWidth="1.8" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z" />
                 </svg>
                 <span>0</span>

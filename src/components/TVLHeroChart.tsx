@@ -61,7 +61,7 @@ export default function TVLHeroChart({ data }: TVLHeroChartProps) {
             labels.push(d.toLocaleDateString('en-US', { month: 'short' }));
           }
           return labels.map((l, i) => (
-            <span key={i} className="text-[10px] text-[rgba(56,112,133,0.35)]">{l}</span>
+            <span key={i} className="text-xs text-[rgba(56,112,133,0.35)]">{l}</span>
           ));
         })()}
       </div>

@@ -66,21 +66,21 @@ export default function ProviderPositions() {
       <div className="flex items-center justify-between border-b border-[#387085]/10 px-5 py-3">
         <div>
           <h2 className="text-sm font-semibold text-[#14140f]">Aave Position Health</h2>
-          <p className="mt-0.5 text-[11px] text-[#387085]/50">
+          <p className="mt-0.5 text-xs text-[#387085]/70">
             Sorted by health factor · lowest first
           </p>
         </div>
         <div className="flex items-center gap-2">
           {counts.Liquidation + counts['At Risk'] > 0 ? (
-            <span className="inline-flex items-center gap-1 border border-red-200/60 bg-red-50 px-2 py-0.5 text-[10px] font-medium text-red-600">
+            <span className="inline-flex items-center gap-1 border border-red-200/60 bg-red-50 px-2 py-0.5 text-xs font-medium text-red-600">
               ⚠ {counts.Liquidation + counts['At Risk']} at risk
             </span>
           ) : (
-            <span className="inline-flex items-center gap-1 bg-green-50 px-2 py-0.5 text-[10px] font-medium text-green-700">
+            <span className="inline-flex items-center gap-1 bg-green-50 px-2 py-0.5 text-xs font-medium text-green-700">
               ✓ All healthy
             </span>
           )}
-          <span className="text-[11px] text-[#387085]/40">{positions.length} borrowers</span>
+          <span className="text-xs text-[#387085]/80">{positions.length} borrowers</span>
         </div>
       </div>
 
@@ -94,10 +94,10 @@ export default function ProviderPositions() {
             <button
               key={opt.key}
               onClick={() => setFilter(opt.key)}
-              className={`rounded-full px-2.5 py-1 text-[10px] font-medium transition-colors ${
+              className={`rounded-full px-2.5 py-1 text-xs font-medium transition-colors ${
                 isActive
                   ? 'bg-[#cd6332] text-white'
-                  : 'bg-[#387085]/8 text-[#387085]/60 hover:bg-[#387085]/15'
+                  : 'bg-[#387085]/8 text-[#387085]/80 hover:bg-[#387085]/15'
               }`}
             >
               {opt.label}
@@ -111,7 +111,7 @@ export default function ProviderPositions() {
       {/* Position rows */}
       <div className="divide-y divide-[#387085]/8">
         {filtered.length === 0 ? (
-          <p className="py-10 text-center text-sm text-[#387085]/40">No positions match this filter.</p>
+          <p className="py-10 text-center text-sm text-[#387085]/80">No positions match this filter.</p>
         ) : (
           filtered.map((position) => {
             const hf          = parseFloat(position.healthFactor);
@@ -137,14 +137,14 @@ export default function ProviderPositions() {
                   {/* Left: status badge + address + distance */}
                   <div className="flex min-w-0 flex-col gap-1">
                     <div className="flex items-center gap-2">
-                      <span className={`flex-shrink-0 rounded-full px-2 py-0.5 text-[10px] font-semibold ${status.bg} ${status.text}`}>
+                      <span className={`flex-shrink-0 rounded-full px-2 py-0.5 text-xs font-semibold ${status.bg} ${status.text}`}>
                         {isLiquidation && '⚠ '}{status.label}
                       </span>
                       <span className="truncate font-mono text-xs text-[#cd6332]">
                         {position.depositor}
                       </span>
                     </div>
-                    <p className={`text-[10px] ${isLiquidation ? 'font-medium text-red-500' : 'text-[#387085]/40'}`}>
+                    <p className={`text-xs ${isLiquidation ? 'font-medium text-red-500' : 'text-[#387085]/80'}`}>
                       {distance}
                     </p>
                   </div>
@@ -153,11 +153,11 @@ export default function ProviderPositions() {
                   <div className="flex flex-shrink-0 items-start gap-5 text-right">
                     {/* Collateral */}
                     <div>
-                      <p className="text-[10px] uppercase tracking-wide text-[#387085]/40">Collateral</p>
+                      <p className="text-xs uppercase tracking-wide text-[#387085]/80">Collateral</p>
                       <p className="text-sm font-semibold text-[#14140f]">
                         {coll.toFixed(4)}
-                        <span className="ml-1 text-[11px] font-normal text-[#387085]/40">sBTC</span>
-                        <span className="ml-1 text-[10px] font-normal text-[#387085]/30">{toUsd(coll)}</span>
+                        <span className="ml-1 text-xs font-normal text-[#387085]/80">sBTC</span>
+                        <span className="ml-1 text-xs font-normal text-[#387085]/70">{toUsd(coll)}</span>
                       </p>
                     </div>
 
@@ -167,13 +167,13 @@ export default function ProviderPositions() {
                       const interest = parseAmount(debt.accruedInterest, debt.decimals);
                       return (
                         <div key={i}>
-                          <p className="text-[10px] uppercase tracking-wide text-[#387085]/40">Debt</p>
+                          <p className="text-xs uppercase tracking-wide text-[#387085]/80">Debt</p>
                           <p className="text-sm font-semibold text-[#cd6332]">
                             {total.toLocaleString('en-US', { maximumFractionDigits: 2 })}
-                            <span className="ml-1 text-[11px] font-normal text-[#387085]/40">{debt.symbol}</span>
+                            <span className="ml-1 text-xs font-normal text-[#387085]/80">{debt.symbol}</span>
                           </p>
                           {interest > 0 && (
-                            <p className="text-[10px] text-[#387085]/35">
+                            <p className="text-xs text-[#387085]/70">
                               +{interest.toLocaleString('en-US', { maximumFractionDigits: 4 })} interest
                             </p>
                           )}
@@ -183,7 +183,7 @@ export default function ProviderPositions() {
 
                     {/* LTV + progress bar */}
                     <div className="w-20">
-                      <p className="text-[10px] uppercase tracking-wide text-[#387085]/40">LTV</p>
+                      <p className="text-xs uppercase tracking-wide text-[#387085]/80">LTV</p>
                       <p className="text-sm font-semibold" style={{ color: ltvColor }}>
                         {position.currentLtv}%
                       </p>
@@ -193,12 +193,12 @@ export default function ProviderPositions() {
                           style={{ width: `${ltvFillPct}%`, background: ltvColor, opacity: 0.8 }}
                         />
                       </div>
-                      <p className="mt-0.5 text-[9px] text-[#387085]/30">of {MAX_LTV}% max</p>
+                      <p className="mt-0.5 text-[9px] text-[#387085]/70">of {MAX_LTV}% max</p>
                     </div>
 
                     {/* Health Factor */}
                     <div>
-                      <p className="text-[10px] uppercase tracking-wide text-[#387085]/40">Health</p>
+                      <p className="text-xs uppercase tracking-wide text-[#387085]/80">Health</p>
                       <p className="text-sm font-semibold" style={{ color: status.color }}>
                         {hf.toFixed(2)}
                       </p>
