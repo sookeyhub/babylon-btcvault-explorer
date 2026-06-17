@@ -124,11 +124,6 @@ function formatDelta(ms: number): string {
   return `${h}h ${m % 60}m`;
 }
 
-function formatTime(ts: string): string {
-  const d = new Date(ts);
-  return d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false, timeZone: 'UTC' }) + ' UTC';
-}
-
 interface TimelineRow {
   evmEvent: VaultLifecycleEvent;
   evmMeta: { status: VaultStatus; label: string; desc: string; role?: string };
@@ -160,19 +155,24 @@ function buildTimeline(vault: VaultData, lifecycle: VaultLifecycleEvent[]): Time
 /* ── Desktop dual-chain row ──────────────────────────────────────────────── */
 
 function DualChainRow({ row, isLast }: { row: TimelineRow; isLast: boolean }) {
-  const { evmEvent, evmMeta, isCurrent, delta } = row;
+  const { evmEvent, evmMeta, isCurrent } = row;
   const btc = evmEvent.btc;
   const iconStyle = STATUS_ICON_STYLES[evmMeta.status] ?? STATUS_ICON_STYLES.Pending;
 
   return (
-    <div className="relative grid grid-cols-[1fr_56px_1fr] gap-0">
-      {/* ── LEFT: BTC L1 (simplified) ─────────────────────────────── */}
-      <div className="flex justify-end pr-4 py-3">
+    <div className="relative grid grid-cols-[1fr_40px_1fr] gap-0">
+      {/* ── LEFT: BTC L1 (mirrored layout) ────────────────────────── */}
+      <div className="pr-4 py-3">
         {btc ? (
-          <div className="max-w-[320px] text-right">
-            <span className="text-[11px] font-semibold text-[#14140f]">{btc.label}</span>
-            <p className="mt-0.5 text-[10px] leading-relaxed text-[#387085]/50">{btc.description}</p>
-            <div className="mt-1 flex items-center justify-end gap-x-2 gap-y-0.5">
+          <div className="text-right">
+            <div className="flex items-start justify-between gap-2">
+              <span className="shrink-0 whitespace-nowrap text-[10px] tabular-nums text-[#387085]/40 text-left">
+                {formatRelativeTime(evmEvent.timestamp)} ({formatDateTime(evmEvent.timestamp)})
+              </span>
+              <span className="text-[12px] font-semibold text-[#14140f]">{btc.label}</span>
+            </div>
+            <p className="mt-1 text-[10px] leading-relaxed text-[#387085]/50">{btc.description}</p>
+            <div className="mt-1.5 flex flex-wrap items-center justify-end gap-x-2.5 gap-y-0.5">
               <span className="inline-flex items-center gap-1">
                 <span className="text-[9px] font-medium uppercase tracking-wide text-[#387085]/35">TXN</span>
                 <span className="flex h-3.5 w-3.5 shrink-0 items-center justify-center rounded-full bg-orange-100 text-[8px] font-bold text-orange-600">₿</span>
@@ -195,53 +195,31 @@ function DualChainRow({ row, isLast }: { row: TimelineRow; isLast: boolean }) {
         )}
       </div>
 
-      {/* ── CENTER: Spine with time + ago ──────────────────────────── */}
+      {/* ── CENTER: Spine with milestone icon ────────────────────── */}
       <div className="relative flex flex-col items-center">
-        {/* Connector line top */}
         <div className="w-px flex-1 bg-[#387085]/15" />
-        {/* Time label */}
-        <div className="relative z-10 flex shrink-0 flex-col items-center py-1">
-          <span className="whitespace-nowrap text-[8px] font-medium tabular-nums text-[#387085]/50">
-            {formatTime(evmEvent.timestamp)}
-          </span>
-          <span className="whitespace-nowrap text-[7px] text-[#387085]/30">
-            {formatRelativeTime(evmEvent.timestamp)}
-          </span>
-          {delta !== null && (
-            <span className="mt-0.5 whitespace-nowrap text-[7px] tabular-nums text-[#387085]/25">
-              Δ {formatDelta(delta)}
-            </span>
-          )}
+        <div className="relative z-10">
+          <MilestoneIcon icon={iconStyle.icon} bg={iconStyle.bg} color={iconStyle.color} isCurrent={isCurrent} />
         </div>
-        {/* Connector line bottom */}
-        {!isLast && <div className="w-px flex-1 bg-[#387085]/15" />}
-        {isLast && <div className="w-px flex-1" />}
+        {!isLast ? <div className="w-px flex-1 bg-[#387085]/15" /> : <div className="w-px flex-1" />}
       </div>
 
-      {/* ── RIGHT: EVM (milestone format) ─────────────────────────── */}
+      {/* ── RIGHT: EVM (mirrored from left) ──────────────────────── */}
       <div className="pl-4 py-3">
-        <div className="max-w-[380px]">
-          {/* Icon + Label + Current badge + Depositor */}
-          <div className="flex items-center gap-2">
-            <MilestoneIcon icon={iconStyle.icon} bg={iconStyle.bg} color={iconStyle.color} isCurrent={isCurrent} />
-            <div className="min-w-0">
-              <div className="flex items-center gap-1.5">
-                <span className="text-[12px] font-semibold text-[#14140f]">{evmMeta.label}</span>
-                {isCurrent && (
-                  <span className="rounded-full bg-[#cd6332] px-1.5 py-0.5 text-[9px] font-medium text-white">Current</span>
-                )}
-                {evmMeta.role && (
-                  <span className="inline-flex items-center gap-1 text-[9px] text-[#387085]/40">
-                    by <Link href={`/accounts/${evmEvent.depositor}`} className="font-mono hover:text-[#387085] hover:underline">{truncateTx(evmEvent.depositor)}</Link>
-                  </span>
-                )}
-              </div>
+        <div>
+          <div className="flex items-start justify-between gap-2">
+            <div className="flex items-center gap-1.5">
+              <span className="text-[12px] font-semibold text-[#14140f]">{evmMeta.label}</span>
+              {isCurrent && (
+                <span className="rounded-full bg-[#cd6332] px-1.5 py-0.5 text-[9px] font-medium text-white">Current</span>
+              )}
             </div>
+            <span className="shrink-0 whitespace-nowrap text-[10px] tabular-nums text-[#387085]/40">
+              {formatRelativeTime(evmEvent.timestamp)} ({formatDateTime(evmEvent.timestamp)})
+            </span>
           </div>
-          {/* Description */}
-          <p className="mt-1 pl-8 text-[10px] leading-relaxed text-[#387085]/55">{evmMeta.desc}</p>
-          {/* Block + TXN inline */}
-          <div className="mt-1.5 flex flex-wrap items-center gap-x-2.5 gap-y-0.5 pl-8">
+          <p className="mt-1 text-[10px] leading-relaxed text-[#387085]/55">{evmMeta.desc}</p>
+          <div className="mt-1.5 flex flex-wrap items-center gap-x-2.5 gap-y-0.5">
             <span className="inline-flex items-center gap-1">
               <span className="text-[9px] font-medium uppercase tracking-wide text-[#387085]/35">Block</span>
               <span className="font-mono text-[10px] text-[#387085]/40">#{evmEvent.block_number.toLocaleString()}</span>
@@ -256,6 +234,13 @@ function DualChainRow({ row, isLast }: { row: TimelineRow; isLast: boolean }) {
               </Link>
               <CopyButton text={evmEvent.tx_hash} />
             </span>
+            {evmMeta.role && (
+              <span className="inline-flex items-center gap-1">
+                <span className="text-[9px] font-medium uppercase tracking-wide text-[#387085]/35">Depositor</span>
+                <Link href={`/accounts/${evmEvent.depositor}`} className="font-mono text-[10px] text-[#387085]/40 hover:text-[#387085] hover:underline">{truncateTx(evmEvent.depositor)}</Link>
+                <CopyButton text={evmEvent.depositor} />
+              </span>
+            )}
           </div>
         </div>
       </div>
@@ -294,20 +279,38 @@ function MobileTimelineRow({ row, isLast }: { row: TimelineRow; isLast: boolean 
               by <Link href={`/accounts/${evmEvent.depositor}`} className="font-mono hover:text-[#387085] hover:underline">{truncateTx(evmEvent.depositor)}</Link>
             </span>
           )}
-          <span className="text-[9px] text-[#387085]/30">{formatRelativeTime(evmEvent.timestamp)}</span>
         </div>
+        <p className="mt-0.5 text-[9px] text-[#387085]/30">
+          {formatRelativeTime(evmEvent.timestamp)} ({formatDateTime(evmEvent.timestamp)})
+        </p>
         <p className="text-[10px] text-[#387085]/55">{evmMeta.desc}</p>
         <div className="mt-1 flex flex-wrap items-center gap-2 text-[10px]">
-          <span className="font-mono text-[#387085]/40">#{evmEvent.block_number.toLocaleString()}</span>
-          <Link href={`/tx/${evmEvent.tx_hash}`} className="font-mono text-[#cd6332] hover:underline">
-            {truncateTx(evmEvent.tx_hash)}
-          </Link>
+          <span className="inline-flex items-center gap-1">
+            <span className="text-[9px] font-medium uppercase tracking-wide text-[#387085]/35">Block</span>
+            <span className="font-mono text-[#387085]/40">#{evmEvent.block_number.toLocaleString()}</span>
+          </span>
+          <span className="inline-flex items-center gap-1">
+            <span className="text-[9px] font-medium uppercase tracking-wide text-[#387085]/35">TXN</span>
+            <Link href={`/tx/${evmEvent.tx_hash}`} className="font-mono text-[#cd6332] hover:underline">
+              {truncateTx(evmEvent.tx_hash)}
+            </Link>
+          </span>
+          {evmMeta.role && (
+            <span className="inline-flex items-center gap-1">
+              <span className="text-[9px] font-medium uppercase tracking-wide text-[#387085]/35">Depositor</span>
+              <Link href={`/accounts/${evmEvent.depositor}`} className="font-mono text-[#387085]/40 hover:text-[#387085] hover:underline">{truncateTx(evmEvent.depositor)}</Link>
+              <CopyButton text={evmEvent.depositor} />
+            </span>
+          )}
         </div>
 
         {/* BTC (inline card) */}
         {btc && (
           <div className="mt-2 rounded border border-orange-200/50 bg-orange-50/30 px-2.5 py-1.5">
             <span className="text-[10px] font-semibold text-[#14140f]">{btc.label}</span>
+            <p className="mt-0.5 text-[9px] text-[#387085]/30">
+              {formatRelativeTime(evmEvent.timestamp)} ({formatDateTime(evmEvent.timestamp)})
+            </p>
             <p className="mt-0.5 text-[9px] text-[#387085]/50">{btc.description}</p>
             <div className="mt-1 flex items-center gap-1">
               <span className="text-[8px] font-medium uppercase tracking-wide text-[#387085]/35">TXN</span>

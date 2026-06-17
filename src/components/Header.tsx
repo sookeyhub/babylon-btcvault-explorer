@@ -30,6 +30,7 @@ export default function Header() {
   const pathname = usePathname();
   const [openMenu, setOpenMenu] = useState<string | null>(null);
   const [darkMode, setDarkMode] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
 
   return (
     <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-sm">
@@ -106,16 +107,32 @@ export default function Header() {
       {/* Bottom bar — Explorer Nav */}
       <div className="border-b border-[#387085]/8 bg-[#faf9f5]">
         <div className="mx-auto flex max-w-[1200px] items-center justify-between px-4 sm:px-6">
-          <nav className="flex items-center">
+          {/* Mobile: hamburger button */}
+          <button
+            onClick={() => setMobileOpen(!mobileOpen)}
+            className="flex h-9 w-9 items-center justify-center text-[#387085]/70 md:hidden"
+            aria-label="Toggle menu"
+          >
+            {mobileOpen ? (
+              <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
+              </svg>
+            ) : (
+              <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+              </svg>
+            )}
+          </button>
+
+          {/* Desktop nav */}
+          <nav className="hidden items-center md:flex">
             {EXPLORER_NAV.map((item) => {
-              // Determine if this nav item (or any of its submenu) is active
               const isActive = item.submenu
                 ? item.submenu.some((sub) => pathname === sub.href || pathname.startsWith(sub.href + '/'))
                 : item.href === '/'
                   ? pathname === '/'
                   : pathname.startsWith(item.href);
 
-              // Items with submenu get a wrapper div for hover
               if (item.submenu) {
                 return (
                   <div
@@ -133,7 +150,6 @@ export default function Header() {
                       }`}
                     >
                       {item.label}
-                      {/* Chevron icon */}
                       <svg
                         className={`h-3 w-3 transition-transform duration-200 ${
                           openMenu === item.label ? 'rotate-180' : ''
@@ -150,9 +166,7 @@ export default function Header() {
                       )}
                     </Link>
 
-                    {/* Dropdown */}
                     {openMenu === item.label && (() => {
-                      // Pick the most specific (longest) submenu href that matches
                       const activeSubHref = item.submenu.reduce<string | null>((best, sub) => {
                         const matches = pathname === sub.href || pathname.startsWith(sub.href + '/');
                         if (!matches) return best;
@@ -194,7 +208,6 @@ export default function Header() {
                 );
               }
 
-              // Regular nav items (no submenu)
               return (
                 <Link
                   key={item.href}
@@ -214,12 +227,12 @@ export default function Header() {
             })}
           </nav>
 
-          {/* Deposit & Borrow — external link button */}
+          {/* Deposit & Borrow — desktop */}
           <a
             href="/lending"
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-1.5 rounded-none border border-[#cd6332]/30 bg-white px-4 py-2 text-[12px] font-semibold text-[#cd6332] transition-all hover:border-[#cd6332] hover:bg-[rgba(205,99,50,0.04)]"
+            className="hidden items-center gap-1.5 rounded-none border border-[#cd6332]/30 bg-white px-4 py-2 text-[12px] font-semibold text-[#cd6332] transition-all hover:border-[#cd6332] hover:bg-[rgba(205,99,50,0.04)] md:flex"
           >
             Deposit &amp; Borrow
             <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor">
@@ -227,6 +240,41 @@ export default function Header() {
             </svg>
           </a>
         </div>
+
+        {/* Mobile dropdown menu */}
+        {mobileOpen && (
+          <div className="border-t border-[#387085]/10 bg-white px-4 py-2 md:hidden">
+            {EXPLORER_NAV.map((item) => {
+              const isActive = item.href === '/'
+                ? pathname === '/'
+                : pathname.startsWith(item.href);
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  onClick={() => setMobileOpen(false)}
+                  className={`block py-2.5 text-[13px] font-medium transition-colors ${
+                    isActive ? 'text-[#cd6332]' : 'text-[#387085]/70'
+                  }`}
+                >
+                  {item.label}
+                </Link>
+              );
+            })}
+            <a
+              href="/lending"
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() => setMobileOpen(false)}
+              className="mt-1 flex items-center gap-1.5 border-t border-[#387085]/10 py-2.5 text-[13px] font-semibold text-[#cd6332]"
+            >
+              Deposit &amp; Borrow
+              <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 6H5.25A2.25 2.25 0 0 0 3 8.25v10.5A2.25 2.25 0 0 0 5.25 21h10.5A2.25 2.25 0 0 0 18 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
+              </svg>
+            </a>
+          </div>
+        )}
       </div>
     </header>
   );

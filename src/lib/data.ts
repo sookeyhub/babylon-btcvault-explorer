@@ -195,36 +195,7 @@ export async function getVaultLifecycle(vaultId: string): Promise<VaultLifecycle
         utxo_value: vault.vaultSize,
       };
     }
-    if (eventType === 'CLAIMABLE_BY') {
-      event.btc = {
-        tx_hash: randHex(64),
-        label: 'PegOut / Claim TX',
-        description: 'Vault UTXO consumed — BTC released to claimer.',
-        block_height: btcBlockBase + 2,
-        confirmations: 1 + Math.floor(rand() * 6),
-        status: rand() > 0.3 ? 'confirmed' : 'mempool',
-      };
-    }
-    if (eventType === 'LIQUIDATED') {
-      event.btc = {
-        tx_hash: randHex(64),
-        label: 'Sweep TX',
-        description: 'Vault UTXO swept by liquidator.',
-        block_height: btcBlockBase + 2,
-        confirmations: 2 + Math.floor(rand() * 8),
-        status: 'confirmed',
-      };
-    }
-    if (eventType === 'EXPIRED') {
-      event.btc = {
-        tx_hash: randHex(64),
-        label: 'Timeout Refund TX',
-        description: 'HTLC timelock expired — depositor reclaims BTC.',
-        block_height: btcBlockBase + 3,
-        confirmations: 4 + Math.floor(rand() * 10),
-        status: 'confirmed',
-      };
-    }
+    // BTC data only for Pre Peg-in (SUBMITTED) and Peg-in (ACTIVATED)
 
     events.push(event);
   }
