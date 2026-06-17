@@ -160,11 +160,11 @@ function DualChainRow({ row, isLast }: { row: TimelineRow; isLast: boolean }) {
   const iconStyle = STATUS_ICON_STYLES[evmMeta.status] ?? STATUS_ICON_STYLES.Pending;
 
   return (
-    <div className="relative grid grid-cols-[1fr_40px_1fr] gap-0">
-      {/* ── LEFT: BTC L1 (mirrored layout) ────────────────────────── */}
-      <div className="pr-4 py-3">
+    <div className="relative grid grid-cols-[2fr_40px_3fr] gap-0">
+      {/* ── LEFT: BTC L1 card ─────────────────────────────────────── */}
+      <div className="flex items-center pr-4 py-2">
         {btc ? (
-          <div className="text-right">
+          <div className="w-full rounded border border-[#387085]/10 bg-[#faf9f5]/60 p-3 text-right">
             <div className="flex items-start justify-between gap-2">
               <span className="shrink-0 whitespace-nowrap text-[10px] tabular-nums text-[#387085]/40 text-left">
                 {formatRelativeTime(evmEvent.timestamp)} ({formatDateTime(evmEvent.timestamp)})
@@ -189,9 +189,7 @@ function DualChainRow({ row, isLast }: { row: TimelineRow; isLast: boolean }) {
             </div>
           </div>
         ) : (
-          <div className="flex items-center py-2">
-            <span className="text-[10px] italic text-[#387085]/20">—</span>
-          </div>
+          <div />
         )}
       </div>
 
@@ -204,9 +202,9 @@ function DualChainRow({ row, isLast }: { row: TimelineRow; isLast: boolean }) {
         {!isLast ? <div className="w-px flex-1 bg-[#387085]/15" /> : <div className="w-px flex-1" />}
       </div>
 
-      {/* ── RIGHT: EVM (mirrored from left) ──────────────────────── */}
-      <div className="pl-4 py-3">
-        <div>
+      {/* ── RIGHT: EVM card ──────────────────────────────────────── */}
+      <div className="flex items-center pl-4 py-2">
+        <div className="w-full rounded border border-[#387085]/10 bg-[#faf9f5]/60 p-3">
           <div className="flex items-start justify-between gap-2">
             <div className="flex items-center gap-1.5">
               <span className="text-[12px] font-semibold text-[#14140f]">{evmMeta.label}</span>
@@ -514,9 +512,9 @@ export default function VaultDetailTabs({ vault, lifecycle }: Props) {
           </details>
         </div>
       ) : (
-        <div className="border border-[#387085]/10 bg-white">
+        <div className="bg-white">
           {/* Desktop: dual-chain timeline */}
-          <div className="hidden px-2 py-4 sm:block">
+          <div className="hidden px-3 py-4 sm:block">
             {timeline.map((row, idx) => (
               <DualChainRow
                 key={row.evmEvent.event_type + idx}
