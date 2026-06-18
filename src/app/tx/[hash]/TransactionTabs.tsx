@@ -133,7 +133,7 @@ const MOCK_CONTEXTS: Record<EventName, CtxShape> = {
           { name: 'onBehalfOf',    type: 'address', value: '0x8c52...e740' },
           { name: 'amount',        type: 'uint256', value: '30000000000', note: '30,000 USDC (6 decimals)' },
           { name: 'interestRateMode', type: 'uint8', value: '2', note: 'Variable rate' },
-          { name: 'borrowRate',    type: 'uint128', value: '52500000000000000', note: '5.25% APY' },
+          { name: 'borrowRate',    type: 'uint128', value: '52500000000000000', note: '5.25% APR' },
           { name: 'referralCode',  type: 'uint16',  value: '0' },
         ],
       },

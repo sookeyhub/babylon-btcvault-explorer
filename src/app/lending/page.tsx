@@ -122,7 +122,7 @@ const TRANSACTIONS: Transaction[] = [
   {
     id: 'tx1', type: 'supply', status: 'success', token: 'ETH', tokenIcon: 'icon-eth', tokenLetter: 'E',
     label: 'Supply ETH', amount: '2.5 ETH', usd: '$4,895', time: '2 mins ago',
-    apy: '3.21% APY', apyType: 'supply',
+    apy: '3.21% APR', apyType: 'supply',
     searchData: '0x8b4e21d93a17 eth supply aave',
     detail: {
       heroTitle: 'Supply Collateral', heroSubtitle: 'Transaction Confirmed',
@@ -133,7 +133,7 @@ const TRANSACTIONS: Transaction[] = [
         dest: 'Aave V3 ETH Reserve', destStyle: 'success', flowDirection: 'supply',
         rows: [
           { key: 'Pool', val: 'ETH Reserve' },
-          { key: 'Supply APY', val: '3.21%', valColor: '#387085' },
+          { key: 'Supply APR', val: '3.21%', valColor: '#387085' },
           { key: 'aToken Received', val: '2.5 aWETH' },
           { key: 'Collateral Enabled', val: 'Yes ✓', pill: { text: 'Yes ✓', type: 'success' } },
         ],
@@ -170,7 +170,7 @@ const TRANSACTIONS: Transaction[] = [
   {
     id: 'tx2', type: 'borrow', status: 'success', token: 'USDC', tokenIcon: 'icon-usdc', tokenLetter: '$',
     label: 'Borrow USDC', amount: '3,000 USDC', usd: '$3,000', time: '6 mins ago',
-    apy: '4.52% APY', apyType: 'borrow',
+    apy: '4.52% APR', apyType: 'borrow',
     searchData: '0x3c9f82a14b56 usdc borrow aave',
     detail: {
       heroTitle: 'Borrow', heroSubtitle: 'Transaction Confirmed',
@@ -181,7 +181,7 @@ const TRANSACTIONS: Transaction[] = [
         toToken: { icon: 'icon-usdc', letter: '$', amount: '3,000 USDC', sub: '≈ $3,000' },
         rows: [
           { key: 'Pool', val: 'USDC Reserve' },
-          { key: 'Borrow APY (Variable)', val: '4.52%', valColor: '#cd6332' },
+          { key: 'APR (Variable)', val: '4.52%', valColor: '#cd6332' },
           { key: 'Debt Token', val: 'variableDebtUSDC' },
           { key: 'Rate Mode', val: '', pill: { text: 'Variable', type: 'brand' } },
         ],
@@ -202,7 +202,7 @@ const TRANSACTIONS: Transaction[] = [
           { key: 'LTV Ratio', from: '14.6%', to: '32.0%' },
           { key: 'Liquidation Threshold', val: '82.5%' },
         ],
-        easyText: 'Borrowed <hl>3,000 USDC</hl> from Aave at a variable rate of <hl>4.52% APY</hl>. Health factor decreased from 2.82 to <hl>2.14</hl> — still healthy. You can still borrow up to $6,156 more.',
+        easyText: 'Borrowed <hl>3,000 USDC</hl> from Aave at a variable rate of <hl>4.52% APR</hl>. Health factor decreased from 2.82 to <hl>2.14</hl> — still healthy. You can still borrow up to $6,156 more.',
       },
       transfers: [
         { from: 'Aave V3 Pool', to: '0xAb3F...c210', type: 'IN', amount: '3,000', tokenIcon: 'icon-usdc', tokenLetter: '$', tokenName: 'USDC' },
@@ -307,7 +307,7 @@ const TRANSACTIONS: Transaction[] = [
   {
     id: 'tx5', type: 'supply', status: 'success', token: 'USDC', tokenIcon: 'icon-usdc', tokenLetter: '$',
     label: 'Supply USDC', amount: '10,000 USDC', usd: '$10,000', time: '30 mins ago',
-    apy: '5.14% APY', apyType: 'supply',
+    apy: '5.14% APR', apyType: 'supply',
     searchData: '0x5e8b12f47a39 usdc supply aave',
     detail: {
       heroTitle: 'Supply Collateral', heroSubtitle: 'Transaction Confirmed',
@@ -318,7 +318,7 @@ const TRANSACTIONS: Transaction[] = [
         dest: 'Aave V3 USDC Reserve', destStyle: 'success', flowDirection: 'supply',
         rows: [
           { key: 'Pool', val: 'USDC Reserve' },
-          { key: 'Supply APY', val: '5.14%', valColor: '#387085' },
+          { key: 'Supply APR', val: '5.14%', valColor: '#387085' },
           { key: 'aToken Received', val: '10,000 aUSDC' },
           { key: 'Collateral Enabled', val: '', pill: { text: 'Yes ✓', type: 'success' } },
         ],
@@ -339,7 +339,7 @@ const TRANSACTIONS: Transaction[] = [
           { key: 'LTV Ratio', from: '41.5%', to: '36.6%' },
           { key: 'Liquidation Threshold', val: '86.0%' },
         ],
-        easyText: 'Deposited <hl>10,000 USDC</hl> as collateral on Aave earning <hl>5.14% APY</hl>. Health factor improved from 1.89 to <hl>2.45</hl>. Estimated yearly earnings: <hl>~$514</hl>.',
+        easyText: 'Deposited <hl>10,000 USDC</hl> as collateral on Aave earning <hl>5.14% APR</hl>. Health factor improved from 1.89 to <hl>2.45</hl>. Estimated yearly earnings: <hl>~$514</hl>.',
       },
       transfers: [
         { from: '0xAb3F...c210', to: 'Aave V3 Pool', type: 'OUT', amount: '10,000', tokenIcon: 'icon-usdc', tokenLetter: '$', tokenName: 'USDC' },
@@ -482,7 +482,7 @@ export default function LendingPage() {
         </DevNoteSection>
         <DevNoteSection heading="2열 레이아웃">
           <p>좌: 트랜잭션 목록 + 확장 상세.</p>
-          <p>우: Lend &amp; Borrow 위젯 (Supply / Borrow 탭, APY, HF 바, 포지션 요약).</p>
+          <p>우: Lend &amp; Borrow 위젯 (Supply / Borrow 탭, APR, HF 바, 포지션 요약).</p>
         </DevNoteSection>
         <DevNoteSection heading="필터 바">
           <p>Type: All / Supply / Borrow / Repay / Withdraw.</p>
@@ -867,7 +867,7 @@ export default function LendingPage() {
                     </div>
                   </div>
                   <div className="lending-widget-info">
-                    <div className="lending-widget-info-row"><span className="lending-widget-info-key">Supply APY</span><span className="lending-widget-info-val" style={{ color: '#387085' }}>3.21%</span></div>
+                    <div className="lending-widget-info-row"><span className="lending-widget-info-key">Supply APR</span><span className="lending-widget-info-val" style={{ color: '#387085' }}>3.21%</span></div>
                     <div className="lending-widget-info-row"><span className="lending-widget-info-key">Collateral Factor</span><span className="lending-widget-info-val">82.5%</span></div>
                     <div className="lending-widget-info-row"><span className="lending-widget-info-key">Est. Yearly Earnings</span><span className="lending-widget-info-val" style={{ color: '#387085' }}>~${supplyYearly.toFixed(2)}</span></div>
                   </div>
@@ -897,7 +897,7 @@ export default function LendingPage() {
                     </div>
                   </div>
                   <div className="lending-widget-info">
-                    <div className="lending-widget-info-row"><span className="lending-widget-info-key">Borrow APY (Variable)</span><span className="lending-widget-info-val" style={{ color: '#cd6332' }}>4.52%</span></div>
+                    <div className="lending-widget-info-row"><span className="lending-widget-info-key">APR (Variable)</span><span className="lending-widget-info-val" style={{ color: '#cd6332' }}>4.52%</span></div>
                     <div className="lending-widget-info-row"><span className="lending-widget-info-key">Available to Borrow</span><span className="lending-widget-info-val">$9,156</span></div>
                   </div>
                   <div className="lending-widget-hf">
@@ -924,7 +924,7 @@ export default function LendingPage() {
                 <div className="lending-widget-position-item"><div className="lending-widget-position-val" style={{ color: '#387085' }}>$17,235</div><div className="lending-widget-position-label">Supplied</div></div>
                 <div className="lending-widget-position-item"><div className="lending-widget-position-val" style={{ color: '#cd6332' }}>$5,520</div><div className="lending-widget-position-label">Borrowed</div></div>
                 <div className="lending-widget-position-item"><div className="lending-widget-position-val" style={{ color: '#387085' }}>2.82</div><div className="lending-widget-position-label">Health Factor</div></div>
-                <div className="lending-widget-position-item"><div className="lending-widget-position-val" style={{ color: '#387085' }}>+1.84%</div><div className="lending-widget-position-label">Net APY</div></div>
+                <div className="lending-widget-position-item"><div className="lending-widget-position-val" style={{ color: '#387085' }}>+1.84%</div><div className="lending-widget-position-label">Net APR</div></div>
               </div>
             </div>
 

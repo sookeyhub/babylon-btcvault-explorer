@@ -171,7 +171,7 @@ export async function getVaultLifecycle(vaultId: string): Promise<VaultLifecycle
       event.btc = {
         tx_hash: randHex(64),
         label: 'Pre Peg-in TX',
-        description: 'BTC deposited into an HTLC output on Bitcoin, awaiting peg-in.',
+        description: 'BTC locked in an HTLC, pending peg-in.',
         block_height: btcBlockBase,
         confirmations: 6 + Math.floor(rand() * 20),
         status: 'confirmed',
@@ -185,7 +185,7 @@ export async function getVaultLifecycle(vaultId: string): Promise<VaultLifecycle
       event.btc = {
         tx_hash: vault.btcPegInTxHash,
         label: 'Peg-in TX',
-        description: 'HTLC output spent into the vault UTXO, locking BTC as collateral.',
+        description: 'BTC committed to the vault UTXO as collateral.',
         block_height: btcBlockBase + 1,
         confirmations: 3 + Math.floor(rand() * 10),
         status: 'confirmed',

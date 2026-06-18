@@ -164,7 +164,7 @@ function getLendingStatus(vaultStatus: VaultStatus): LendingBannerConfig {
   };
 }
 
-function StatusBanner({ status }: { status: VaultStatus }) {
+function StatusBanner({ status, depositorAddress }: { status: VaultStatus; depositorAddress: string }) {
   const cfg = getLendingStatus(status);
 
   return (
@@ -172,10 +172,16 @@ function StatusBanner({ status }: { status: VaultStatus }) {
       <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full ${cfg.iconBg} ${cfg.iconColor}`}>
         {cfg.icon}
       </div>
-      <div className="min-w-0">
+      <div className="min-w-0 flex-1">
         <span className={`text-sm font-semibold ${cfg.labelText}`}>{cfg.status}</span>
         <p className={`text-xs ${cfg.subText}`}>{cfg.desc}</p>
       </div>
+      <Link
+        href={`/accounts/${depositorAddress}?tab=lending`}
+        className="shrink-0 text-xs font-medium text-[#cd6332] hover:underline"
+      >
+        View all Lending Activity ›
+      </Link>
     </div>
   );
 }
@@ -260,7 +266,7 @@ export default async function VaultDetailPage({ params }: Props) {
       </div>
 
       {/* ── Status banner ─────────────────────────────────────────────────── */}
-      <StatusBanner status={vault.status} />
+      <StatusBanner status={vault.status} depositorAddress={vault.depositorAddress} />
 
       {/* ── 4 summary cards ───────────────────────────────────────────────── */}
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
@@ -281,7 +287,6 @@ export default async function VaultDetailPage({ params }: Props) {
             <div className="border border-[#387085]/10 bg-[#faf9f5] p-3">
               <div className="flex items-center justify-between">
                 <p className="text-xs font-medium uppercase tracking-wide text-[#387085]/70">Current Status</p>
-                <button className="text-xs font-medium text-[#cd6332] hover:underline">View all Vault Activity ›</button>
               </div>
               <div className="mt-1 flex items-center gap-2">
                 <StatusIcon status={vault.status} />

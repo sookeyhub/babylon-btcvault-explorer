@@ -360,7 +360,7 @@ export default function VaultDetailTabs({ vault, lifecycle }: Props) {
               : 'text-[#387085]/80 hover:text-[#14140f]'
           }`}
         >
-          Overview
+          Details
           {activeTab === 'overview' && (
             <span className="absolute bottom-[-1px] left-5 right-5 h-[2px] bg-[#cd6332]" />
           )}

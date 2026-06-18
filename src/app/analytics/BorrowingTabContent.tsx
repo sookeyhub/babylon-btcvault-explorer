@@ -297,7 +297,7 @@ export default function BorrowingTabContent() {
                 <th className="whitespace-nowrap px-4 py-2.5 font-medium">Total Borrowed</th>
                 <th className="whitespace-nowrap px-4 py-2.5 font-medium">Available to Borrow</th>
                 <th className="whitespace-nowrap px-4 py-2.5 font-medium">Utilization</th>
-                <th className="whitespace-nowrap px-4 py-2.5 font-medium">Borrow APY</th>
+                <th className="whitespace-nowrap px-4 py-2.5 font-medium">APR</th>
                 <th className="whitespace-nowrap px-4 py-2.5 font-medium">Status</th>
               </tr>
             </thead>

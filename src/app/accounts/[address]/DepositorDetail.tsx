@@ -451,7 +451,7 @@ function PositionDebtsTable() {
           <tr className="bg-[#cd6332] text-xs font-medium uppercase tracking-wider text-white">
             <th className="whitespace-nowrap px-4 py-2.5 font-medium">Assets</th>
             <th className="whitespace-nowrap px-4 py-2.5 font-medium">Amount Borrowed</th>
-            <th className="whitespace-nowrap px-4 py-2.5 font-medium">Borrow APY</th>
+            <th className="whitespace-nowrap px-4 py-2.5 font-medium">APR</th>
             <th className="whitespace-nowrap px-4 py-2.5 font-medium">Interest</th>
             <th className="whitespace-nowrap px-4 py-2.5 font-medium">
               <span className="inline-flex items-center gap-1">
@@ -644,7 +644,7 @@ function PositionsByDApp() {
                   <tr className="border-b border-[#387085]/8 bg-[#faf9f5]">
                     <th className="px-5 py-2 text-left text-xs font-medium uppercase tracking-wide text-[#387085]/80">Assets</th>
                     <th className="px-5 py-2 text-xs font-medium uppercase tracking-wide text-[#387085]/80">Amount Borrowed</th>
-                    <th className="px-5 py-2 text-xs font-medium uppercase tracking-wide text-[#387085]/80">Borrow APY</th>
+                    <th className="px-5 py-2 text-xs font-medium uppercase tracking-wide text-[#387085]/80">APR</th>
                     <th className="px-5 py-2 text-xs font-medium uppercase tracking-wide text-[#387085]/80">Interest</th>
                     <th className="px-5 py-2 text-xs font-medium uppercase tracking-wide text-[#387085]/80">
                       <span className="inline-flex items-center gap-0.5">
@@ -801,7 +801,7 @@ function DAppPositionSection({ position, isFirst }: { position: DAppPosition; is
             <tr className="border-b border-[#387085]/8 bg-[#faf9f5] text-xs font-medium uppercase tracking-wider text-[#387085]/70">
               <th className="whitespace-nowrap px-4 py-2.5 font-medium">Assets</th>
               <th className="whitespace-nowrap px-4 py-2.5 font-medium">Amount Borrowed</th>
-              <th className="whitespace-nowrap px-4 py-2.5 font-medium">Borrow APY</th>
+              <th className="whitespace-nowrap px-4 py-2.5 font-medium">APR</th>
               <th className="whitespace-nowrap px-4 py-2.5 font-medium">Interest</th>
               <th className="whitespace-nowrap px-4 py-2.5 font-medium">
                 <span className="inline-flex items-center gap-1">
@@ -970,12 +970,6 @@ export default function DepositorDetail({ address, vaults }: DepositorDetailProp
         <div className="border border-[#387085]/10 bg-white p-4">
           <div className="flex items-start justify-between">
             <p className="text-xs font-semibold uppercase tracking-wide text-[#387085]/80">Total Debt</p>
-            <button
-              onClick={() => setActiveTab('collateral')}
-              className="text-xs font-medium text-[#cd6332] hover:underline"
-            >
-              View all Assets ›
-            </button>
           </div>
           <p className="mt-1.5 text-2xl font-bold text-[#14140f]">
             $ {debtTotalUsd.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
